@@ -2,8 +2,10 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
-  tags: []
+  serializedVersion: 3
+  tags:
+  - Wall
+  - Door
   layers:
   - Default
   - TransparentFX
@@ -11,9 +13,9 @@ TagManager:
   - 
   - Water
   - UI
-  - 
-  - 
-  - 
+  - Wall
+  - Door
+  - Player
   - 
   - 
   - 
@@ -41,3 +43,17 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Floor
+    uniqueID: 1412049667
+    locked: 0
+  - name: Wall
+    uniqueID: 85979291
+    locked: 0
+  - name: Door
+    uniqueID: 4238252269
+    locked: 0
+  - name: Player
+    uniqueID: 3208294851
+    locked: 0
+  m_RenderingLayers:
+  - Default
