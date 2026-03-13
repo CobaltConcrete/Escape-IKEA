@@ -14,7 +14,7 @@ public class Counter : MonoBehaviour
     {
         count = 0;
         maxCount = 12;
-        counterText.text = count.ToString() + "/" + maxCount.ToString();
+        counterText.text = "Items Found: " + count.ToString() + "/" + maxCount.ToString();
         
     }
 
@@ -26,11 +26,12 @@ public class Counter : MonoBehaviour
         }
     }
 
+    //Increases counter
     public void Increment()
     {
         if (count < maxCount){
             count++;
-            counterText.text = count.ToString() + "/" + maxCount.ToString();
+            counterText.text = "Items Found: " + count.ToString() + "/" + maxCount.ToString();
         }
     }
 }
