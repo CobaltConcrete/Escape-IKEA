@@ -8,11 +8,13 @@ public class Counter : MonoBehaviour
     public TMP_Text counterText;
 
     private int count;
+    private int maxCount;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         count = 0;
-        counterText.text = count.ToString();
+        maxCount = 12;
+        counterText.text = count.ToString() + "/" + maxCount.ToString();
         
     }
 
@@ -26,7 +28,9 @@ public class Counter : MonoBehaviour
 
     public void Increment()
     {
-        count++;
-        counterText.text = count.ToString();
+        if (count < maxCount){
+            count++;
+            counterText.text = count.ToString() + "/" + maxCount.ToString();
+        }
     }
 }
