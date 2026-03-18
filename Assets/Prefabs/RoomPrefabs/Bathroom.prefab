@@ -11,6 +11,7 @@ GameObject:
   - component: {fileID: 6378411985123387850}
   - component: {fileID: 3170246060900774639}
   - component: {fileID: 2841542118079122019}
+  - component: {fileID: 3687688526285434425}
   m_Layer: 0
   m_Name: Bathroom
   m_TagString: Untagged
@@ -103,6 +104,22 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 10, y: 10}
   m_EdgeRadius: 0
+--- !u!114 &3687688526285434425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 520739178390693697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 830a19d33e6764d53b77996d11ebffc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawner: {fileID: 0}
+  enemyCount: 5
+  meatballCount: 2
+  spawnRadius: 3
 --- !u!1 &613285044208628983
 GameObject:
   m_ObjectHideFlags: 0

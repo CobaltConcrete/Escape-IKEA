@@ -1349,6 +1349,7 @@ GameObject:
   - component: {fileID: 3125483003241167705}
   - component: {fileID: 7484418997713642370}
   - component: {fileID: 5256496874783605114}
+  - component: {fileID: -2436559980975748940}
   m_Layer: 0
   m_Name: LivingRoom10x20y
   m_TagString: Untagged
@@ -1443,6 +1444,22 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 10, y: 20}
   m_EdgeRadius: 0
+--- !u!114 &-2436559980975748940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6749980618424993291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 830a19d33e6764d53b77996d11ebffc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawner: {fileID: 0}
+  enemyCount: 5
+  meatballCount: 2
+  spawnRadius: 3
 --- !u!1 &7007382920975324046
 GameObject:
   m_ObjectHideFlags: 0
