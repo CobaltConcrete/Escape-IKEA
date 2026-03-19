@@ -9,7 +9,6 @@ public class Inventory
     private List<Item> itemList;
     private Action<Item> useItemAction;
 
-
     public Inventory(Action<Item> useItemAction)
     {
         this.useItemAction = useItemAction;
@@ -21,6 +20,7 @@ public class Inventory
 
     public void AddItem(Item item)
     {
+        
         if (item.IsStackable())
         {
             bool itemAlreadyInInventory = false;

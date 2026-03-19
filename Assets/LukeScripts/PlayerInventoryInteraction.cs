@@ -11,6 +11,8 @@ public class PlayerInventoryInteraction : MonoBehaviour
     private Coroutine flashCoroutine;
     private Color baseColor;
 
+    [SerializeField] private Dialogue playerDialogue;
+    private bool firstItemFound;
     private void Awake()
     {
         inventory = new Inventory(UseItem);
@@ -18,6 +20,7 @@ public class PlayerInventoryInteraction : MonoBehaviour
 
         playerSpriteRenderer = transform.Find("PlayerSprite").GetComponent<SpriteRenderer>();
         baseColor = playerSpriteRenderer.color;
+        firstItemFound = false;
     }
     private void Start()
     {
@@ -57,6 +60,11 @@ public class PlayerInventoryInteraction : MonoBehaviour
         ItemWorld itemWorld = collider.GetComponent<ItemWorld>();
         if (itemWorld != null && itemWorld.CanBePickedUp())
         {
+            if (!firstItemFound){
+                firstItemFound = true;
+                playerDialogue.ShowDialogue();
+
+            }
             inventory.AddItem(itemWorld.GetItem());
             itemWorld.DestroySelf();
         }
