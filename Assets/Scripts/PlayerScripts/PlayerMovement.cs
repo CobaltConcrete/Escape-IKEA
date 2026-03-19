@@ -1,7 +1,8 @@
 using UnityEngine;
+using System.Collections;
 
 [RequireComponent(typeof(Rigidbody2D))]
-public class PlayerController : MonoBehaviour
+public class PlayerMovement : MonoBehaviour
 {
     [Header("Movement")]
     [SerializeField]
@@ -10,6 +11,10 @@ public class PlayerController : MonoBehaviour
 
     private Rigidbody2D rb;
     private Vector2 move;
+
+    //Speed Pill Stuffs
+    private float originalSpeed;
+    private Coroutine speedCoroutine;
 
     void Start()
     {
@@ -29,6 +34,22 @@ public class PlayerController : MonoBehaviour
     {
         // Move the player
         rb.MovePosition(rb.position + move * speed * Time.fixedDeltaTime);
+    }
+
+    public void BoostSpeedFor10Seconds()
+    {
+        speedCoroutine = StartCoroutine(SpeedBoostRoutine());
+    }
+
+    private IEnumerator SpeedBoostRoutine()
+    {
+        originalSpeed = speed;
+
+        speed = 8f;
+
+        yield return new WaitForSeconds(10f);
+
+        speed = originalSpeed;
     }
 
     // Collide with walls

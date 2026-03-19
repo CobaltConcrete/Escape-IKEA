@@ -8,7 +8,7 @@ public class Item
     {
         Sword,
         HealthPill,
-        AnotherPill,
+        SpeedPill,
         Coin,
         Medkit,
     }
@@ -25,7 +25,7 @@ public class Item
                 return ItemAssets.Instance.swordSprite;
             case ItemType.HealthPill: 
                 return ItemAssets.Instance.healthPillSprite;
-            case ItemType.AnotherPill: 
+            case ItemType.SpeedPill: 
                 return ItemAssets.Instance.anotherPillSprite;
             case ItemType.Coin: 
                 return ItemAssets.Instance.coinSprite;
@@ -43,7 +43,7 @@ public class Item
                 return 1f;
             case ItemType.HealthPill:
                 return 0.75f;
-            case ItemType.AnotherPill:
+            case ItemType.SpeedPill:
                 return 0.75f;
             case ItemType.Coin:
                 return 0.65f;
@@ -61,7 +61,7 @@ public class Item
                 return new Color(1, 1, 1);
             case ItemType.HealthPill:
                 return new Color(1, 0, 0);
-            case ItemType.AnotherPill:
+            case ItemType.SpeedPill:
                 return new Color(0, 0, 1);
             case ItemType.Coin:
                 return new Color(1, 1, 0);
@@ -77,7 +77,7 @@ public class Item
             default:
             case ItemType.Coin:
             case ItemType.HealthPill:
-            case ItemType.AnotherPill:
+            case ItemType.SpeedPill:
                 return true;
             case ItemType.Sword:
             case ItemType.Medkit:

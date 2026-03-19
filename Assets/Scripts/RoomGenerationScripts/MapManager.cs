@@ -141,9 +141,22 @@ public class MapManager : MonoBehaviour
             if (occupied[x, y])
                 continue;
 
+            //if (x == centerX && y == centerY)
+            //{
+            //    Instantiate(startingRoomPrefab, MapToWorld(x, y), Quaternion.identity, transform);
+            //    occupied[x, y] = true;
+            //    continue;
+            //}
+
             if (x == centerX && y == centerY)
             {
-                Instantiate(startingRoomPrefab, MapToWorld(x, y), Quaternion.identity, transform);
+                GameObject startRoomObj = Instantiate(startingRoomPrefab, MapToWorld(x, y), Quaternion.identity, transform);
+
+                if (ItemSpawnManager.Instance != null)
+                {
+                    ItemSpawnManager.Instance.RegisterRoom(startRoomObj, x, y, 1, 1);
+                }
+
                 occupied[x, y] = true;
                 continue;
             }
@@ -205,7 +218,21 @@ public class MapManager : MonoBehaviour
 
     void PlaceRoom(RoomPrefab room, int x, int y)
     {
-        Instantiate(room.prefab, MapToWorld(x, y), Quaternion.identity, transform);
+        //Instantiate(room.prefab, MapToWorld(x, y), Quaternion.identity, transform);
+
+        //for (int dx = 0; dx < room.cellWidth; dx++)
+        //{
+        //    for (int dy = 0; dy < room.cellHeight; dy++)
+        //    {
+        //        occupied[x + dx, y + dy] = true;
+        //    }
+        //}
+        GameObject roomObj = Instantiate(room.prefab, MapToWorld(x, y), Quaternion.identity, transform);
+
+        if (ItemSpawnManager.Instance != null)
+        {
+            ItemSpawnManager.Instance.RegisterRoom(roomObj, x, y, room.cellWidth, room.cellHeight);
+        }
 
         for (int dx = 0; dx < room.cellWidth; dx++)
         {

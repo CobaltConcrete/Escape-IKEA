@@ -6,6 +6,7 @@ public class PlayerInventoryInteraction : MonoBehaviour
     private Inventory inventory;
     [SerializeField] private UI_Inventory uiInventory;
     private SpriteRenderer playerSpriteRenderer;
+    private PlayerMovement playerMovement;
 
     private Coroutine flashCoroutine;
     private Color baseColor;
@@ -13,11 +14,15 @@ public class PlayerInventoryInteraction : MonoBehaviour
     private void Awake()
     {
         inventory = new Inventory(UseItem);
-        uiInventory.SetPlayer(this);
-        uiInventory.SetInventory(inventory);
+        playerMovement = GetComponent<PlayerMovement>();
 
         playerSpriteRenderer = transform.Find("PlayerSprite").GetComponent<SpriteRenderer>();
         baseColor = playerSpriteRenderer.color;
+    }
+    private void Start()
+    {
+        uiInventory.SetPlayer(this);
+        uiInventory.SetInventory(inventory);
     }
 
     public Vector3 GetPosition()
@@ -25,16 +30,17 @@ public class PlayerInventoryInteraction : MonoBehaviour
         return transform.position;
     }
 
-    private void UseItem(Item item)
+    internal void UseItem(Item item)
     {
         switch (item.itemType)
         {
             case Item.ItemType.HealthPill:
                 FlashGreen();
+                playerMovement.BoostSpeedFor10Seconds();
                 inventory.RemoveOneItem(item);
                 break;
 
-            case Item.ItemType.AnotherPill:
+            case Item.ItemType.SpeedPill:
                 FlashBlue();
                 inventory.RemoveOneItem(item);
                 break;
