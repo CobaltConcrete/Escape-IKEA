@@ -180,12 +180,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   spriteRenderer: {fileID: 0}
-  minAttackInterval: 2.5
-  maxAttackInterval: 8
+  minAttackInterval: 1.2
+  maxAttackInterval: 3.8
   aimDuration: 0.8
   dashForce: 12
   dashDuration: 1.2
-  bounceForce: 5
   stunDuration: 1.2
   bouncePauseDuration: 0.12
   recoilDistance: 1.5
@@ -224,6 +223,7 @@ MonoBehaviour:
   damageToPlayer: 10
   damageCooldown: 0.75
   contactDamageRadius: 0.55
+  contactDamageDistance: 0.01
 --- !u!114 &-9025449423726534894
 MonoBehaviour:
   m_ObjectHideFlags: 0

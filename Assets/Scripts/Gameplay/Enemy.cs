@@ -19,12 +19,13 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float boundsPadding = 0.1f;
 
     [Header("Hit Reaction")]
-    [SerializeField] private float recoilDistance = 2f;
+    [SerializeField] private float recoilDistance = 0.3f;
     [SerializeField] private float recoilDuration = 0.12f;
     [SerializeField] private float stunDurationAfterHit = 2f;
 
     [Header("Wall Bounce")]
     [SerializeField] private float wallBounceCooldown = 0.15f;
+
 
     private float lastWallBounceTime = -999f;
 

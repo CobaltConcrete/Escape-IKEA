@@ -1700,19 +1700,19 @@ MonoBehaviour:
   spawnGroups:
   - groupName: Employee
     prefab: {fileID: 6291527677918437734, guid: e473e2195ce4e41b6bfde2257fe2d519, type: 3}
-    spawnChance: 0.7
+    spawnChance: 0.932
     minCount: 1
     maxCount: 3
     sortingOrder: 10
   - groupName: Meatball
     prefab: {fileID: 2870026492113798478, guid: c5692d816becb45e5bd4aaee83b6f00d, type: 3}
-    spawnChance: 0.5
+    spawnChance: 0.731
     minCount: 0
     maxCount: 2
     sortingOrder: 8
   - groupName: CafeteriaEmployee
     prefab: {fileID: 1626777669089237922, guid: f4f55aeea54d40b40b4154fdb751f326, type: 3}
-    spawnChance: 0.4
+    spawnChance: 0.661
     minCount: 1
     maxCount: 3
     sortingOrder: 7

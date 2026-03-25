@@ -20,7 +20,6 @@ public class EnemyDashCharger : MonoBehaviour
     [SerializeField] private float dashDuration = 0.5f;
 
     [Header("Bounce + Stun")]
-    [SerializeField] private float bounceForce = 5f;
     [SerializeField] private float stunDuration = 1.2f;
     [SerializeField] private float bouncePauseDuration = 0.12f;
 
@@ -88,6 +87,7 @@ public class EnemyDashCharger : MonoBehaviour
             activeRoutine = StartCoroutine(AimThenDash());
         }
     }
+
     private IEnumerator Recoil(Vector2 direction)
     {
         float timer = 0f;
@@ -104,6 +104,7 @@ public class EnemyDashCharger : MonoBehaviour
 
         rb.linearVelocity = Vector2.zero;
     }
+
     private IEnumerator AimThenDash()
     {
         isBusy = true;
@@ -180,7 +181,6 @@ public class EnemyDashCharger : MonoBehaviour
         if (!isDashing) return;
         if (collision.contactCount == 0) return;
 
-        // hit wall
         if (collision.gameObject.CompareTag("Wall"))
         {
             isDashing = false;
@@ -197,7 +197,6 @@ public class EnemyDashCharger : MonoBehaviour
             return;
         }
 
-        // hit player
         if (collision.gameObject.CompareTag("Player"))
         {
             isDashing = false;
@@ -213,6 +212,7 @@ public class EnemyDashCharger : MonoBehaviour
             activeRoutine = StartCoroutine(RecoilThenStun(away));
         }
     }
+
     private IEnumerator RecoilThenStun(Vector2 dir)
     {
         if (spriteRenderer != null)
@@ -266,6 +266,8 @@ public class EnemyDashCharger : MonoBehaviour
 
     private float GetRandomAttackInterval()
     {
-        return Random.Range(minAttackInterval, maxAttackInterval);
+        float min = Mathf.Min(minAttackInterval, maxAttackInterval);
+        float max = Mathf.Max(minAttackInterval, maxAttackInterval);
+        return Random.Range(min, max);
     }
 }

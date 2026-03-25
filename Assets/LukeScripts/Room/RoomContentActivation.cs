@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class RoomContentActivation : MonoBehaviour
@@ -10,6 +11,8 @@ public class RoomContentActivation : MonoBehaviour
     [SerializeField] private Transform itemContainer;
 
     private static RoomContentActivation currentActiveRoom;
+    private static readonly HashSet<RoomContentActivation> playerRooms = new HashSet<RoomContentActivation>();
+    private static Transform playerTransform;
 
     private void Awake()
     {
@@ -27,25 +30,94 @@ public class RoomContentActivation : MonoBehaviour
     private void Start()
     {
         SetRoomContentActive(false);
-        TryActivateIfPlayerAlreadyInside();
+        TryRegisterIfPlayerAlreadyInside();
+        ReevaluateActiveRoom();
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (!collision.CompareTag("Player")) return;
 
-        ActivateThisRoom();
+        playerTransform = collision.transform;
+        playerRooms.Add(this);
+        ReevaluateActiveRoom();
     }
 
-    public void ActivateThisRoom()
+    private void OnTriggerStay2D(Collider2D collision)
     {
-        if (currentActiveRoom != null && currentActiveRoom != this)
+        if (!collision.CompareTag("Player")) return;
+
+        playerTransform = collision.transform;
+        playerRooms.Add(this);
+        ReevaluateActiveRoom();
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (!collision.CompareTag("Player")) return;
+
+        playerRooms.Remove(this);
+
+        if (currentActiveRoom == this)
+        {
+            currentActiveRoom.SetRoomContentActive(false);
+            currentActiveRoom = null;
+        }
+
+        ReevaluateActiveRoom();
+    }
+
+    private void TryRegisterIfPlayerAlreadyInside()
+    {
+        if (roomTrigger == null) return;
+
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null) return;
+
+        Collider2D playerCol = player.GetComponent<Collider2D>();
+        if (playerCol == null) return;
+
+        if (roomTrigger.bounds.Intersects(playerCol.bounds))
+        {
+            playerTransform = player.transform;
+            playerRooms.Add(this);
+        }
+    }
+
+    private static void ReevaluateActiveRoom()
+    {
+        if (playerTransform == null) return;
+
+        RoomContentActivation bestRoom = null;
+        float bestDistance = float.MaxValue;
+
+        foreach (RoomContentActivation room in playerRooms)
+        {
+            if (room == null || room.roomTrigger == null) continue;
+
+            Vector2 closestPoint = room.roomTrigger.ClosestPoint(playerTransform.position);
+            float dist = ((Vector2)playerTransform.position - closestPoint).sqrMagnitude;
+
+            if (dist < bestDistance)
+            {
+                bestDistance = dist;
+                bestRoom = room;
+            }
+        }
+
+        if (bestRoom == currentActiveRoom) return;
+
+        if (currentActiveRoom != null)
         {
             currentActiveRoom.SetRoomContentActive(false);
         }
 
-        currentActiveRoom = this;
-        SetRoomContentActive(true);
+        currentActiveRoom = bestRoom;
+
+        if (currentActiveRoom != null)
+        {
+            currentActiveRoom.SetRoomContentActive(true);
+        }
     }
 
     public void SetRoomContentActive(bool active)
@@ -73,22 +145,6 @@ public class RoomContentActivation : MonoBehaviour
         if (itemContainer != null)
         {
             itemContainer.gameObject.SetActive(active);
-        }
-    }
-
-    private void TryActivateIfPlayerAlreadyInside()
-    {
-        if (roomTrigger == null) return;
-
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player == null) return;
-
-        Collider2D playerCol = player.GetComponent<Collider2D>();
-        if (playerCol == null) return;
-
-        if (roomTrigger.bounds.Intersects(playerCol.bounds))
-        {
-            ActivateThisRoom();
         }
     }
 }

@@ -7,10 +7,9 @@ public class EnemyAimerShooter : MonoBehaviour
     [SerializeField] private Transform player;
 
     [Header("Attack Timing")]
-    [SerializeField] private float attackInterval = 4f;
-    [SerializeField] private float randomIntervalOffset = 1.2f;
+    [SerializeField] private float minAttackInterval = 2.8f;
+    [SerializeField] private float maxAttackInterval = 5.2f;
     [SerializeField] private float aimDuration = 3f;
-    [SerializeField] private bool randomizeInitialDelay = true;
 
     [Header("Tracking")]
     [SerializeField] private float trackingRange = 6f;
@@ -100,11 +99,8 @@ public class EnemyAimerShooter : MonoBehaviour
 
     private IEnumerator BeginAttackLoop()
     {
-        if (randomizeInitialDelay)
-        {
-            float initialDelay = Random.Range(0f, attackInterval);
-            yield return new WaitForSeconds(initialDelay);
-        }
+        float firstDelay = GetRandomAttackInterval();
+        yield return new WaitForSeconds(firstDelay);
 
         yield return AttackLoop();
         attackLoopRoutine = null;
@@ -114,8 +110,7 @@ public class EnemyAimerShooter : MonoBehaviour
     {
         while (true)
         {
-            float nextDelay = attackInterval + Random.Range(-randomIntervalOffset, randomIntervalOffset);
-            nextDelay = Mathf.Max(0.5f, nextDelay);
+            float nextDelay = GetRandomAttackInterval();
 
             yield return new WaitForSeconds(nextDelay);
 
@@ -124,6 +119,12 @@ public class EnemyAimerShooter : MonoBehaviour
                 yield return AimAndShoot();
             }
         }
+    }
+    private float GetRandomAttackInterval()
+    {
+        float min = Mathf.Min(minAttackInterval, maxAttackInterval);
+        float max = Mathf.Max(minAttackInterval, maxAttackInterval);
+        return Random.Range(min, max);
     }
 
     //private IEnumerator AimAndShoot()

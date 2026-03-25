@@ -207,6 +207,7 @@ MonoBehaviour:
   damageToPlayer: 10
   damageCooldown: 0.75
   contactDamageRadius: 0.55
+  contactDamageDistance: 0.01
 --- !u!114 &-5141088472471799213
 MonoBehaviour:
   m_ObjectHideFlags: 0

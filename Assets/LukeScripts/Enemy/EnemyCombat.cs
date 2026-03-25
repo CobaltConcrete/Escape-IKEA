@@ -10,6 +10,9 @@ public class EnemyCombat : MonoBehaviour
     [SerializeField] private float damageCooldown = 0.75f;
     [SerializeField] private float contactDamageRadius = 0.55f;
 
+    [Header("HitboxRange")]
+    [SerializeField] private float contactDamageDistance = 0f;
+
     private float currentHealth;
     private float lastDamageTime = -999f;
 
@@ -50,6 +53,12 @@ public class EnemyCombat : MonoBehaviour
 
             PlayerHealth playerHealth = hit.GetComponent<PlayerHealth>() ?? hit.GetComponentInParent<PlayerHealth>();
             if (playerHealth == null) continue;
+
+            ColliderDistance2D distanceInfo = hit.Distance(GetComponent<Collider2D>());
+
+            // too far, can't hit
+            if (distanceInfo.distance > contactDamageDistance)
+                continue;
 
             lastDamageTime = Time.time;
             playerHealth.TakeDamage(damageToPlayer);
