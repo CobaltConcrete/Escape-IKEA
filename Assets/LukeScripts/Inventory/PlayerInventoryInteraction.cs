@@ -220,47 +220,47 @@ public class PlayerInventoryInteraction : MonoBehaviour
             }
         }
     }
-    private void TryAutoEquipNextInPriority(EquipTag equipTag, List<ItemDefinition> priorityList, ItemDefinition currentDefinition)
-    {
-        if (!autoEquipWhenSlotEmpty) return;
-        if (priorityList == null || priorityList.Count == 0) return;
-        if (equipmentData.GetEquippedItem(equipTag) != null) return;
+    //private void TryAutoEquipNextInPriority(EquipTag equipTag, List<ItemDefinition> priorityList, ItemDefinition currentDefinition)
+    //{
+    //    if (!autoEquipWhenSlotEmpty) return;
+    //    if (priorityList == null || priorityList.Count == 0) return;
+    //    if (equipmentData.GetEquippedItem(equipTag) != null) return;
 
-        int startIndex = -1;
+    //    int startIndex = -1;
 
-        if (currentDefinition != null)
-        {
-            startIndex = GetPriorityIndex(currentDefinition, priorityList);
-        }
+    //    if (currentDefinition != null)
+    //    {
+    //        startIndex = GetPriorityIndex(currentDefinition, priorityList);
+    //    }
 
-        int count = priorityList.Count;
+    //    int count = priorityList.Count;
 
-        for (int step = 1; step <= count; step++)
-        {
-            int index = (startIndex + step) % count;
-            ItemDefinition def = priorityList[index];
+    //    for (int step = 1; step <= count; step++)
+    //    {
+    //        int index = (startIndex + step) % count;
+    //        ItemDefinition def = priorityList[index];
 
-            Item item = inventory.FindFirstItemByDefinition(def);
-            if (item == null) continue;
-            if (!ItemEquipClassifier.IsEquipable(item)) continue;
-            if (ItemEquipClassifier.GetEquipTag(item) != equipTag) continue;
+    //        Item item = inventory.FindFirstItemByDefinition(def);
+    //        if (item == null) continue;
+    //        if (!ItemEquipClassifier.IsEquipable(item)) continue;
+    //        if (ItemEquipClassifier.GetEquipTag(item) != equipTag) continue;
 
-            if (equipTag == EquipTag.Utility)
-            {
-                Item itemToEquip = BuildUtilityItemToEquip(def);
-                if (itemToEquip == null) return;
+    //        if (equipTag == EquipTag.Utility)
+    //        {
+    //            Item itemToEquip = BuildUtilityItemToEquip(def);
+    //            if (itemToEquip == null) return;
 
-                equipmentUI.EquipItem(itemToEquip);
-                SetCurrentUtilityChain(itemToEquip);
-            }
-            else
-            {
-                AutoEquipItem(item);
-            }
+    //            equipmentUI.EquipItem(itemToEquip);
+    //            SetCurrentUtilityChain(itemToEquip);
+    //        }
+    //        else
+    //        {
+    //            AutoEquipItem(item);
+    //        }
 
-            return;
-        }
-    }
+    //        return;
+    //    }
+    //}
 
     private Item BuildUtilityItemToEquip(ItemDefinition definition)
     {
@@ -308,40 +308,67 @@ public class PlayerInventoryInteraction : MonoBehaviour
         SetCurrentUtilityChain(itemToEquip);
         return true;
     }
-    private void TryAutoEquipWorseUtilityAfterDrop(ItemDefinition droppedDefinition)
+    private bool TryEquipByDefinition(EquipTag equipTag, ItemDefinition definition)
+    {
+        if (definition == null) return false;
+
+        if (equipTag == EquipTag.Utility)
+        {
+            return TryEquipUtilityByDefinition(definition);
+        }
+
+        Item item = inventory.FindFirstItemByDefinition(definition);
+        if (item == null) return false;
+        if (!ItemEquipClassifier.IsEquipable(item)) return false;
+        if (ItemEquipClassifier.GetEquipTag(item) != equipTag) return false;
+
+        AutoEquipItem(item);
+        return true;
+    }
+
+    private void TryAutoEquipWorseAfterDrop(
+    EquipTag equipTag,
+    List<ItemDefinition> priorityList,
+    ItemDefinition droppedDefinition)
     {
         if (!autoEquipWhenSlotEmpty) return;
-        if (utilityPriorityList == null || utilityPriorityList.Count == 0) return;
-        if (equipmentData.GetEquippedItem(EquipTag.Utility) != null) return;
+        if (priorityList == null || priorityList.Count == 0) return;
+        if (equipmentData.GetEquippedItem(equipTag) != null) return;
 
-        int startIndex = GetPriorityIndex(droppedDefinition, utilityPriorityList);
+        int startIndex = GetPriorityIndex(droppedDefinition, priorityList);
 
-        // if not on priority list, look for the best on the list after dropped
+        // not on list, find best
         if (startIndex < 0)
         {
-            for (int i = 0; i < utilityPriorityList.Count; i++)
+            for (int i = 0; i < priorityList.Count; i++)
             {
-                ItemDefinition def = utilityPriorityList[i];
-                if (TryEquipUtilityByDefinition(def))
+                if (TryEquipByDefinition(equipTag, priorityList[i]))
                 {
                     return;
                 }
             }
-
             return;
         }
 
         // look for worse
-        for (int i = startIndex + 1; i < utilityPriorityList.Count; i++)
+        for (int i = startIndex + 1; i < priorityList.Count; i++)
         {
-            ItemDefinition def = utilityPriorityList[i];
-            if (TryEquipUtilityByDefinition(def))
+            if (TryEquipByDefinition(equipTag, priorityList[i]))
             {
                 return;
             }
         }
 
-        // if can't find worse, just leave empty
+        // if already the worst, go back to find best
+        for (int i = 0; i < startIndex; i++)
+        {
+            if (TryEquipByDefinition(equipTag, priorityList[i]))
+            {
+                return;
+            }
+        }
+
+        // if there really are nothing left, leave empty
     }
 
     private void AutoEquipItem(Item item)
@@ -470,32 +497,19 @@ public class PlayerInventoryInteraction : MonoBehaviour
     public void UnequipItem(EquipTag equipTag)
     {
         Item removedItem = equipmentUI.UnequipItem(equipTag);
+        if (removedItem == null) return;
 
-        if (removedItem != null)
-        {
-            inventory.AddItem(removedItem);
-        }
+        inventory.AddItem(removedItem);
 
-        ItemDefinition removedDefinition = removedItem != null ? removedItem.definition : null;
+        ItemDefinition removedDefinition = removedItem.definition;
 
         if (equipTag == EquipTag.Utility)
         {
             currentUtilityChainDefinition = null;
-            TryAutoEquipNextInPriority(EquipTag.Utility, utilityPriorityList, removedDefinition);
-            return;
         }
 
-        if (equipTag == EquipTag.Weapon)
-        {
-            TryAutoEquipNextInPriority(EquipTag.Weapon, weaponPriorityList, removedDefinition);
-            return;
-        }
-
-        if (equipTag == EquipTag.Armor)
-        {
-            TryAutoEquipNextInPriority(EquipTag.Armor, armorPriorityList, removedDefinition);
-            return;
-        }
+        List<ItemDefinition> priorityList = GetPriorityListByTag(equipTag);
+        TryAutoEquipWorseAfterDrop(equipTag, priorityList, removedDefinition);
     }
 
     //public void DropEquippedItem(EquipTag equipTag)
@@ -552,25 +566,22 @@ public class PlayerInventoryInteraction : MonoBehaviour
         equipmentUI.RefreshAllSlots();
         ItemWorld.DropItem(GetPosition(), droppedItem);
 
-        // utility£ºif dropped manually, look for worse on list, don't replace with same
-        if (equipTag == EquipTag.Utility)
+        List<ItemDefinition> priorityList = GetPriorityListByTag(equipTag);
+        TryAutoEquipWorseAfterDrop(equipTag, priorityList, droppedDefinition);
+    }
+    private List<ItemDefinition> GetPriorityListByTag(EquipTag equipTag)
+    {
+        switch (equipTag)
         {
-            if (droppedItem.IsStackable())
-            {
-                // stackable
-                TryAutoEquipAfterEmpty(equipTag);
-            }
-            else
-            {
-                // unstackable
-                TryAutoEquipWorseUtilityAfterDrop(droppedDefinition);
-            }
-
-            return;
+            case EquipTag.Weapon:
+                return weaponPriorityList;
+            case EquipTag.Armor:
+                return armorPriorityList;
+            case EquipTag.Utility:
+                return utilityPriorityList;
+            default:
+                return null;
         }
-
-        // weapon / armor
-        TryAutoEquipAfterEmpty(equipTag);
     }
 
     private void OnTriggerEnter2D(Collider2D collider)
