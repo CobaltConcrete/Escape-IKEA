@@ -5,6 +5,13 @@ public class ItemWorldSpawner : MonoBehaviour
     [SerializeField] private ItemDefinition itemDefinition;
     [SerializeField] private int amount = 1;
 
+    private Transform spawnParent;
+
+    public void SetSpawnParent(Transform parent)
+    {
+        spawnParent = parent;
+    }
+
     private void Start()
     {
         if (itemDefinition == null)
@@ -19,7 +26,13 @@ public class ItemWorldSpawner : MonoBehaviour
             amount = amount
         };
 
-        ItemWorld.SpawnItemWorld(transform.position, item);
+        ItemWorld spawned = ItemWorld.SpawnItemWorld(transform.position, item);
+
+        if (spawned != null && spawnParent != null)
+        {
+            spawned.transform.SetParent(spawnParent, true);
+        }
+
         Destroy(gameObject);
     }
 }

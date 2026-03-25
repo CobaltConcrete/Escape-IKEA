@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerAttack : MonoBehaviour
@@ -12,11 +13,25 @@ public class PlayerAttack : MonoBehaviour
             return;
 
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, attackRadius);
+        HashSet<EnemyCombat> damagedEnemies = new HashSet<EnemyCombat>();
+
         foreach (Collider2D col in hits)
         {
-            Enemy e = col.GetComponent<Enemy>();
-            if (e != null)
-                e.TakeDamage(attackDamage);
+            bool isEnemy =
+                col.CompareTag("Enemy") ||
+                (col.transform.parent != null && col.transform.parent.CompareTag("Enemy"));
+
+            if (!isEnemy) continue;
+
+            EnemyCombat enemyCombat =
+                col.GetComponent<EnemyCombat>() ??
+                col.GetComponentInParent<EnemyCombat>();
+
+            if (enemyCombat != null && !damagedEnemies.Contains(enemyCombat))
+            {
+                enemyCombat.TakeDamage(attackDamage);
+                damagedEnemies.Add(enemyCombat);
+            }
         }
     }
 
@@ -25,4 +40,3 @@ public class PlayerAttack : MonoBehaviour
         return Input.GetKeyDown(attackKey);
     }
 }
-
