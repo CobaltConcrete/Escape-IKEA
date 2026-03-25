@@ -1282,37 +1282,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!1 &4360543345437612692
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2025712274201392123}
-  m_Layer: 0
-  m_Name: SpawnedItems
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2025712274201392123
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4360543345437612692}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3125483003241167705}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &4970575358715598619
 GameObject:
   m_ObjectHideFlags: 0
@@ -1447,115 +1416,6 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!1 &5540407143314748755
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8519844553131565289}
-  - component: {fileID: 8437461692891624488}
-  m_Layer: 0
-  m_Name: EnemyWanderArea
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8519844553131565289
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5540407143314748755}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3125483003241167705}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &8437461692891624488
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5540407143314748755}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 5}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 9.7, y: 19.7}
-  m_EdgeRadius: 0
---- !u!1 &6529007337993599114
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 5640877987964570561}
-  m_Layer: 0
-  m_Name: SpawnedObjects
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &5640877987964570561
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6529007337993599114}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3125483003241167705}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6749980618424993291
 GameObject:
   m_ObjectHideFlags: 0
@@ -1567,9 +1427,8 @@ GameObject:
   - component: {fileID: 3125483003241167705}
   - component: {fileID: 7484418997713642370}
   - component: {fileID: 5256496874783605114}
+  - component: {fileID: -2436559980975748940}
   - component: {fileID: 4049492374165272118}
-  - component: {fileID: 5609370691163766229}
-  - component: {fileID: 5909522022788532126}
   m_Layer: 0
   m_Name: LivingRoom10x20y
   m_TagString: Untagged
@@ -1590,10 +1449,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8519844553131565289}
-  - {fileID: 8189788221543139054}
-  - {fileID: 2025712274201392123}
-  - {fileID: 5640877987964570561}
   - {fileID: 6990419294973220445}
   - {fileID: 3703653494114497661}
   - {fileID: 7730096293467302012}
@@ -1669,6 +1524,22 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 10, y: 20}
   m_EdgeRadius: 0
+--- !u!114 &-2436559980975748940
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6749980618424993291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 830a19d33e6764d53b77996d11ebffc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawner: {fileID: 0}
+  employeeCount: 2
+  meatballCount: 2
+  spawnEdgeInset: 0.4
 --- !u!114 &4049492374165272118
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1682,67 +1553,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnArea: {fileID: 6971005607538664092}
---- !u!114 &5609370691163766229
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6749980618424993291}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b157162196d74744d974792e87bd05ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemySpawnAreaCollider: {fileID: 5660571354825917036}
-  enemyWanderAreaCollider: {fileID: 8437461692891624488}
-  spawnParent: {fileID: 5640877987964570561}
-  spawnGroups:
-  - groupName: Employee
-    prefab: {fileID: 6291527677918437734, guid: e473e2195ce4e41b6bfde2257fe2d519, type: 3}
-    spawnChance: 0.7
-    minCount: 1
-    maxCount: 3
-    sortingOrder: 10
-  - groupName: Meatball
-    prefab: {fileID: 2870026492113798478, guid: c5692d816becb45e5bd4aaee83b6f00d, type: 3}
-    spawnChance: 0.5
-    minCount: 0
-    maxCount: 2
-    sortingOrder: 8
-  - groupName: CafeteriaEmployee
-    prefab: {fileID: 1626777669089237922, guid: f4f55aeea54d40b40b4154fdb751f326, type: 3}
-    spawnChance: 0.4
-    minCount: 1
-    maxCount: 3
-    sortingOrder: 7
-  - groupName: DistortedShopper
-    prefab: {fileID: 3464154710725457275, guid: 73a96bd0a680f8949861c27cf368dbe9, type: 3}
-    spawnChance: 0.4
-    minCount: 1
-    maxCount: 3
-    sortingOrder: 6
-  maxPositionTriesPerSpawn: 20
-  edgePadding: 0.5
-  overlapCheckRadius: 0.4
-  blockingLayers:
-    serializedVersion: 2
-    m_Bits: 192
---- !u!114 &5909522022788532126
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6749980618424993291}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a681a38598fa0274d9b983e71abc9db9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomTrigger: {fileID: 5256496874783605114}
-  enemyContainer: {fileID: 5640877987964570561}
-  itemContainer: {fileID: 2025712274201392123}
 --- !u!1 &7007382920975324046
 GameObject:
   m_ObjectHideFlags: 0
@@ -2011,94 +1821,3 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!1 &9004418277595652330
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 8189788221543139054}
-  - component: {fileID: 5660571354825917036}
-  - component: {fileID: 1075559148016400893}
-  m_Layer: 0
-  m_Name: EnemySpawnArea
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &8189788221543139054
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9004418277595652330}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 3125483003241167705}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &5660571354825917036
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9004418277595652330}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0.05329871, y: 4.9794035}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 5.948458, y: 16.00241}
-  m_EdgeRadius: 0
---- !u!114 &1075559148016400893
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9004418277595652330}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b83e878cbfe295448ee6fdf5f066cf7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

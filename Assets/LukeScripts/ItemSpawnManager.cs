@@ -25,7 +25,7 @@ public class ItemSpawnManager : MonoBehaviour
     private class RoomItemState
     {
         public bool shouldSpawn;
-        public Vector3 worldPosition;
+        public Vector3 localPosition;
         public GameObject selectedPrefab;
     }
 
@@ -88,11 +88,9 @@ public class ItemSpawnManager : MonoBehaviour
             return state;
         }
 
-        Vector3 worldPoint = roomInstance.transform.TransformPoint(localPoint);
-
         state.shouldSpawn = true;
         state.selectedPrefab = selectedPrefab;
-        state.worldPosition = worldPoint;
+        state.localPosition = localPoint;
 
         return state;
     }
@@ -138,10 +136,7 @@ public class ItemSpawnManager : MonoBehaviour
 
     private void EnsureRoomItemExists(GameObject roomInstance, RoomItemState state)
     {
-        Transform itemParent = roomInstance.transform.Find("SpawnedItems");
-        Transform searchRoot = itemParent != null ? itemParent : roomInstance.transform;
-
-        Transform existing = searchRoot.Find(spawnedItemName);
+        Transform existing = roomInstance.transform.Find(spawnedItemName);
 
         if (!state.shouldSpawn || state.selectedPrefab == null)
         {
@@ -155,22 +150,11 @@ public class ItemSpawnManager : MonoBehaviour
         if (existing != null)
             return;
 
-        Transform parentToUse = itemParent != null ? itemParent : roomInstance.transform;
-
-        GameObject spawnedSpawner = Instantiate(
-            state.selectedPrefab,
-            state.worldPosition,
-            Quaternion.identity,
-            parentToUse
-        );
-
-        spawnedSpawner.name = spawnedItemName;
-
-        ItemWorldSpawner spawner = spawnedSpawner.GetComponent<ItemWorldSpawner>();
-        if (spawner != null)
-        {
-            spawner.SetSpawnParent(parentToUse);
-        }
+        GameObject spawnedItem = Instantiate(state.selectedPrefab, roomInstance.transform);
+        spawnedItem.name = spawnedItemName;
+        spawnedItem.transform.localPosition = state.localPosition;
+        spawnedItem.transform.localRotation = Quaternion.identity;
+        spawnedItem.transform.localScale = Vector3.one;
     }
 
     private string MakeRoomKey(int x, int y, int width, int height)

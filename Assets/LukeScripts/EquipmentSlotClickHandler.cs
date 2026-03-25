@@ -9,15 +9,12 @@ public class EquipmentSlotClickHandler : MonoBehaviour, IPointerClickHandler
 
     public void OnPointerClick(PointerEventData eventData)
     {
-        if (playerInventoryInteraction == null) return;
-
         if (eventData.button == PointerEventData.InputButton.Left)
         {
-            playerInventoryInteraction.UnequipItem(equipTag);
-        }
-        else if (eventData.button == PointerEventData.InputButton.Right)
-        {
-            playerInventoryInteraction.DropEquippedItem(equipTag);
+            if (playerInventoryInteraction != null)
+            {
+                playerInventoryInteraction.UnequipItem(equipTag);
+            }
         }
     }
 }

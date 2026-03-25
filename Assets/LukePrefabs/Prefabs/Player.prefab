@@ -74,7 +74,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1086672445
-  m_SortingLayer: 6
+  m_SortingLayer: 5
   m_SortingOrder: 0
   m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
   m_Color: {r: 0, g: 1, b: 1, a: 1}
@@ -257,19 +257,10 @@ MonoBehaviour:
   equipmentUI: {fileID: 0}
   equipmentData: {fileID: 0}
   playerDialogue: {fileID: 0}
-  autoEquipWhenSlotEmpty: 1
-  autoRefillUtilityWhenConsumed: 1
-  weaponPriorityList:
-  - {fileID: 11400000, guid: 712ca49f61bfc7d48bc9eee9ef6045b4, type: 2}
-  - {fileID: 11400000, guid: a497e763e5473154fa5fcfed649410fd, type: 2}
-  - {fileID: 11400000, guid: 56b77b7c4beb2404d858b0225d87ec60, type: 2}
-  armorPriorityList:
-  - {fileID: 11400000, guid: 85f7b633f1a24ca44b174daeabbdb926, type: 2}
-  - {fileID: 11400000, guid: 4bf43283896190c469e54683f8d18681, type: 2}
   utilityPriorityList:
   - {fileID: 11400000, guid: 8b1ded8cb101ed6489ded3f5d0897afb, type: 2}
-  - {fileID: 11400000, guid: 0b9f9db855c79b7439d128dc85067cf3, type: 2}
   - {fileID: 11400000, guid: 7db76ef5dc1369a4d93382e40f3c7caa, type: 2}
+  - {fileID: 11400000, guid: 0b9f9db855c79b7439d128dc85067cf3, type: 2}
 --- !u!114 &335984860027219545
 MonoBehaviour:
   m_ObjectHideFlags: 0

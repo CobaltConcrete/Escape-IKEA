@@ -11,9 +11,8 @@ GameObject:
   - component: {fileID: 6378411985123387850}
   - component: {fileID: 3170246060900774639}
   - component: {fileID: 2841542118079122019}
+  - component: {fileID: 3687688526285434425}
   - component: {fileID: -4188706600703422064}
-  - component: {fileID: -807783230289628483}
-  - component: {fileID: -2542676994314198565}
   m_Layer: 0
   m_Name: Bathroom
   m_TagString: Untagged
@@ -45,10 +44,6 @@ Transform:
   - {fileID: 4338630182239827653}
   - {fileID: 978457694357915955}
   - {fileID: 6077659195215923032}
-  - {fileID: 2880658391314670249}
-  - {fileID: 9012392692916595599}
-  - {fileID: 474166244792718767}
-  - {fileID: 3877753836869701407}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &3170246060900774639
@@ -109,8 +104,24 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 9.8, y: 9.8}
+  m_Size: {x: 10, y: 10}
   m_EdgeRadius: 0
+--- !u!114 &3687688526285434425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 520739178390693697}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 830a19d33e6764d53b77996d11ebffc2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawner: {fileID: 0}
+  employeeCount: 2
+  meatballCount: 2
+  spawnEdgeInset: 0.4
 --- !u!114 &-4188706600703422064
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -124,98 +135,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   spawnArea: {fileID: 36780251377860297}
---- !u!114 &-807783230289628483
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 520739178390693697}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b157162196d74744d974792e87bd05ff, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  enemySpawnAreaCollider: {fileID: 3936281308942464385}
-  enemyWanderAreaCollider: {fileID: 8316041361562263767}
-  spawnParent: {fileID: 2880658391314670249}
-  spawnGroups:
-  - groupName: Employee
-    prefab: {fileID: 6291527677918437734, guid: e473e2195ce4e41b6bfde2257fe2d519, type: 3}
-    spawnChance: 0.7
-    minCount: 1
-    maxCount: 3
-    sortingOrder: 10
-  - groupName: Meatball
-    prefab: {fileID: 2870026492113798478, guid: c5692d816becb45e5bd4aaee83b6f00d, type: 3}
-    spawnChance: 0.5
-    minCount: 0
-    maxCount: 2
-    sortingOrder: 8
-  - groupName: CafeteriaEmployee
-    prefab: {fileID: 1626777669089237922, guid: f4f55aeea54d40b40b4154fdb751f326, type: 3}
-    spawnChance: 0.4
-    minCount: 1
-    maxCount: 3
-    sortingOrder: 7
-  - groupName: DistortedShopper
-    prefab: {fileID: 3464154710725457275, guid: 73a96bd0a680f8949861c27cf368dbe9, type: 3}
-    spawnChance: 0.4
-    minCount: 1
-    maxCount: 3
-    sortingOrder: 6
-  maxPositionTriesPerSpawn: 20
-  edgePadding: 0.5
-  overlapCheckRadius: 0.4
-  blockingLayers:
-    serializedVersion: 2
-    m_Bits: 192
---- !u!114 &-2542676994314198565
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 520739178390693697}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a681a38598fa0274d9b983e71abc9db9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomTrigger: {fileID: 2841542118079122019}
-  enemyContainer: {fileID: 2880658391314670249}
-  itemContainer: {fileID: 9012392692916595599}
---- !u!1 &538233312824322580
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 9012392692916595599}
-  m_Layer: 0
-  m_Name: SpawnedItems
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &9012392692916595599
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 538233312824322580}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 6378411985123387850}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &613285044208628983
 GameObject:
   m_ObjectHideFlags: 0
@@ -1632,203 +1551,3 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
---- !u!1 &7805332991600758700
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 3877753836869701407}
-  - component: {fileID: 8316041361562263767}
-  m_Layer: 0
-  m_Name: EnemyWanderArea
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &3877753836869701407
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7805332991600758700}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 6378411985123387850}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &8316041361562263767
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7805332991600758700}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 9.7, y: 9.7}
-  m_EdgeRadius: 0
---- !u!1 &8268931546309050120
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2880658391314670249}
-  m_Layer: 0
-  m_Name: SpawnedObjects
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2880658391314670249
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8268931546309050120}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 6378411985123387850}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &8635305029529412827
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 474166244792718767}
-  - component: {fileID: 3936281308942464385}
-  - component: {fileID: 2062516526550915049}
-  m_Layer: 0
-  m_Name: EnemySpawnArea
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &474166244792718767
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8635305029529412827}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 6378411985123387850}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &3936281308942464385
-BoxCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8635305029529412827}
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 1
-  m_UsedByEffector: 0
-  m_CompositeOperation: 0
-  m_CompositeOrder: 0
-  m_Offset: {x: 0.040349007, y: -0.020174146}
-  m_SpriteTilingProperty:
-    border: {x: 0, y: 0, z: 0, w: 0}
-    pivot: {x: 0, y: 0}
-    oldSize: {x: 0, y: 0}
-    newSize: {x: 0, y: 0}
-    adaptiveTilingThreshold: 0
-    drawMode: 0
-    adaptiveTiling: 0
-  m_AutoTiling: 0
-  m_Size: {x: 5.922559, y: 6.003257}
-  m_EdgeRadius: 0
---- !u!114 &2062516526550915049
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8635305029529412827}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b83e878cbfe295448ee6fdf5f066cf7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 

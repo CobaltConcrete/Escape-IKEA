@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 3297271436586200869}
   - component: {fileID: 6924176029194304441}
   - component: {fileID: 1804827316909422306}
-  - component: {fileID: 2680106428504148284}
   m_Layer: 8
   m_Name: Meatball
   m_TagString: Untagged
@@ -141,15 +140,3 @@ MonoBehaviour:
   healAmount: 25
   useMeatballBrownTint: 1
   meatballTint: {r: 0.5, g: 0.32, b: 0.12, a: 1}
---- !u!114 &2680106428504148284
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2870026492113798478}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6392ff11c9b67f44890dc519402a091, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
