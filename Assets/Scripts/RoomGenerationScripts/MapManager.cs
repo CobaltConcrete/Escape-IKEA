@@ -96,32 +96,33 @@ public class MapManager : MonoBehaviour
         occupied = new bool[maxCellCols, maxCellRows];
         roomGrid = new GameObject[maxCellCols, maxCellRows];
 
+        // Spawn start room
+        GameObject startRoom = Instantiate(startingRoomPrefab, MapToWorld(centerX, centerY), Quaternion.identity, transform);
+        occupied[centerX, centerY] = true;
+        roomGrid[centerX, centerY] = startRoom;
+
+        // Spawn boss room
         PlaceRoom(bossRoom, bossX, bossY);
 
+        // Spawn other rooms
         List<Vector2Int> positions = new List<Vector2Int>();
         for (int y = 0; y < maxCellRows; y++)
+        {
             for (int x = 0; x < maxCellCols; x++)
+            {
+                // Skip cells already occupied
+                if (occupied[x, y]) 
+                    continue;
+
                 positions.Add(new Vector2Int(x, y));
+            }
+        }
 
         Shuffle(positions);
 
         foreach (var pos in positions)
         {
-            int x = pos.x;
-            int y = pos.y;
-
-            if (occupied[x, y])
-                continue;
-
-            if (x == centerX && y == centerY)
-            {
-                GameObject startRoom = Instantiate(startingRoomPrefab, MapToWorld(x, y), Quaternion.identity, transform);
-                occupied[x, y] = true;
-                roomGrid[x, y] = startRoom;
-                continue;
-            }
-
-            TryPlaceRandomRoom(x, y);
+            TryPlaceRandomRoom(pos.x, pos.y);
         }
     }
 
