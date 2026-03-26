@@ -11,20 +11,21 @@ public class Door : MonoBehaviour
     [SerializeField] public float interactionRange = 2f;
 
     [Header("Door Behavior")]
-    [SerializeField] public bool isHorizontal = true;
-    [SerializeField] public Door linkedDoor;
+    [SerializeField] public bool isHorizontal = true; // determines slide direction
+    [SerializeField] public Door linkedDoor;          // for boundary syncing
 
     [Header("Rendering")]
     [SerializeField] private SpriteRenderer spriteRenderer;
 
     private Vector3 closedPosition;
     private Vector3 openPosition;
+    private Vector3 interactionPoint; // fixed point for interaction
 
     private bool isOpen = false;
     private bool isMoving = false;
     private Transform player;
 
-    // Connected rooms for rendering visibility ie only make door visible if either room it is in contact with is visible
+    // Connected rooms for rendering visibility
     private GameObject roomA;
     private GameObject roomB;
 
@@ -32,10 +33,14 @@ public class Door : MonoBehaviour
     {
         closedPosition = transform.position;
 
+        // Set the open position based on door orientation
         if (isHorizontal)
             openPosition = closedPosition + (-transform.right * openDistance);
         else
             openPosition = closedPosition + (-transform.up * openDistance);
+
+        // Store the initial doorway position for interaction
+        interactionPoint = closedPosition;
 
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
@@ -49,7 +54,8 @@ public class Door : MonoBehaviour
     {
         if (player == null) return;
 
-        float dist = Vector3.Distance(player.position, transform.position);
+        // Measure distance from fixed interaction point instead of moving door
+        float dist = Vector3.Distance(player.position, interactionPoint);
 
         if (dist <= interactionRange)
         {
