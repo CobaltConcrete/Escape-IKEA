@@ -27,7 +27,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.4, y: 0, z: -0.028791841}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalScale: {x: 3, y: 3, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3848462790633160891}
@@ -74,14 +74,14 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1086672445
-  m_SortingLayer: 5
+  m_SortingLayer: 6
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7482667652216324306, guid: 311925a002f4447b3a28927169b83ea6, type: 3}
-  m_Color: {r: 0, g: 1, b: 1, a: 1}
+  m_Sprite: {fileID: 6823970842699944021, guid: 1a56a38a48cd94658a491ddd19e737a7, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 0.25, y: 0.32}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -272,6 +272,11 @@ MonoBehaviour:
   equipmentUI: {fileID: 0}
   equipmentData: {fileID: 0}
   playerDialogue: {fileID: 0}
+  autoEquipWhenSlotEmpty: 0
+  autoRefillUtilityWhenConsumed: 0
+  weaponPriorityList: []
+  armorPriorityList: []
+  utilityPriorityList: []
 --- !u!114 &5893818433679787834
 MonoBehaviour:
   m_ObjectHideFlags: 0
