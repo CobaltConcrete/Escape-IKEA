@@ -1349,8 +1349,60 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
+      propertyPath: spawnableItems.Array.size
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
+      propertyPath: spawnableItems.Array.data[3].itemPrefab
+      value: 
+      objectReference: {fileID: 8285000707375923867, guid: a9d38d52224665842991800db8a4967b, type: 3}
+    - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
+      propertyPath: spawnableItems.Array.data[4].itemPrefab
+      value: 
+      objectReference: {fileID: 9190976781513619552, guid: feb6cac6d5e251344b06932d218d5caa, type: 3}
+    - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
+      propertyPath: spawnableItems.Array.data[5].itemPrefab
+      value: 
+      objectReference: {fileID: 6893116251842173615, guid: 7980763824a28744ea3c069e7f11f8f1, type: 3}
+    - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
+      propertyPath: spawnableItems.Array.data[6].itemPrefab
+      value: 
+      objectReference: {fileID: 2875444163375626223, guid: 5e5061444e91cb446850a7aa1ad4e450, type: 3}
+    - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
+      propertyPath: spawnableItems.Array.data[7].itemPrefab
+      value: 
+      objectReference: {fileID: 6568326992980098917, guid: fef15190ee5c4c14c90fff07cece10d4, type: 3}
+    - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
       propertyPath: spawnableItems.Array.data[0].spawnWeight
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
+      propertyPath: spawnableItems.Array.data[1].spawnWeight
+      value: 0.432
+      objectReference: {fileID: 0}
+    - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
+      propertyPath: spawnableItems.Array.data[2].spawnWeight
+      value: 0.387
+      objectReference: {fileID: 0}
+    - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
+      propertyPath: spawnableItems.Array.data[3].spawnWeight
+      value: 0.381
+      objectReference: {fileID: 0}
+    - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
+      propertyPath: spawnableItems.Array.data[4].spawnWeight
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
+      propertyPath: spawnableItems.Array.data[5].spawnWeight
+      value: 0.499
+      objectReference: {fileID: 0}
+    - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
+      propertyPath: spawnableItems.Array.data[6].spawnWeight
+      value: 0.664
+      objectReference: {fileID: 0}
+    - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
+      propertyPath: spawnableItems.Array.data[7].spawnWeight
+      value: 0.419
       objectReference: {fileID: 0}
     - target: {fileID: 8279092013213780573, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
       propertyPath: m_LocalPosition.x
