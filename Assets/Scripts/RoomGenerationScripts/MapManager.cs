@@ -5,55 +5,38 @@ using System.Collections.Generic;
 public class RoomPrefab
 {
     public GameObject prefab;
-    
-    [Tooltip("Number of grid cells this room occupies horizontally")]
     public int cellWidth = 1;
-
-    [Tooltip("Number of grid cells this room occupies vertically")]
     public int cellHeight = 1;
 }
 
 public class MapManager : MonoBehaviour
 {
     [Header("Map Settings")]
-    [SerializeField]
-    [Tooltip("Max number of unit cells in a row")]
-    public int maxCellRows = 5;
-    
-    [SerializeField]
-    [Tooltip("Max number of unit cells in a column")]
-    public int maxCellCols = 5;
-
-    [SerializeField]
-    [Tooltip("Actual size of each unit cell")]
-    public Vector2 unitCellSize = new Vector2(10f, 10f);
+    [SerializeField] public int maxCellRows = 5;
+    [SerializeField] public int maxCellCols = 5;
+    [SerializeField] public Vector2 unitCellSize = new Vector2(10f, 10f);
 
     [Header("Room Prefabs")]
-    [SerializeField]
-    private RoomPrefab[] roomPrefabs;
-
-    [SerializeField]
-    private GameObject startingRoomPrefab;
-
-    [SerializeField]
-    private RoomPrefab bossRoom;
-
-    [Header("Boundary Rooms")]
-    [SerializeField]
-    private GameObject[] boundaryPrefabs;
+    [SerializeField] private RoomPrefab[] roomPrefabs;
+    [SerializeField] private GameObject startingRoomPrefab;
+    [SerializeField] private RoomPrefab bossRoom;
 
     [Header("Player")]
-    [SerializeField]
-    private Transform player;
+    [SerializeField] private Transform player;
+
+    [Header("Doors")]
+    [SerializeField] private GameObject horizontalDoorPrefab;
+    [SerializeField] private GameObject verticalDoorPrefab;
+    [SerializeField] private GameObject horizontalBoundaryDoorPrefab;
+    [SerializeField] private GameObject verticalBoundaryDoorPrefab;
 
     private bool[,] occupied;
+    private GameObject[,] roomGrid;
 
-    // Boss X and Y coordinates (of the center of its left unit cell)
     private int bossX;
     private int bossY;
 
-    // Center coordinates for the entire map
-    private int centerX;   
+    private int centerX;
     private int centerY;
 
     private void Start()
@@ -63,43 +46,42 @@ public class MapManager : MonoBehaviour
 
         ChooseBossLocation();
         GenerateMap();
+        GenerateDoors();
 
         if (player != null)
         {
-            player.position = MapToWorld(maxCellCols / 2, maxCellRows / 2);
+            player.position = MapToWorld(centerX, centerY);
         }
     }
 
-    // Boss Location (size = 2 cells x 1 cell) will be at the edge of the map. Its coordinate is the center of its left unit cell
+    // ==================== Room Spawning stuff ====================
+
     void ChooseBossLocation()
     {
-        // Initialize possible candidates for boss spawn
         List<Vector2Int> candidates = new List<Vector2Int>();
 
         for (int x = 0; x <= maxCellCols - bossRoom.cellWidth; x++)
         {
-            candidates.Add(new Vector2Int(x, 0));                                   // touch left boundary
-            candidates.Add(new Vector2Int(x, maxCellRows - bossRoom.cellHeight));   // touch right boundary
+            candidates.Add(new Vector2Int(x, 0));
+            candidates.Add(new Vector2Int(x, maxCellRows - bossRoom.cellHeight));
         }
 
         for (int y = 1; y < maxCellRows - 1; y++)
         {
-            candidates.Add(new Vector2Int(0, y));                                   // touch top boundary
-            candidates.Add(new Vector2Int(maxCellCols - bossRoom.cellWidth, y));    // touch bottom boundary
+            candidates.Add(new Vector2Int(0, y));
+            candidates.Add(new Vector2Int(maxCellCols - bossRoom.cellWidth, y));
         }
 
         while (candidates.Count > 0)
         {
-            int index = Random.Range(0, candidates.Count);  // randomly choose candidates
+            int index = Random.Range(0, candidates.Count);
             Vector2Int pos = candidates[index];
-            candidates.RemoveAt(index);                     // eliminate from candidates list in case its reject
+            candidates.RemoveAt(index);
 
-            // Check is boss room overlaps spawn
             bool overlapsSpawn =
                 pos.x <= centerX && centerX < pos.x + bossRoom.cellWidth &&
                 pos.y <= centerY && centerY < pos.y + bossRoom.cellHeight;
 
-            // Accept if not overlap spawn
             if (!overlapsSpawn)
             {
                 bossX = pos.x;
@@ -111,163 +93,192 @@ public class MapManager : MonoBehaviour
 
     void GenerateMap()
     {
-        // 2D map showing which cells occupied already
         occupied = new bool[maxCellCols, maxCellRows];
+        roomGrid = new GameObject[maxCellCols, maxCellRows];
 
-        // Place boss room first so its cells are marked occupied
+        // Spawn start room
+        GameObject startRoom = Instantiate(startingRoomPrefab, MapToWorld(centerX, centerY), Quaternion.identity, transform);
+        occupied[centerX, centerY] = true;
+        roomGrid[centerX, centerY] = startRoom;
+
+        // Spawn boss room
         PlaceRoom(bossRoom, bossX, bossY);
 
-        // Create a list of all cell positions
+        // Spawn other rooms
         List<Vector2Int> positions = new List<Vector2Int>();
         for (int y = 0; y < maxCellRows; y++)
-            for (int x = 0; x < maxCellCols; x++)
-                positions.Add(new Vector2Int(x, y));
-
-        // Shuffle positions
-        for (int i = 0; i < positions.Count; i++)
         {
-            int j = Random.Range(i, positions.Count);
-            var temp = positions[i];
-            positions[i] = positions[j];
-            positions[j] = temp;
+            for (int x = 0; x < maxCellCols; x++)
+            {
+                // Skip cells already occupied
+                if (occupied[x, y]) 
+                    continue;
+
+                positions.Add(new Vector2Int(x, y));
+            }
         }
 
-        // Place rooms in shuffled order
+        Shuffle(positions);
+
         foreach (var pos in positions)
         {
-            int x = pos.x;
-            int y = pos.y;
-
-            if (occupied[x, y])
-                continue;
-
-            //if (x == centerX && y == centerY)
-            //{
-            //    Instantiate(startingRoomPrefab, MapToWorld(x, y), Quaternion.identity, transform);
-            //    occupied[x, y] = true;
-            //    continue;
-            //}
-
-            if (x == centerX && y == centerY)
-            {
-                GameObject startRoomObj = Instantiate(startingRoomPrefab, MapToWorld(x, y), Quaternion.identity, transform);
-
-                if (ItemSpawnManager.Instance != null)
-                {
-                    ItemSpawnManager.Instance.RegisterRoom(startRoomObj, x, y, 1, 1);
-                }
-
-                occupied[x, y] = true;
-                continue;
-            }
-
-            TryPlaceRandomRoom(x, y);
+            TryPlaceRandomRoom(pos.x, pos.y);
         }
+    }
 
-        // GenerateBoundary();
+    void Shuffle(List<Vector2Int> list)
+    {
+        for (int i = 0; i < list.Count; i++)
+        {
+            int j = Random.Range(i, list.Count);
+            (list[i], list[j]) = (list[j], list[i]);
+        }
     }
 
     void TryPlaceRandomRoom(int x, int y)
     {
-        // Generate a list of candidate rooms that can be places at (x,y) without overlapping other rooms / boundaries
-        List<RoomPrefab> candidateRooms = new List<RoomPrefab>();
+        List<RoomPrefab> candidates = new List<RoomPrefab>();
 
         foreach (var room in roomPrefabs)
         {
             if (CanPlace(room, x, y))
-                candidateRooms.Add(room);
+                candidates.Add(room);
         }
 
-        if (candidateRooms.Count == 0)
-            return;
+        if (candidates.Count == 0) return;
 
-        // Randomly select a room from one of these candidates
-        RoomPrefab selectedRoom = candidateRooms[Random.Range(0, candidateRooms.Count)];
-        PlaceRoom(selectedRoom, x, y);
-    }
-
-    bool OverlapsCenter(RoomPrefab room, int x, int y)
-    {
-        // Check if this room overlaps spawnpoint (map center)
-        return x <= centerX && centerX < x + room.cellWidth &&
-            y <= centerY && centerY < y + room.cellHeight;
+        PlaceRoom(candidates[Random.Range(0, candidates.Count)], x, y);
     }
 
     bool CanPlace(RoomPrefab room, int x, int y)
     {
-        // Bounds check
         if (x + room.cellWidth > maxCellCols || y + room.cellHeight > maxCellRows)
             return false;
 
-        // Occupancy check
         for (int dx = 0; dx < room.cellWidth; dx++)
-        {
             for (int dy = 0; dy < room.cellHeight; dy++)
-            {
                 if (occupied[x + dx, y + dy])
                     return false;
-            }
-        }
-
-        // Prevent encroaching on center spawn
-        if (OverlapsCenter(room, x, y))
-            return false;
 
         return true;
     }
 
     void PlaceRoom(RoomPrefab room, int x, int y)
     {
-        //Instantiate(room.prefab, MapToWorld(x, y), Quaternion.identity, transform);
-
-        //for (int dx = 0; dx < room.cellWidth; dx++)
-        //{
-        //    for (int dy = 0; dy < room.cellHeight; dy++)
-        //    {
-        //        occupied[x + dx, y + dy] = true;
-        //    }
-        //}
-        GameObject roomObj = Instantiate(room.prefab, MapToWorld(x, y), Quaternion.identity, transform);
-
-        if (ItemSpawnManager.Instance != null)
-        {
-            ItemSpawnManager.Instance.RegisterRoom(roomObj, x, y, room.cellWidth, room.cellHeight);
-        }
+        GameObject obj = Instantiate(room.prefab, MapToWorld(x, y), Quaternion.identity, transform);
 
         for (int dx = 0; dx < room.cellWidth; dx++)
         {
             for (int dy = 0; dy < room.cellHeight; dy++)
             {
                 occupied[x + dx, y + dy] = true;
+                roomGrid[x + dx, y + dy] = obj;
             }
         }
     }
 
-    // void GenerateBoundary()
-    // {
-    //     for (int x = -1; x <= maxCellCols; x++)
-    //     {
-    //         SpawnBoundary(x, -1);
-    //         SpawnBoundary(x, maxCellRows);
-    //     }
+    // ==================== Door Spawning stuff ====================
 
-    //     for (int y = 0; y < maxCellRows; y++)
-    //     {
-    //         SpawnBoundary(-1, y);
-    //         SpawnBoundary(maxCellCols, y);
-    //     }
-    // }
+    void GenerateDoors()
+    {
+        GenerateInternalDoors();
+        GenerateBoundaryDoors();
+    }
 
-    // void SpawnBoundary(int x, int y)
-    // {
-    //     if (boundaryPrefabs == null || boundaryPrefabs.Length == 0)
-    //         return;
+    void GenerateInternalDoors()
+    {
+        for (int x = 0; x < maxCellCols; x++)
+        {
+            for (int y = 0; y < maxCellRows; y++)
+            {
+                if (!occupied[x, y]) continue;
 
-    //     GameObject prefab = boundaryPrefabs[Random.Range(0, boundaryPrefabs.Length)];
-    //     Instantiate(prefab, MapToWorld(x, y), Quaternion.identity, transform);
-    // }
+                GameObject currentRoom = roomGrid[x, y];
 
-    // Map coordinates -> World coordinates
+                // RIGHT neighbor → Vertical door
+                if (x < maxCellCols - 1 && occupied[x + 1, y])
+                {
+                    GameObject neighborRoom = roomGrid[x + 1, y];
+
+                    // 🚨 KEY FIX: skip if same room
+                    if (currentRoom != neighborRoom)
+                    {
+                        Vector3 pos = MapToWorld(x, y) + new Vector3(unitCellSize.x / 2f, 0, 0);
+
+                        Door d = SpawnDoor(verticalDoorPrefab, pos, false);
+                        d.Initialize(currentRoom, neighborRoom);
+                    }
+                }
+
+                // TOP neighbor → Horizontal door
+                if (y < maxCellRows - 1 && occupied[x, y + 1])
+                {
+                    GameObject neighborRoom = roomGrid[x, y + 1];
+
+                    // 🚨 KEY FIX: skip if same room
+                    if (currentRoom != neighborRoom)
+                    {
+                        Vector3 pos = MapToWorld(x, y) + new Vector3(0, unitCellSize.y / 2f, 0);
+
+                        Door d = SpawnDoor(horizontalDoorPrefab, pos, true);
+                        d.Initialize(currentRoom, neighborRoom);
+                    }
+                }
+            }
+        }
+    }
+
+    void GenerateBoundaryDoors()
+    {
+        for (int x = 0; x < maxCellCols; x++)
+        {
+            Door top = SpawnDoor(horizontalBoundaryDoorPrefab,
+                MapToWorld(x, maxCellRows - 1) + new Vector3(0, unitCellSize.y / 2f, 0), true);
+
+            Door bottom = SpawnDoor(horizontalBoundaryDoorPrefab,
+                MapToWorld(x, 0) + new Vector3(0, -unitCellSize.y / 2f, 0), true);
+
+            top.Initialize(roomGrid[x, maxCellRows - 1], null);
+            bottom.Initialize(roomGrid[x, 0], null);
+
+            LinkDoors(top, bottom);
+        }
+
+        for (int y = 0; y < maxCellRows; y++)
+        {
+            Door left = SpawnDoor(verticalBoundaryDoorPrefab,
+                MapToWorld(0, y) + new Vector3(-unitCellSize.x / 2f, 0, 0), false);
+
+            Door right = SpawnDoor(verticalBoundaryDoorPrefab,
+                MapToWorld(maxCellCols - 1, y) + new Vector3(unitCellSize.x / 2f, 0, 0), false);
+
+            left.Initialize(roomGrid[0, y], null);
+            right.Initialize(roomGrid[maxCellCols - 1, y], null);
+
+            LinkDoors(left, right);
+        }
+    }
+
+    Door SpawnDoor(GameObject prefab, Vector3 pos, bool isHorizontal)
+    {
+        GameObject obj = Instantiate(prefab, pos, Quaternion.identity, transform);
+        Door door = obj.GetComponent<Door>();
+
+        if (door != null)
+            door.isHorizontal = isHorizontal;
+
+        return door;
+    }
+
+    void LinkDoors(Door a, Door b)
+    {
+        if (a == null || b == null) return;
+        a.linkedDoor = b;
+        b.linkedDoor = a;
+    }
+
+    // ==================== Utils ====================
+
     public Vector3 MapToWorld(int x, int y)
     {
         return new Vector3(x * unitCellSize.x, y * unitCellSize.y, 0f);
