@@ -97,9 +97,15 @@ public class MapManager : MonoBehaviour
         roomGrid = new GameObject[maxCellCols, maxCellRows];
 
         // Spawn start room
-        GameObject startRoom = Instantiate(startingRoomPrefab, MapToWorld(centerX, centerY), Quaternion.identity, transform);
+        GameObject startRoomObj = Instantiate(startingRoomPrefab, MapToWorld(centerX, centerY), Quaternion.identity, transform);
+        
+        if (ItemSpawnManager.Instance != null)
+        {
+            ItemSpawnManager.Instance.RegisterRoom(startRoomObj, centerX, centerY, 1, 1);
+        }
+        
         occupied[centerX, centerY] = true;
-        roomGrid[centerX, centerY] = startRoom;
+        roomGrid[centerX, centerY] = startRoomObj;
 
         // Spawn boss room
         PlaceRoom(bossRoom, bossX, bossY);
@@ -165,14 +171,20 @@ public class MapManager : MonoBehaviour
 
     void PlaceRoom(RoomPrefab room, int x, int y)
     {
-        GameObject obj = Instantiate(room.prefab, MapToWorld(x, y), Quaternion.identity, transform);
+
+        GameObject roomObj = Instantiate(room.prefab, MapToWorld(x, y), Quaternion.identity, transform);
+
+        if (ItemSpawnManager.Instance != null)
+        {
+            ItemSpawnManager.Instance.RegisterRoom(roomObj, x, y, room.cellWidth, room.cellHeight);
+        }
 
         for (int dx = 0; dx < room.cellWidth; dx++)
         {
             for (int dy = 0; dy < room.cellHeight; dy++)
             {
                 occupied[x + dx, y + dy] = true;
-                roomGrid[x + dx, y + dy] = obj;
+                roomGrid[x + dx, y + dy] = roomObj;
             }
         }
     }
