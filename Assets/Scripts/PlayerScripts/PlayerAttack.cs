@@ -6,6 +6,7 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private float attackDamage = 15f;
     [SerializeField] private float attackRadius = 1.25f;
     [SerializeField] private KeyCode attackKey = KeyCode.J;
+    [SerializeField] private float bulletClearRadius = 1.6f;
 
     private void Update()
     {
@@ -29,9 +30,17 @@ public class PlayerAttack : MonoBehaviour
 
             if (enemyCombat != null && !damagedEnemies.Contains(enemyCombat))
             {
-                enemyCombat.TakeDamage(attackDamage);
+                enemyCombat.TakeDamageFrom(transform.position, attackDamage);
                 damagedEnemies.Add(enemyCombat);
             }
+        }
+
+        Collider2D[] bulletHits = Physics2D.OverlapCircleAll(transform.position, bulletClearRadius);
+        for (int i = 0; i < bulletHits.Length; i++)
+        {
+            EnemyBullet bullet = bulletHits[i].GetComponent<EnemyBullet>();
+            if (bullet == null) continue;
+            Destroy(bullet.gameObject);
         }
     }
 

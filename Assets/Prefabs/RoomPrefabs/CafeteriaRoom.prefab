@@ -360,6 +360,7 @@ GameObject:
   - component: {fileID: 7871331883554067030}
   - component: {fileID: 7640435745210340264}
   - component: {fileID: 4526436974333089289}
+  - component: {fileID: 6189421176342105510}
   m_Layer: 0
   m_Name: CafeteriaRoom
   m_TagString: Untagged
@@ -488,30 +489,12 @@ MonoBehaviour:
   enemyWanderAreaCollider: {fileID: 3948193875352072267}
   spawnParent: {fileID: 6958675699673471726}
   spawnGroups:
-  - groupName: Employee
-    prefab: {fileID: 6291527677918437734, guid: e473e2195ce4e41b6bfde2257fe2d519, type: 3}
+  - groupName: CafeteriaBoss
+    prefab: {fileID: 1626777669089237922, guid: 5f2d51f8a8eb4c4db1b7e5a399e8db49, type: 3}
     spawnChance: 1
     minCount: 1
-    maxCount: 3
+    maxCount: 1
     sortingOrder: 10
-  - groupName: Meatball
-    prefab: {fileID: 2870026492113798478, guid: c5692d816becb45e5bd4aaee83b6f00d, type: 3}
-    spawnChance: 0.932
-    minCount: 0
-    maxCount: 2
-    sortingOrder: 8
-  - groupName: CafeteriaEmployee
-    prefab: {fileID: 1626777669089237922, guid: f4f55aeea54d40b40b4154fdb751f326, type: 3}
-    spawnChance: 0.852
-    minCount: 1
-    maxCount: 3
-    sortingOrder: 7
-  - groupName: DistortedShopper
-    prefab: {fileID: 3464154710725457275, guid: 73a96bd0a680f8949861c27cf368dbe9, type: 3}
-    spawnChance: 0.4
-    minCount: 1
-    maxCount: 3
-    sortingOrder: 6
   maxPositionTriesPerSpawn: 20
   edgePadding: 0.5
   overlapCheckRadius: 0.4
@@ -533,6 +516,23 @@ MonoBehaviour:
   roomTrigger: {fileID: 186864520387980171}
   enemyContainer: {fileID: 6958675699673471726}
   itemContainer: {fileID: 1359586083509128961}
+--- !u!114 &6189421176342105510
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 652476656982324103}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e9e3b5fd4e84d2ca2e4b8dd9d8224a1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roomTrigger: {fileID: 186864520387980171}
+  enemyContainer: {fileID: 6958675699673471726}
+  bossNameHint: CafeteriaEmployee
+  clearMessage: Boss defeated! Leave the store.
+  startLocked: 0
 --- !u!1 &1697749999502467874
 GameObject:
   m_ObjectHideFlags: 0

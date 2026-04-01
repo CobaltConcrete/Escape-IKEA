@@ -154,8 +154,8 @@ MonoBehaviour:
     sortingOrder: 8
   - groupName: CafeteriaEmployee
     prefab: {fileID: 1626777669089237922, guid: f4f55aeea54d40b40b4154fdb751f326, type: 3}
-    spawnChance: 0.549
-    minCount: 0
+    spawnChance: 0.55
+    minCount: 1
     maxCount: 2
     sortingOrder: 7
   - groupName: DistortedShopper
