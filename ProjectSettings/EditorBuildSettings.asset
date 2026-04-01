@@ -8,6 +8,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/IKEAscene.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: 3da6bc33314d6a34abbc00b72b449d01
+  - enabled: 1
+    path: Assets/Scenes/Pause.unity
+    guid: 1adac9d71f39e6b46812f390660413a5
+  - enabled: 1
+    path: Assets/Scenes/Lose.unity
+    guid: 781f07404b9a25744bc1f4b69e3491b6
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0
