@@ -966,6 +966,10 @@ MonoBehaviour:
   barWidthFallback: 200
   healthFillImage: {fileID: 1113538291}
   healthText: {fileID: 0}
+  bossHealthBarFillRect: {fileID: 0}
+  bossHealthFillImage: {fileID: 0}
+  bossHealthText: {fileID: 0}
+  bossBarColor: {r: 1, g: 0, b: 0, a: 1}
 --- !u!114 &1029708346
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3975,6 +3979,14 @@ PrefabInstance:
       propertyPath: interactionPromptUI
       value: 
       objectReference: {fileID: 1601841349886002471}
+    - target: {fileID: 1822560432590618026, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: maxHealth
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 1822560432590618026, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: startingHealth
+      value: 1000
+      objectReference: {fileID: 0}
     - target: {fileID: 2186692304189018441, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
       propertyPath: m_Name
       value: Player
