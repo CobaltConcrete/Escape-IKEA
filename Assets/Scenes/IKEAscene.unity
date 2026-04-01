@@ -1219,15 +1219,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
       propertyPath: spawnableItems.Array.data[1].spawnWeight
-      value: 0.432
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
       propertyPath: spawnableItems.Array.data[2].spawnWeight
-      value: 0.387
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
       propertyPath: spawnableItems.Array.data[3].spawnWeight
-      value: 0.381
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
       propertyPath: spawnableItems.Array.data[4].spawnWeight
@@ -1235,7 +1235,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
       propertyPath: spawnableItems.Array.data[5].spawnWeight
-      value: 0.499
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2204963074887111245, guid: da6bb8e719474e942898fa37e8a1e920, type: 3}
       propertyPath: spawnableItems.Array.data[6].spawnWeight
