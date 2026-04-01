@@ -23,10 +23,16 @@ public class ItemWorldSpawner : MonoBehaviour
         Item item = new Item
         {
             definition = itemDefinition,
-            amount = amount
+            amount = amount,
+            worldScale = transform.lossyScale
         };
 
-        ItemWorld spawned = ItemWorld.SpawnItemWorld(transform.position, item);
+        ItemWorld spawned = ItemWorld.SpawnItemWorld(
+            transform.position,
+            transform.rotation,
+            transform.lossyScale,
+            item
+        );
 
         if (spawned != null && spawnParent != null)
         {

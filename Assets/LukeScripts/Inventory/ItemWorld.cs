@@ -3,9 +3,14 @@ using UnityEngine.Rendering.Universal;
 using TMPro;
 using CodeMonkey.Utils;
 
-public class ItemWorld : MonoBehaviour
+public class ItemWorld : MonoBehaviour, IInteractable
 {
     public static ItemWorld SpawnItemWorld(Vector3 position, Item item)
+    {
+        return SpawnItemWorld(position, Quaternion.identity, Vector3.one, item);
+    }
+
+    public static ItemWorld SpawnItemWorld(Vector3 position, Quaternion rotation, Vector3 scale, Item item)
     {
         ItemAssets itemAssets = ItemAssets.GetInstance();
 
@@ -21,7 +26,8 @@ public class ItemWorld : MonoBehaviour
             return null;
         }
 
-        Transform spawnedTransform = Instantiate(itemAssets.pfItemWorld, position, Quaternion.identity);
+        Transform spawnedTransform = Instantiate(itemAssets.pfItemWorld, position, rotation);
+        spawnedTransform.localScale = scale;
 
         ItemWorld itemWorld = spawnedTransform.GetComponent<ItemWorld>();
         if (itemWorld == null)
@@ -33,6 +39,34 @@ public class ItemWorld : MonoBehaviour
         itemWorld.SetItem(item);
         return itemWorld;
     }
+    //public static ItemWorld SpawnItemWorld(Vector3 position, Item item)
+    //{
+    //    ItemAssets itemAssets = ItemAssets.GetInstance();
+
+    //    if (itemAssets == null)
+    //    {
+    //        Debug.LogError("No ItemAssets found in scene!");
+    //        return null;
+    //    }
+
+    //    if (itemAssets.pfItemWorld == null)
+    //    {
+    //        Debug.LogError("pfItemWorld is not assigned on ItemAssets!");
+    //        return null;
+    //    }
+
+    //    Transform spawnedTransform = Instantiate(itemAssets.pfItemWorld, position, Quaternion.identity);
+
+    //    ItemWorld itemWorld = spawnedTransform.GetComponent<ItemWorld>();
+    //    if (itemWorld == null)
+    //    {
+    //        Debug.LogError("pfItemWorld prefab is missing ItemWorld component!");
+    //        return null;
+    //    }
+
+    //    itemWorld.SetItem(item);
+    //    return itemWorld;
+    //}
 
     private Item item;
     private SpriteRenderer spriteRenderer;
@@ -90,13 +124,22 @@ public class ItemWorld : MonoBehaviour
         }
 
         spriteRenderer.sprite = item.GetSprite();
-        transform.localScale = defaultScale;
 
         if (light2D != null)
         {
-            light2D.color = item.GetColor();
-            light2D.intensity = 1f;
-            light2D.pointLightOuterRadius = 1f;
+            if (item.IsLoot())
+            {
+                // Loot
+                light2D.enabled = false;
+            }
+            else
+            {
+                // Item
+                light2D.enabled = true;
+                light2D.color = item.GetColor();
+                light2D.intensity = 1f;
+                light2D.pointLightOuterRadius = 1f;
+            }
         }
 
         if (textMeshPro != null)
@@ -126,7 +169,8 @@ public class ItemWorld : MonoBehaviour
     {
         Vector3 randomDir = UtilsClass.GetRandomDir();
 
-        ItemWorld itemWorld = SpawnItemWorld(dropPosition + randomDir * 1.1f, item);
+        ItemWorld itemWorld = SpawnItemWorld(dropPosition + randomDir * 1.1f, Quaternion.identity, item.worldScale, item);
+
         if (itemWorld == null) return null;
 
         itemWorld.SetCanBePickedUpTimer(0.25f);
@@ -141,4 +185,35 @@ public class ItemWorld : MonoBehaviour
 
         return itemWorld;
     }
+
+    public void Interact(PlayerInventoryInteraction player)
+    {
+        if (player == null) return;
+        if (!CanBePickedUp()) return;
+        if (item == null || item.definition == null) return;
+
+        if (item.IsLoot())
+        {
+            player.PickupLoot(this);
+        }
+    }
+
+    public string GetInteractionText()
+    {
+        if (item == null || item.definition == null) return "";
+
+        if (item.IsLoot())
+        {
+            return "[F] Pick up " + item.definition.itemName;
+        }
+
+        return "";
+    }
+
+    public Vector3 GetInteractionPosition()
+    {
+        return transform.position;
+    }
+
+
 }

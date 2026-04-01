@@ -4,6 +4,7 @@ public class ToggleInventory : MonoBehaviour
 {
     [SerializeField] private GameObject uiRoot;
     [SerializeField] private GameObject utilityQuickSlot;
+    [SerializeField] private GameObject dialogueBox;
 
     private bool isOpen = false;
 
@@ -32,6 +33,11 @@ public class ToggleInventory : MonoBehaviour
         if (utilityQuickSlot != null)
         {
             utilityQuickSlot.SetActive(!isOpen);
+        }
+
+        if(dialogueBox != null)
+        {
+            dialogueBox.SetActive(!isOpen);
         }
 
         if (isOpen)

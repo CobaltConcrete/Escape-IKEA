@@ -5,13 +5,18 @@ using UnityEngine;
 public class Inventory
 {
     public event EventHandler OnItemListChanged;
+    public event EventHandler OnLootListChanged;
+
     private List<Item> itemList;
+    private List<Item> lootList;
+
     private Action<Item> useItemAction;
 
     public Inventory(Action<Item> useItemAction)
     {
         this.useItemAction = useItemAction;
         itemList = new List<Item>();
+        lootList = new List<Item>();
     }
     public int GetTotalAmountByDefinition(ItemDefinition definition)
     {
@@ -85,10 +90,44 @@ public class Inventory
 
         OnItemListChanged?.Invoke(this, EventArgs.Empty);
     }
+    public void AddLoot(Item item)
+    {
+        if (item == null || item.definition == null) return;
+
+        if (item.IsStackable())
+        {
+            bool itemAlreadyInLoot = false;
+
+            foreach (Item lootItem in lootList)
+            {
+                if (lootItem.definition == item.definition)
+                {
+                    lootItem.amount += item.amount;
+                    itemAlreadyInLoot = true;
+                    break;
+                }
+            }
+
+            if (!itemAlreadyInLoot)
+            {
+                lootList.Add(item);
+            }
+        }
+        else
+        {
+            lootList.Add(item);
+        }
+
+        OnLootListChanged?.Invoke(this, EventArgs.Empty);
+    }
 
     public int GetItemIndex(Item item)
     {
         return itemList.IndexOf(item);
+    }
+    public List<Item> GetLootList()
+    {
+        return lootList;
     }
 
     public void InsertItemAt(Item item, int index)
@@ -163,6 +202,26 @@ public class Inventory
         }
 
         OnItemListChanged?.Invoke(this, EventArgs.Empty);
+    }
+    public void RemoveLoot(Item item)
+    {
+        if (item == null || item.definition == null) return;
+
+        if (item.IsStackable())
+        {
+            item.amount--;
+
+            if (item.amount <= 0)
+            {
+                lootList.Remove(item);
+            }
+        }
+        else
+        {
+            lootList.Remove(item);
+        }
+
+        OnLootListChanged?.Invoke(this, EventArgs.Empty);
     }
 
     public void RemoveOneItem(Item item)

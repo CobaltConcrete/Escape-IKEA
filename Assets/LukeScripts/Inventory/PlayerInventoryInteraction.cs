@@ -8,13 +8,22 @@ public class PlayerInventoryInteraction : MonoBehaviour
     private Inventory inventory;
 
     [SerializeField] private UI_Inventory uiInventory;
+    [SerializeField] private UI_LootInventory uiLootInventory;
     [SerializeField] private EquipmentUI equipmentUI;
     [SerializeField] private EquipmentData equipmentData;
     [SerializeField] private Dialogue playerDialogue;
 
+    private ItemWorld nearbyLoot;
+    [SerializeField] private float interactRadius = 1.2f;
+    [SerializeField] private LayerMask interactableLayerMask;
+    [SerializeField] private UI_InteractionPrompt interactionPromptUI;
+
+    private IInteractable currentInteractable;
+
     [Header("Auto Equip Settings")]
     [SerializeField] private bool autoEquipWhenSlotEmpty = false;
     [SerializeField] private bool autoRefillUtilityWhenConsumed = false;
+    [SerializeField] private bool autoReplaceWithHigherPriority = false;
 
     private SpriteRenderer playerSpriteRenderer;
     private PlayerMovement playerMovement;
@@ -47,8 +56,17 @@ public class PlayerInventoryInteraction : MonoBehaviour
 
     private void Start()
     {
-        uiInventory.SetPlayer(this);
-        uiInventory.SetInventory(inventory);
+        if (uiInventory != null)
+        {
+            uiInventory.SetPlayer(this);
+            uiInventory.SetInventory(inventory);
+        }
+
+        if (uiLootInventory != null)
+        {
+            uiLootInventory.SetPlayer(this);
+            uiLootInventory.SetInventory(inventory);
+        }
     }
 
     private void Update()
@@ -57,13 +75,83 @@ public class PlayerInventoryInteraction : MonoBehaviour
         {
             UseEquippedUtility();
         }
-    }
 
+        FindBestInteractable();
+
+        if (Input.GetKeyDown(KeyCode.F))
+        {
+            if (currentInteractable != null)
+            {
+                currentInteractable.Interact(this);
+            }
+        }
+    }
     public Vector3 GetPosition()
     {
         return transform.position;
     }
+    public void PickupLoot(ItemWorld itemWorld)
+    {
+        if (itemWorld == null) return;
 
+        Item pickedUpItem = itemWorld.GetItem();
+
+        if (pickedUpItem == null || pickedUpItem.definition == null) return;
+        if (!pickedUpItem.IsLoot()) return;
+
+        inventory.AddLoot(pickedUpItem);
+        itemWorld.DestroySelf();
+    }
+    private void FindBestInteractable()
+    {
+        currentInteractable = null;
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(
+            transform.position,
+            interactRadius,
+            interactableLayerMask
+        );
+
+        float bestDistance = float.MaxValue;
+
+        foreach (Collider2D hit in hits)
+        {
+            IInteractable interactable = hit.GetComponent<IInteractable>();
+            if (interactable == null) continue;
+
+            float distance = Vector2.Distance(transform.position, hit.transform.position);
+
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                currentInteractable = interactable;
+            }
+        }
+
+        UpdateInteractionPrompt();
+    }
+
+    private void UpdateInteractionPrompt()
+    {
+        if (interactionPromptUI == null) return;
+
+        if (currentInteractable == null)
+        {
+            interactionPromptUI.Hide();
+            return;
+        }
+
+        string text = currentInteractable.GetInteractionText();
+
+        if (string.IsNullOrEmpty(text))
+        {
+            interactionPromptUI.Hide();
+        }
+        else
+        {
+            interactionPromptUI.Show(text);
+        }
+    }
     private void TryAutoEquipPickedUpItem(Item pickedItem)
     {
         if (pickedItem == null || pickedItem.definition == null) return;
@@ -73,47 +161,58 @@ public class PlayerInventoryInteraction : MonoBehaviour
         EquipTag pickedTag = ItemEquipClassifier.GetEquipTag(pickedItem);
         Item equippedItem = equipmentData.GetEquippedItem(pickedTag);
 
-        // Weapon / Armor£ºauto equip if empty
-        if (pickedTag == EquipTag.Weapon || pickedTag == EquipTag.Armor)
+        List<ItemDefinition> priorityList = GetPriorityListByTag(pickedTag);
+
+        // =========================
+        // Case 1: slot empty
+        // only controlled by autoEquipWhenSlotEmpty
+        // =========================
+        if (equippedItem == null)
         {
-            if (equippedItem == null)
+            if (autoEquipWhenSlotEmpty)
             {
                 AutoEquipItem(pickedItem);
             }
-
             return;
         }
 
-        // Utility
-        if (pickedTag != EquipTag.Utility) return;
-
-        // empty: equip immediately
-        if (equippedItem == null)
+        // =========================
+        // Case 2: slot not empty
+        // Utility special case: same item stack together
+        // =========================
+        if (pickedTag == EquipTag.Utility)
         {
-            AutoEquipItem(pickedItem);
+            if (equippedItem.definition == pickedItem.definition && equippedItem.IsStackable())
+            {
+                int totalAmount = inventory.GetTotalAmountByDefinition(pickedItem.definition);
+
+                inventory.RemoveAllByDefinition(pickedItem.definition);
+                equippedItem.amount += totalAmount;
+
+                equipmentUI.RefreshSlot(EquipTag.Utility);
+                return;
+            }
+        }
+
+        // =========================
+        // Case 3: slot not empty, check higher priority replacement
+        // only controlled by autoReplaceWithHigherPriority
+        // =========================
+        if (!autoReplaceWithHigherPriority)
+        {
             return;
         }
 
-        // same utility: stack on slot
-        if (equippedItem.definition == pickedItem.definition && equippedItem.IsStackable())
+        if (!IsHigherPriority(pickedItem.definition, equippedItem.definition, priorityList))
         {
-            int totalAmount = inventory.GetTotalAmountByDefinition(pickedItem.definition);
-
-            inventory.RemoveAllByDefinition(pickedItem.definition);
-            equippedItem.amount += totalAmount;
-
-            equipmentUI.RefreshSlot(EquipTag.Utility);
             return;
         }
 
-        // when bool true, replace with top priority
-        int equippedPriority = GetPriorityIndex(equippedItem.definition, utilityPriorityList);
-        int pickedPriority = GetPriorityIndex(pickedItem.definition, utilityPriorityList);
+        int originalIndex = inventory.GetItemIndex(pickedItem);
 
-        if (pickedPriority >= 0 && (equippedPriority < 0 || pickedPriority < equippedPriority))
+        // Utility needs special build logic
+        if (pickedTag == EquipTag.Utility)
         {
-            int originalIndex = inventory.GetItemIndex(pickedItem);
-
             Item itemToEquip = BuildUtilityItemToEquip(pickedItem.definition);
             if (itemToEquip == null) return;
 
@@ -124,8 +223,135 @@ public class PlayerInventoryInteraction : MonoBehaviour
             {
                 inventory.InsertItemAt(oldItem, originalIndex);
             }
+
+            return;
+        }
+
+        // Weapon / Armor replacement
+        Item itemClone = pickedItem.Clone();
+        Item oldEquippedItem = equipmentUI.EquipItem(itemClone);
+
+        if (pickedItem.IsStackable())
+        {
+            inventory.RemoveItem(pickedItem);
+        }
+        else
+        {
+            inventory.RemoveOneItem(pickedItem);
+        }
+
+        if (oldEquippedItem != null)
+        {
+            inventory.InsertItemAt(oldEquippedItem, originalIndex);
         }
     }
+
+    //below is the AutoEquip Version where autoReplaceWithHigherPriority only influences WEAPON/ARMOR, not UTILITY
+
+    //private void TryAutoEquipPickedUpItem(Item pickedItem)
+    //{
+    //    if (pickedItem == null || pickedItem.definition == null) return;
+    //    if (!ItemEquipClassifier.IsEquipable(pickedItem)) return;
+    //    if (equipmentData == null) return;
+
+    //    EquipTag pickedTag = ItemEquipClassifier.GetEquipTag(pickedItem);
+    //    Item equippedItem = equipmentData.GetEquippedItem(pickedTag);
+    //    List<ItemDefinition> priorityList = GetPriorityListByTag(pickedTag);
+
+    //    // =========================
+    //    // Weapon / Armor
+    //    // =========================
+    //    if (pickedTag == EquipTag.Weapon || pickedTag == EquipTag.Armor)
+    //    {
+    //        // slot empty -> controlled by autoEquipWhenSlotEmpty
+    //        if (equippedItem == null)
+    //        {
+    //            if (autoEquipWhenSlotEmpty)
+    //            {
+    //                AutoEquipItem(pickedItem);
+    //            }
+    //            return;
+    //        }
+
+    //        // slot not empty -> controlled by autoReplaceWithHigherPriority
+    //        if (!autoReplaceWithHigherPriority)
+    //        {
+    //            return;
+    //        }
+
+    //        if (!IsHigherPriority(pickedItem.definition, equippedItem.definition, priorityList))
+    //        {
+    //            return;
+    //        }
+
+    //        int originalIndex = inventory.GetItemIndex(pickedItem);
+
+    //        Item itemToEquip = pickedItem.Clone();
+    //        Item oldItem = equipmentUI.EquipItem(itemToEquip);
+
+    //        if (pickedItem.IsStackable())
+    //        {
+    //            inventory.RemoveItem(pickedItem);
+    //        }
+    //        else
+    //        {
+    //            inventory.RemoveOneItem(pickedItem);
+    //        }
+
+    //        if (oldItem != null)
+    //        {
+    //            inventory.InsertItemAt(oldItem, originalIndex);
+    //        }
+
+    //        return;
+    //    }
+
+    //    // =========================
+    //    // Utility
+    //    // =========================
+    //    if (pickedTag != EquipTag.Utility) return;
+
+    //    // slot empty -> controlled by autoEquipWhenSlotEmpty
+    //    if (equippedItem == null)
+    //    {
+    //        if (autoEquipWhenSlotEmpty)
+    //        {
+    //            AutoEquipItem(pickedItem);
+    //        }
+    //        return;
+    //    }
+
+    //    // same utility -> always stack
+    //    if (equippedItem.definition == pickedItem.definition && equippedItem.IsStackable())
+    //    {
+    //        int totalAmount = inventory.GetTotalAmountByDefinition(pickedItem.definition);
+
+    //        inventory.RemoveAllByDefinition(pickedItem.definition);
+    //        equippedItem.amount += totalAmount;
+
+    //        equipmentUI.RefreshSlot(EquipTag.Utility);
+    //        return;
+    //    }
+
+    //    // utility replacement -> ALWAYS compare priority
+    //    if (!IsHigherPriority(pickedItem.definition, equippedItem.definition, utilityPriorityList))
+    //    {
+    //        return;
+    //    }
+
+    //    int utilityOriginalIndex = inventory.GetItemIndex(pickedItem);
+
+    //    Item utilityToEquip = BuildUtilityItemToEquip(pickedItem.definition);
+    //    if (utilityToEquip == null) return;
+
+    //    Item oldUtility = equipmentUI.EquipItem(utilityToEquip);
+    //    SetCurrentUtilityChain(utilityToEquip);
+
+    //    if (oldUtility != null)
+    //    {
+    //        inventory.InsertItemAt(oldUtility, utilityOriginalIndex);
+    //    }
+    //}
 
     private int GetPriorityIndex(ItemDefinition definition, List<ItemDefinition> priorityList)
     {
@@ -141,6 +367,24 @@ public class PlayerInventoryInteraction : MonoBehaviour
         }
 
         return -1;
+    }
+
+    private bool IsHigherPriority(ItemDefinition pickedDefinition, ItemDefinition equippedDefinition, List<ItemDefinition> priorityList)
+    {
+        int pickedPriority = GetPriorityIndex(pickedDefinition, priorityList);
+        int equippedPriority = GetPriorityIndex(equippedDefinition, priorityList);
+
+        if (pickedPriority < 0)
+        {
+            return false;
+        }
+
+        if (equippedPriority < 0)
+        {
+            return true;
+        }
+
+        return pickedPriority < equippedPriority;
     }
 
     private void SetCurrentUtilityChain(Item item)
@@ -584,24 +828,76 @@ public class PlayerInventoryInteraction : MonoBehaviour
         }
     }
 
+    //private void OnTriggerEnter2D(Collider2D collider)
+    //{
+    //    ItemWorld itemWorld = collider.GetComponent<ItemWorld>();
+
+    //    if (itemWorld != null && itemWorld.CanBePickedUp())
+    //    {
+    //        Item pickedUpItem = itemWorld.GetItem();
+    //        if (pickedUpItem == null || pickedUpItem.definition == null) return;
+
+    //        if (!firstItemFound)
+    //        {
+    //            firstItemFound = true;
+    //            playerDialogue.ShowDialogue();
+    //        }
+
+    //        if (pickedUpItem.IsLoot())
+    //        {
+    //            // Loot don't auto pick up, just record that there is a loot nearby
+    //            nearbyLoot = itemWorld;
+    //        }
+    //        else
+    //        {
+    //            // normal item pick up immediately
+    //            inventory.AddItem(pickedUpItem);
+    //            TryAutoEquipPickedUpItem(pickedUpItem);
+    //            itemWorld.DestroySelf();
+    //        }
+    //    }
+    //}
     private void OnTriggerEnter2D(Collider2D collider)
     {
         ItemWorld itemWorld = collider.GetComponent<ItemWorld>();
 
-        if (itemWorld != null && itemWorld.CanBePickedUp())
+        if (itemWorld == null || !itemWorld.CanBePickedUp())
         {
-            if (!firstItemFound)
-            {
-                firstItemFound = true;
-                playerDialogue.ShowDialogue();
-            }
+            return;
+        }
 
-            Item pickedUpItem = itemWorld.GetItem();
+        Item pickedUpItem = itemWorld.GetItem();
 
-            inventory.AddItem(pickedUpItem);
-            TryAutoEquipPickedUpItem(pickedUpItem);
+        if (pickedUpItem == null || pickedUpItem.definition == null)
+        {
+            return;
+        }
 
-            itemWorld.DestroySelf();
+        // Loot don't auto pick up, leave it to F interact
+        if (pickedUpItem.IsLoot())
+        {
+            return;
+        }
+
+        // normal item pick up immediately
+        if (!firstItemFound)
+        {
+            firstItemFound = true;
+            playerDialogue.ShowDialogue();
+        }
+
+        inventory.AddItem(pickedUpItem);
+        TryAutoEquipPickedUpItem(pickedUpItem);
+
+        itemWorld.DestroySelf();
+    }
+    private void OnTriggerExit2D(Collider2D collider)
+    {
+        ItemWorld itemWorld = collider.GetComponent<ItemWorld>();
+
+        if (itemWorld != null && itemWorld == nearbyLoot)
+        {
+            nearbyLoot = null;
         }
     }
 

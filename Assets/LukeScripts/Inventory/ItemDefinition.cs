@@ -1,6 +1,12 @@
 using UnityEngine;
 using static EquipmentEnum;
 
+public enum ItemCategory
+{
+    Normal,
+    Loot
+}
+
 [CreateAssetMenu(menuName = "Inventory/Item Definition")]
 public class ItemDefinition : ScriptableObject
 {
@@ -10,6 +16,9 @@ public class ItemDefinition : ScriptableObject
     public float uiScale = 1f;
     public Color glowColor = Color.white;
     public EquipTag equipTag = EquipTag.None;
+
+    [Header("Category")]
+    public ItemCategory itemCategory = ItemCategory.Normal;
 
     [Header("Use Effect")]
     public ItemUseEffect useEffect = ItemUseEffect.None;

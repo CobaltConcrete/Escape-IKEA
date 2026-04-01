@@ -254,11 +254,18 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   uiInventory: {fileID: 0}
+  uiLootInventory: {fileID: 0}
   equipmentUI: {fileID: 0}
   equipmentData: {fileID: 0}
   playerDialogue: {fileID: 0}
+  interactRadius: 1.2
+  interactableLayerMask:
+    serializedVersion: 2
+    m_Bits: 2048
+  interactionPromptUI: {fileID: 0}
   autoEquipWhenSlotEmpty: 1
   autoRefillUtilityWhenConsumed: 1
+  autoReplaceWithHigherPriority: 0
   weaponPriorityList:
   - {fileID: 11400000, guid: 712ca49f61bfc7d48bc9eee9ef6045b4, type: 2}
   - {fileID: 11400000, guid: a497e763e5473154fa5fcfed649410fd, type: 2}
@@ -284,3 +291,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   uiRoot: {fileID: 0}
   utilityQuickSlot: {fileID: 0}
+  dialogueBox: {fileID: 0}

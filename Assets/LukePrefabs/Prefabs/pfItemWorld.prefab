@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7163489287122536335}
   - component: {fileID: 3057304995095792669}
   - component: {fileID: 6742764347897453963}
-  m_Layer: 9
+  m_Layer: 11
   m_Name: pfItemWorld
   m_TagString: Item
   m_Icon: {fileID: 0}
@@ -240,7 +240,7 @@ GameObject:
   - component: {fileID: 5350365816221753014}
   - component: {fileID: 2332317257279133164}
   - component: {fileID: 9196536211115337305}
-  m_Layer: 5
+  m_Layer: 11
   m_Name: Amount
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -308,7 +308,7 @@ MeshRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -629998721
-  m_SortingLayer: 6
+  m_SortingLayer: 7
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
 --- !u!114 &9196536211115337305

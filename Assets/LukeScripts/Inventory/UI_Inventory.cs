@@ -162,6 +162,7 @@ public class UI_Inventory : MonoBehaviour
 
         foreach (Item item in inventory.GetItemList())
         {
+            if (item.IsLoot()) continue;
             RectTransform itemSlotRectTransform =
                 Instantiate(itemSlotTemplate, itemSlotContainer).GetComponent<RectTransform>();
 
@@ -180,11 +181,7 @@ public class UI_Inventory : MonoBehaviour
 
             buttonUI.MouseRightClickFunc = () =>
             {
-                Item duplicateItem = new Item
-                {
-                    definition = item.definition,
-                    amount = item.amount
-                };
+                Item duplicateItem = item.Clone();
 
                 inventory.RemoveItem(item);
                 ItemWorld.DropItem(player.GetPosition(), duplicateItem);
