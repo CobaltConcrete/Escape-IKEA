@@ -33,6 +33,7 @@ public class EnemySpawnController : MonoBehaviour
     [SerializeField] private int maxPositionTriesPerSpawn = 20;
     [SerializeField] private float edgePadding = 0.5f;
     [SerializeField] private float overlapCheckRadius = 0.4f;
+    [SerializeField] private float doorAvoidRadius = 1.2f;
     [SerializeField] private LayerMask blockingLayers;
 
     private bool hasSpawned = false;
@@ -46,6 +47,11 @@ public class EnemySpawnController : MonoBehaviour
     public void SpawnRoomContents()
     {
         if (hasSpawned) return;
+        if (IsTutorialRoom())
+        {
+            hasSpawned = true;
+            return;
+        }
 
         if (enemySpawnAreaCollider == null)
         {
@@ -64,6 +70,8 @@ public class EnemySpawnController : MonoBehaviour
         foreach (SpawnGroup group in spawnGroups)
         {
             if (group.prefab == null) continue;
+            if (IsBossGroup(group) && !IsCafeteriaRoom())
+                continue;
 
             float roll = Random.value;
             if (roll > group.spawnChance) continue;
@@ -109,11 +117,48 @@ public class EnemySpawnController : MonoBehaviour
             if (Physics2D.OverlapCircle(testPos, overlapCheckRadius, blockingLayers) != null)
                 continue;
 
+            if (IsNearDoor(testPos))
+                continue;
+
             position = testPos;
             return true;
         }
 
         position = Vector3.zero;
+        return false;
+    }
+
+    private bool IsNearDoor(Vector3 testPos)
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll(testPos, doorAvoidRadius);
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i] != null && hits[i].CompareTag("Door"))
+                return true;
+        }
+        return false;
+    }
+
+    private bool IsTutorialRoom()
+    {
+        string n = gameObject.name;
+        return n.Contains("SportsRoom") || n.Contains("Tutorial");
+    }
+
+    private bool IsCafeteriaRoom()
+    {
+        string n = gameObject.name;
+        return n.Contains("CafeteriaRoom");
+    }
+
+    private bool IsBossGroup(SpawnGroup group)
+    {
+        if (group == null) return false;
+        if (!string.IsNullOrEmpty(group.groupName) &&
+            group.groupName.Contains("CafeteriaBoss"))
+            return true;
+        string prefabName = group.prefab != null ? group.prefab.name : "";
+        if (prefabName.Contains("CafeteriaBoss")) return true;
         return false;
     }
 

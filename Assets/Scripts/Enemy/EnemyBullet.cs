@@ -8,6 +8,10 @@ public class EnemyBullet : MonoBehaviour
 
     private Vector2 moveDirection;
     private bool initialized = false;
+    private bool useBounds;
+    private bool bounceInBounds;
+    private Vector2 minBounds;
+    private Vector2 maxBounds;
 
     private void Start()
     {
@@ -26,17 +30,55 @@ public class EnemyBullet : MonoBehaviour
         initialized = true;
     }
 
+    public void SetBounds(Bounds bounds, bool bounce)
+    {
+        minBounds = bounds.min;
+        maxBounds = bounds.max;
+        useBounds = true;
+        bounceInBounds = bounce;
+    }
+
     private void Update()
     {
         if (!initialized) return;
 
-        transform.position += (Vector3)(moveDirection * speed * Time.deltaTime);
+        Vector3 pos3 = transform.position + (Vector3)(moveDirection * speed * Time.deltaTime);
+        if (useBounds)
+        {
+            Vector2 pos = pos3;
+            if (pos.x < minBounds.x)
+            {
+                pos.x = minBounds.x;
+                if (bounceInBounds) moveDirection.x = Mathf.Abs(moveDirection.x);
+            }
+            else if (pos.x > maxBounds.x)
+            {
+                pos.x = maxBounds.x;
+                if (bounceInBounds) moveDirection.x = -Mathf.Abs(moveDirection.x);
+            }
+
+            if (pos.y < minBounds.y)
+            {
+                pos.y = minBounds.y;
+                if (bounceInBounds) moveDirection.y = Mathf.Abs(moveDirection.y);
+            }
+            else if (pos.y > maxBounds.y)
+            {
+                pos.y = maxBounds.y;
+                if (bounceInBounds) moveDirection.y = -Mathf.Abs(moveDirection.y);
+            }
+
+            pos3 = new Vector3(pos.x, pos.y, transform.position.z);
+        }
+
+        transform.position = pos3;
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Wall"))
         {
+            if (useBounds && bounceInBounds) return;
             Destroy(gameObject);
             return;
         }
