@@ -38,6 +38,7 @@ public class ItemDefinitionEditor : Editor
             EditorGUILayout.PropertyField(serializedObject.FindProperty("minRequiredAmount"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("maxRequiredAmount"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("lootWorldPrefab"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("shoppingListKey"));
 
             EditorGUILayout.Space();
 

@@ -10,8 +10,12 @@ public class LootSpawnManager : MonoBehaviour
     [SerializeField] private float spawnCheckRadius = 0.25f;
     [SerializeField] private int maxPointAttemptsPerSpawn = 12;
 
+    [Header("Required Loot Guarantee")]
+    [SerializeField] private int extraRequiredSpawnBuffer = 2;
+    [SerializeField] private int maxAttemptsPerRequiredGroup = 30;
+
     [Header("Bonus Loot")]
-    [SerializeField] private int bonusValueBuffer = 500;
+    [SerializeField] private int bonusValueBuffer = 1500;
     [SerializeField] private int maxBonusSpawnAttempts = 50;
 
     private readonly List<LootSpawnArea> allSpawnAreas = new List<LootSpawnArea>();
@@ -66,36 +70,78 @@ public class LootSpawnManager : MonoBehaviour
             return;
         }
 
+        if (allLootDefinitions == null || allLootDefinitions.Count == 0)
+        {
+            Debug.LogWarning("LootSpawnManager: allLootDefinitions is empty.");
+            return;
+        }
+
+        Dictionary<string, int> spawnedCountByKey = new Dictionary<string, int>();
+        Dictionary<string, int> lootValueByKey = new Dictionary<string, int>();
+
         int guaranteedValue = 0;
 
+        // 1. 先保证 shopping list 每一类 loot 至少刷够 required + buffer
         foreach (ShoppingListEntry entry in shoppingList)
         {
             if (entry == null || entry.itemDefinition == null) continue;
 
-            for (int i = 0; i < entry.requiredAmount; i++)
-            {
-                bool success = SpawnOneLoot(entry.itemDefinition);
+            string key = entry.itemDefinition.GetShoppingListKey();
+            int targetCount = entry.requiredAmount + extraRequiredSpawnBuffer;
 
-                if (!success)
+            List<ItemDefinition> groupPool = GetDefinitionsByShoppingListKey(key, allLootDefinitions);
+
+            if (groupPool.Count == 0)
+            {
+                Debug.LogError($"LootSpawnManager: No loot definitions found for shoppingListKey = {key}");
+                continue;
+            }
+
+            if (!lootValueByKey.ContainsKey(key))
+            {
+                lootValueByKey[key] = entry.itemDefinition.lootValue;
+            }
+
+            int currentCount = GetSpawnedCountForKey(spawnedCountByKey, key);
+            int attempts = 0;
+
+            while (currentCount < targetCount && attempts < maxAttemptsPerRequiredGroup)
+            {
+                attempts++;
+
+                ItemDefinition chosenVariant = GetRandomDefinitionFromGroup(groupPool);
+                if (chosenVariant == null)
                 {
-                    Debug.LogError($"LootSpawnManager: Failed to spawn required loot {entry.itemDefinition.itemName}.");
+                    break;
                 }
-                else
+
+                bool success = SpawnOneLoot(chosenVariant);
+                if (success)
                 {
-                    guaranteedValue += entry.itemDefinition.lootValue;
+                    currentCount++;
+                    spawnedCountByKey[key] = currentCount;
+                    guaranteedValue += chosenVariant.lootValue;
                 }
+            }
+
+            if (currentCount < targetCount)
+            {
+                Debug.LogError(
+                    $"LootSpawnManager: Failed to guarantee enough loot for key {key}. Spawned={currentCount}, Target={targetCount}"
+                );
             }
         }
 
+        // 2. 保底够了之后，再刷 bonus value
         int targetTotalValue = requiredGoalValue + bonusValueBuffer;
         int currentPotentialValue = guaranteedValue;
-        int attempts = 0;
+        int attemptsForBonus = 0;
 
         List<ItemDefinition> bonusPool = BuildBonusPool(allLootDefinitions);
 
-        while (currentPotentialValue < targetTotalValue && attempts < maxBonusSpawnAttempts)
+        while (currentPotentialValue < targetTotalValue && attemptsForBonus < maxBonusSpawnAttempts)
         {
-            attempts++;
+            attemptsForBonus++;
 
             ItemDefinition bonusLoot = GetWeightedRandomBonusLoot(bonusPool);
             if (bonusLoot == null)
@@ -111,6 +157,23 @@ public class LootSpawnManager : MonoBehaviour
         }
 
         Debug.Log($"LootSpawnManager: Spawn generation complete. Potential value = {currentPotentialValue}, target = {targetTotalValue}");
+
+        // 3. 最后做一次 required 校验
+        foreach (ShoppingListEntry entry in shoppingList)
+        {
+            if (entry == null || entry.itemDefinition == null) continue;
+
+            string key = entry.itemDefinition.GetShoppingListKey();
+            int minimumRequired = entry.requiredAmount + extraRequiredSpawnBuffer;
+            int spawned = GetSpawnedCountForKey(spawnedCountByKey, key);
+
+            if (spawned < minimumRequired)
+            {
+                Debug.LogError(
+                    $"LootSpawnManager: Final validation failed for key {key}. Spawned={spawned}, MinimumRequired={minimumRequired}"
+                );
+            }
+        }
     }
 
     public void SpawnAdditionalBonusLoot(int extraSpawnCount, List<ItemDefinition> allLootDefinitions)
@@ -209,6 +272,57 @@ public class LootSpawnManager : MonoBehaviour
         return bonusPool[bonusPool.Count - 1];
     }
 
+    private List<ItemDefinition> GetDefinitionsByShoppingListKey(string key, List<ItemDefinition> allLootDefinitions)
+    {
+        List<ItemDefinition> result = new List<ItemDefinition>();
+
+        if (string.IsNullOrWhiteSpace(key) || allLootDefinitions == null)
+        {
+            return result;
+        }
+
+        foreach (ItemDefinition def in allLootDefinitions)
+        {
+            if (def == null) continue;
+            if (!def.IsLoot()) continue;
+            if (def.lootValue <= 0) continue;
+            if (def.allowedRoomTypes == null || def.allowedRoomTypes.Count == 0) continue;
+
+            if (def.GetShoppingListKey() == key)
+            {
+                result.Add(def);
+            }
+        }
+
+        return result;
+    }
+
+    private ItemDefinition GetRandomDefinitionFromGroup(List<ItemDefinition> groupPool)
+    {
+        if (groupPool == null || groupPool.Count == 0)
+        {
+            return null;
+        }
+
+        int index = Random.Range(0, groupPool.Count);
+        return groupPool[index];
+    }
+
+    private int GetSpawnedCountForKey(Dictionary<string, int> spawnedCountByKey, string key)
+    {
+        if (spawnedCountByKey == null || string.IsNullOrWhiteSpace(key))
+        {
+            return 0;
+        }
+
+        if (spawnedCountByKey.TryGetValue(key, out int count))
+        {
+            return count;
+        }
+
+        return 0;
+    }
+
     private bool SpawnOneLoot(ItemDefinition itemDefinition)
     {
         if (itemDefinition == null) return false;
@@ -223,7 +337,6 @@ public class LootSpawnManager : MonoBehaviour
             return false;
         }
 
-        // 打乱顺序，避免老刷第一个
         Shuffle(validAreas);
 
         foreach (LootSpawnArea area in validAreas)

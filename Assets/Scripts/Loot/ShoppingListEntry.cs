@@ -21,4 +21,13 @@ public class ShoppingListEntry
 
         return itemDefinition.lootValue * requiredAmount;
     }
+    public string GetDisplayName()
+    {
+        if (itemDefinition == null)
+        {
+            return "";
+        }
+
+        return itemDefinition.GetShoppingListKey();
+    }
 }

@@ -148,6 +148,7 @@ public class RunObjectiveManager : MonoBehaviour
     private List<ItemDefinition> GetEligibleLootPool()
     {
         List<ItemDefinition> result = new List<ItemDefinition>();
+        HashSet<string> seenKeys = new HashSet<string>();
 
         foreach (ItemDefinition itemDef in allItemDefinitions)
         {
@@ -156,6 +157,14 @@ public class RunObjectiveManager : MonoBehaviour
             if (!itemDef.canAppearInShoppingList) continue;
             if (itemDef.lootValue <= 0) continue;
 
+            string key = itemDef.GetShoppingListKey();
+
+            if (seenKeys.Contains(key))
+            {
+                continue;
+            }
+
+            seenKeys.Add(key);
             result.Add(itemDef);
         }
 
@@ -209,7 +218,7 @@ public class RunObjectiveManager : MonoBehaviour
 
                 foreach (ShoppingListEntry entry in currentShoppingList)
                 {
-                    if (entry.itemDefinition == item.definition)
+                    if (entry.itemDefinition != null && entry.itemDefinition.GetShoppingListKey() == item.definition.GetShoppingListKey())
                     {
                         entry.collectedAmount += amount;
                         break;

@@ -27,6 +27,7 @@ MonoBehaviour:
   minRequiredAmount: 1
   maxRequiredAmount: 3
   lootWorldPrefab: {fileID: 2955381025110779136, guid: 0810feb9964425a41a075ee66870a17f, type: 3}
+  shoppingListKey: Chest
   allowedRoomTypes: 020000000600000005000000
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.8, y: 0.8, z: 0.8}

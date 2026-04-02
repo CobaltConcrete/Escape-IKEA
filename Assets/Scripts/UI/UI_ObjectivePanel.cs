@@ -71,7 +71,7 @@ public class UI_ObjectiveTextPanel : MonoBehaviour
                 TextMeshProUGUI text = lootTextTransform.GetComponent<TextMeshProUGUI>();
                 if (text != null)
                 {
-                    text.text = $"{entry.itemDefinition.itemName} {entry.collectedAmount}/{entry.requiredAmount}";
+                    text.text = $"{entry.GetDisplayName()} {entry.collectedAmount}/{entry.requiredAmount}";
                 }
             }
 

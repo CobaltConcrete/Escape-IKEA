@@ -75,6 +75,9 @@ public class PageManager : MonoBehaviour
 
     public void WinGame()
     {
+
+        PlayerPrefs.SetInt("LastRunValue", RunObjectiveManager.Instance.CurrentCollectedValue);
+        PlayerPrefs.Save();
         SceneManager.LoadScene("Win");
     }
 

@@ -40,6 +40,9 @@ public class ItemDefinition : ScriptableObject
     public int maxRequiredAmount = 3;
     public GameObject lootWorldPrefab;
 
+    [Header("Loot Group Settings")]
+    public string shoppingListKey = "";
+
     [Header("Loot Spawn Settings")]
     public List<RoomType> allowedRoomTypes = new List<RoomType>();
     public int bonusSpawnWeight = 1;
@@ -72,5 +75,15 @@ public class ItemDefinition : ScriptableObject
     public bool IsNormalItem()
     {
         return itemCategory == ItemCategory.Normal;
+    }
+
+    public string GetShoppingListKey()
+    {
+        if (!string.IsNullOrWhiteSpace(shoppingListKey))
+        {
+            return shoppingListKey;
+        }
+
+        return itemName;
     }
 }
