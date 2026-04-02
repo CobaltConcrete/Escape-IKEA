@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: -8225381597860622731}
   - component: {fileID: 7802225297280564428}
   - component: {fileID: -5187446036180141741}
-  m_Layer: 0
-  m_Name: ChairLeft
-  m_TagString: Untagged
+  m_Layer: 12
+  m_Name: YChairLeftRight
+  m_TagString: Loot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -28,13 +28,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2955381025110779136}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -7.44, y: 2.76, z: -4.3825064}
-  m_LocalScale: {x: 0.13, y: 0.13, z: 0.13}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &-59159626031353184
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 895c7b0b55164e3428f6e1776c3cde1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemDefinition: {fileID: 11400000, guid: cb2f57d35c419214aa05986c11256367, type: 2}
+  itemDefinition: {fileID: 11400000, guid: 6da3d6411d0270c4db136dd71f9267f2, type: 2}
   amount: 1
 --- !u!212 &-8225381597860622731
 SpriteRenderer:
@@ -93,7 +93,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 79a5d1e0e28d35f4f92aac75f9a8cdb8, type: 3}
+  m_Sprite: {fileID: -6833735102609310062, guid: aabefb4e958bb4272ab30e987b19ceca, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -123,8 +123,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 6.9549007, y: 4.3830867, z: 1}
-  m_Center: {x: 0.13678707, y: -0.39753857, z: 0}
+  m_Size: {x: 2, y: 2, z: 2}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-5187446036180141741
 MonoBehaviour:
   m_ObjectHideFlags: 0

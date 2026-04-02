@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 9086373605952938387}
   - component: {fileID: 3545180115902821008}
-  - component: {fileID: 7292015500068095592}
+  - component: {fileID: 6599746485521419256}
   m_Layer: 8
   m_Name: PlayerSprite
   m_TagString: Player
@@ -28,7 +28,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.4, y: 0, z: -0.028791841}
-  m_LocalScale: {x: 0.5, y: 0.5, z: 1}
+  m_LocalScale: {x: 4, y: 4, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 3848462790633160891}
@@ -88,7 +88,7 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!95 &7292015500068095592
+--- !u!95 &6599746485521419256
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
@@ -126,7 +126,6 @@ GameObject:
   - component: {fileID: 1822560432590618026}
   - component: {fileID: 8600148856383864679}
   - component: {fileID: 107977642095276863}
-  - component: {fileID: 5893818433679787834}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -262,8 +261,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6268c1f5cb88a4a6fa4912559636d0d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
-  startingHealth: 100
+  maxHealth: 1000
+  startingHealth: 1000
 --- !u!114 &8600148856383864679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -279,6 +278,7 @@ MonoBehaviour:
   attackDamage: 15
   attackRadius: 1.25
   attackKey: 106
+  bulletClearRadius: 1.6
 --- !u!114 &107977642095276863
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -304,21 +304,14 @@ MonoBehaviour:
   autoEquipWhenSlotEmpty: 1
   autoRefillUtilityWhenConsumed: 1
   autoReplaceWithHigherPriority: 0
-  weaponPriorityList: []
-  armorPriorityList: []
-  utilityPriorityList: []
---- !u!114 &5893818433679787834
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2186692304189018441}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 1858335c46fa15948bef650b25393fed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  uiRoot: {fileID: 0}
-  utilityQuickSlot: {fileID: 0}
-  dialogueBox: {fileID: 0}
+  weaponPriorityList:
+  - {fileID: 11400000, guid: 712ca49f61bfc7d48bc9eee9ef6045b4, type: 2}
+  - {fileID: 11400000, guid: 56b77b7c4beb2404d858b0225d87ec60, type: 2}
+  - {fileID: 11400000, guid: a497e763e5473154fa5fcfed649410fd, type: 2}
+  armorPriorityList:
+  - {fileID: 11400000, guid: 85f7b633f1a24ca44b174daeabbdb926, type: 2}
+  - {fileID: 11400000, guid: 4bf43283896190c469e54683f8d18681, type: 2}
+  utilityPriorityList:
+  - {fileID: 11400000, guid: 8b1ded8cb101ed6489ded3f5d0897afb, type: 2}
+  - {fileID: 11400000, guid: 0b9f9db855c79b7439d128dc85067cf3, type: 2}
+  - {fileID: 11400000, guid: 7db76ef5dc1369a4d93382e40f3c7caa, type: 2}

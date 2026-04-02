@@ -17,8 +17,25 @@ MonoBehaviour:
   stackable: 0
   uiScale: 0.7
   glowColor: {r: 0.33730364, g: 0, b: 1, a: 1}
-  equipTag: 0
   itemCategory: 1
+  equipTag: 0
   useEffect: 0
   effectValue: 0
   effectDuration: 0
+  lootValue: 700
+  canAppearInShoppingList: 1
+  minRequiredAmount: 1
+  maxRequiredAmount: 3
+  lootWorldPrefab: {fileID: 2955381025110779136, guid: 0810feb9964425a41a075ee66870a17f, type: 3}
+  allowedRoomTypes: 020000000600000005000000
+  bonusSpawnWeight: 1
+  worldDropScale: {x: 0.8, y: 0.8, z: 0.8}
+  spawnFootprint: {x: 1.1, y: 1.1}
+  worldColliderType: 1
+  boxOffset: {x: 0, y: 0}
+  boxSize: {x: 1.5, y: 1.5}
+  boxEdgeRadius: 0
+  circleOffset: {x: 0, y: 0}
+  circleRadius: 0.5
+  worldTag: Loot
+  worldLayer: 12

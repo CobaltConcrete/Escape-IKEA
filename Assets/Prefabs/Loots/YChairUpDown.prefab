@@ -13,9 +13,9 @@ GameObject:
   - component: {fileID: -8225381597860622731}
   - component: {fileID: 7802225297280564428}
   - component: {fileID: -5187446036180141741}
-  m_Layer: 0
-  m_Name: ChairDown
-  m_TagString: Untagged
+  m_Layer: 12
+  m_Name: YChairUpDown
+  m_TagString: Loot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -28,13 +28,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2955381025110779136}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 1, w: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -7.44, y: 2.76, z: -4.3825064}
-  m_LocalScale: {x: 0.13, y: 0.13, z: 0.13}
+  m_LocalScale: {x: 0.7, y: 0.7, z: 0.7}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 180}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &-59159626031353184
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 895c7b0b55164e3428f6e1776c3cde1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemDefinition: {fileID: 11400000, guid: 31c6c07e50b4cc64b8c412645343bfa5, type: 2}
+  itemDefinition: {fileID: 11400000, guid: 19070407d5b12f84fb19ceaa00bcf179, type: 2}
   amount: 1
 --- !u!212 &-8225381597860622731
 SpriteRenderer:
@@ -93,7 +93,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 79a5d1e0e28d35f4f92aac75f9a8cdb8, type: 3}
+  m_Sprite: {fileID: -1287689501662393466, guid: df85dd5b37fc54ab79e712422dabf06d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -123,8 +123,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 6.9166365, y: 4.3759184, z: 1}
-  m_Center: {x: 0.11139214, y: -0.35435167, z: 0}
+  m_Size: {x: 2, y: 2, z: 2}
+  m_Center: {x: 0, y: 0, z: 0}
 --- !u!114 &-5187446036180141741
 MonoBehaviour:
   m_ObjectHideFlags: 0

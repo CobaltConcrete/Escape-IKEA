@@ -17,7 +17,18 @@ MonoBehaviour:
   stackable: 1
   uiScale: 0.65
   glowColor: {r: 1, g: 1, b: 0, a: 1}
+  itemCategory: 0
   equipTag: 0
   useEffect: 0
   effectValue: 0
   effectDuration: 0
+  lootValue: 0
+  canAppearInShoppingList: 1
+  minRequiredAmount: 1
+  maxRequiredAmount: 3
+  lootWorldPrefab: {fileID: 0}
+  allowedRoomTypes: 
+  bonusSpawnWeight: 1
+  worldDropScale: {x: 0.11000001, y: 0.11000001, z: 0.11000001}
+  worldTag: Item
+  worldLayer: 9

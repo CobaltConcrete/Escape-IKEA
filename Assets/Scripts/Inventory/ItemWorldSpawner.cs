@@ -34,11 +34,37 @@ public class ItemWorldSpawner : MonoBehaviour
             item
         );
 
-        if (spawned != null && spawnParent != null)
+        if (spawned != null)
         {
-            spawned.transform.SetParent(spawnParent, true);
+            ApplyDefinitionWorldSettings(spawned.gameObject, itemDefinition);
+
+            if (spawnParent != null)
+            {
+                spawned.transform.SetParent(spawnParent, true);
+            }
         }
 
         Destroy(gameObject);
+    }
+
+    private void ApplyDefinitionWorldSettings(GameObject target, ItemDefinition definition)
+    {
+        if (target == null || definition == null)
+        {
+            return;
+        }
+
+        target.tag = definition.worldTag;
+        SetLayerRecursively(target, definition.worldLayer);
+    }
+
+    private void SetLayerRecursively(GameObject obj, int layer)
+    {
+        obj.layer = layer;
+
+        foreach (Transform child in obj.transform)
+        {
+            SetLayerRecursively(child.gameObject, layer);
+        }
     }
 }

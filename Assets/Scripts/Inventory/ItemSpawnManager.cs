@@ -30,6 +30,7 @@ public class ItemSpawnManager : MonoBehaviour
     }
 
     private readonly Dictionary<string, RoomItemState> roomItemStates = new Dictionary<string, RoomItemState>();
+    private readonly Dictionary<GameObject, string> roomObjectToKey = new Dictionary<GameObject, string>();
 
     private void Awake()
     {
@@ -49,6 +50,15 @@ public class ItemSpawnManager : MonoBehaviour
 
         string roomKey = MakeRoomKey(cellX, cellY, cellWidth, cellHeight);
 
+        if (!roomObjectToKey.ContainsKey(roomInstance))
+        {
+            roomObjectToKey.Add(roomInstance, roomKey);
+        }
+        else
+        {
+            roomObjectToKey[roomInstance] = roomKey;
+        }
+
         if (!roomItemStates.TryGetValue(roomKey, out RoomItemState state))
         {
             state = CreateRoomItemState(roomInstance);
@@ -58,9 +68,32 @@ public class ItemSpawnManager : MonoBehaviour
         EnsureRoomItemExists(roomInstance, state);
     }
 
+    public void RespawnRoom(GameObject roomInstance)
+    {
+        if (roomInstance == null)
+            return;
+
+        if (IsTutorialRoom(roomInstance))
+            return;
+
+        if (!roomObjectToKey.TryGetValue(roomInstance, out string roomKey))
+        {
+            Debug.LogWarning($"ItemSpawnManager: RespawnRoom failed because room key was not registered for {roomInstance.name}");
+            return;
+        }
+
+        ClearExistingRoomItem(roomInstance);
+
+        RoomItemState newState = CreateRoomItemState(roomInstance);
+        roomItemStates[roomKey] = newState;
+
+        EnsureRoomItemExists(roomInstance, newState);
+    }
+
     private RoomItemState CreateRoomItemState(GameObject roomInstance)
     {
         RoomItemState state = new RoomItemState();
+
         if (IsTutorialRoom(roomInstance))
         {
             state.shouldSpawn = false;
@@ -178,6 +211,21 @@ public class ItemSpawnManager : MonoBehaviour
         }
     }
 
+    private void ClearExistingRoomItem(GameObject roomInstance)
+    {
+        if (roomInstance == null)
+            return;
+
+        Transform itemParent = roomInstance.transform.Find("SpawnedItems");
+        Transform searchRoot = itemParent != null ? itemParent : roomInstance.transform;
+
+        Transform existing = searchRoot.Find(spawnedItemName);
+        if (existing != null)
+        {
+            Destroy(existing.gameObject);
+        }
+    }
+
     private string MakeRoomKey(int x, int y, int width, int height)
     {
         return $"{x}_{y}_{width}_{height}";
@@ -186,6 +234,7 @@ public class ItemSpawnManager : MonoBehaviour
     private bool IsTutorialRoom(GameObject roomInstance)
     {
         if (roomInstance == null) return false;
+
         string roomName = roomInstance.name;
         return roomName.Contains("SportsRoom") || roomName.Contains("Tutorial");
     }

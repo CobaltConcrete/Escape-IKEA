@@ -52,6 +52,17 @@ public class MapManager : MonoBehaviour
         {
             player.position = MapToWorld(centerX, centerY);
         }
+
+        // ===== LOOT SYSTEM INIT =====
+        if (LootSpawnManager.Instance != null)
+        {
+            LootSpawnManager.Instance.RefreshSpawnAreas();
+        }
+
+        if (RunObjectiveManager.Instance != null)
+        {
+            RunObjectiveManager.Instance.GenerateNewRunObjective();
+        }
     }
 
     // ==================== Room Spawning stuff ====================

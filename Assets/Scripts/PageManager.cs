@@ -8,16 +8,16 @@ public class PageManager : MonoBehaviour
     private GameObject[] gameUIObjects;
 
     #region Unity_functions
-    private void Awake() {
-        if(Instance == null)
+    private void Awake()
+    {
+        if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            MainMenu();
         }
-        else if(Instance != this)
+        else if (Instance != this)
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         }
     }
 

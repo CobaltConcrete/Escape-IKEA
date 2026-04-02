@@ -15,7 +15,6 @@ public class UI_LootInventory : MonoBehaviour
 
     private void Awake()
     {
-        // 找 Loot 专用容器
         lootSlotContainer = transform.Find("lootSlotContainer");
 
         if (lootSlotContainer == null)
@@ -40,6 +39,24 @@ public class UI_LootInventory : MonoBehaviour
         lootSlotTemplate.gameObject.SetActive(false);
     }
 
+    private void OnEnable()
+    {
+        if (inventory != null)
+        {
+            inventory.OnLootListChanged += Inventory_OnLootListChanged;
+        }
+
+        RefreshLootItems();
+    }
+
+    private void OnDisable()
+    {
+        if (inventory != null)
+        {
+            inventory.OnLootListChanged -= Inventory_OnLootListChanged;
+        }
+    }
+
     public void SetPlayer(PlayerInventoryInteraction player)
     {
         this.player = player;
@@ -54,9 +71,14 @@ public class UI_LootInventory : MonoBehaviour
 
         this.inventory = inventory;
 
-        if (this.inventory != null)
+        if (isActiveAndEnabled && this.inventory != null)
         {
             this.inventory.OnLootListChanged += Inventory_OnLootListChanged;
+        }
+
+        if (RunObjectiveManager.Instance != null)
+        {
+            RunObjectiveManager.Instance.SetInventory(inventory);
         }
 
         RefreshLootItems();
@@ -82,7 +104,6 @@ public class UI_LootInventory : MonoBehaviour
             return;
         }
 
-        // 清空旧格子
         foreach (Transform child in lootSlotContainer)
         {
             if (child == lootSlotTemplate) continue;
@@ -98,6 +119,7 @@ public class UI_LootInventory : MonoBehaviour
         foreach (Item item in inventory.GetLootList())
         {
             if (item == null || item.definition == null) continue;
+            if (!item.definition.IsLoot()) continue;
 
             RectTransform slot =
                 Instantiate(lootSlotTemplate, lootSlotContainer).GetComponent<RectTransform>();
@@ -108,13 +130,11 @@ public class UI_LootInventory : MonoBehaviour
 
             if (buttonUI != null)
             {
-                // left click
                 buttonUI.ClickFunc = () =>
                 {
-                    // TODO: 查看 Loot 详情
+                    // TODO: loot detail
                 };
 
-                // right click, remove one
                 buttonUI.MouseRightClickFunc = () =>
                 {
                     if (player == null) return;
@@ -132,10 +152,8 @@ public class UI_LootInventory : MonoBehaviour
             }
 
             float topOffset = 8f;
-            slot.anchoredPosition =
-                new Vector2(x * slotSize, topOffset - y * slotSize);
+            slot.anchoredPosition = new Vector2(x * slotSize, topOffset - y * slotSize);
 
-            // 图标
             Transform imageTransform = slot.Find("image");
             if (imageTransform != null)
             {
@@ -151,7 +169,6 @@ public class UI_LootInventory : MonoBehaviour
                 }
             }
 
-            // 数量
             Transform amountTransform = slot.Find("amountText");
             if (amountTransform != null)
             {
@@ -170,7 +187,6 @@ public class UI_LootInventory : MonoBehaviour
             }
         }
 
-        // 自动撑高 ScrollView
         int count = inventory.GetLootList().Count;
         int rowCount = Mathf.CeilToInt(count / (float)columnCount);
         rowCount = Mathf.Max(1, rowCount);
@@ -180,12 +196,8 @@ public class UI_LootInventory : MonoBehaviour
         float viewportHeight = 166f;
         float padding = 10f;
         float height = rowCount * slotSize + padding;
-
         height = Mathf.Max(viewportHeight, height);
 
-        containerRect.sizeDelta = new Vector2(
-            containerRect.sizeDelta.x,
-            height
-        );
+        containerRect.sizeDelta = new Vector2(containerRect.sizeDelta.x, height);
     }
 }

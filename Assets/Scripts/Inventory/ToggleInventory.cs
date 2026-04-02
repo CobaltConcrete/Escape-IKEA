@@ -13,14 +13,6 @@ public class ToggleInventory : MonoBehaviour
         SetInventoryState(false);
     }
 
-    private void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.E))
-        {
-            SetInventoryState(!isOpen);
-        }
-    }
-
     private void SetInventoryState(bool open)
     {
         isOpen = open;

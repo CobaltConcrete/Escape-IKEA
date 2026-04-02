@@ -39,34 +39,6 @@ public class ItemWorld : MonoBehaviour, IInteractable
         itemWorld.SetItem(item);
         return itemWorld;
     }
-    //public static ItemWorld SpawnItemWorld(Vector3 position, Item item)
-    //{
-    //    ItemAssets itemAssets = ItemAssets.GetInstance();
-
-    //    if (itemAssets == null)
-    //    {
-    //        Debug.LogError("No ItemAssets found in scene!");
-    //        return null;
-    //    }
-
-    //    if (itemAssets.pfItemWorld == null)
-    //    {
-    //        Debug.LogError("pfItemWorld is not assigned on ItemAssets!");
-    //        return null;
-    //    }
-
-    //    Transform spawnedTransform = Instantiate(itemAssets.pfItemWorld, position, Quaternion.identity);
-
-    //    ItemWorld itemWorld = spawnedTransform.GetComponent<ItemWorld>();
-    //    if (itemWorld == null)
-    //    {
-    //        Debug.LogError("pfItemWorld prefab is missing ItemWorld component!");
-    //        return null;
-    //    }
-
-    //    itemWorld.SetItem(item);
-    //    return itemWorld;
-    //}
 
     private Item item;
     private SpriteRenderer spriteRenderer;
@@ -74,11 +46,13 @@ public class ItemWorld : MonoBehaviour, IInteractable
     private TextMeshPro textMeshPro;
     private float canBePickedUpTimer;
     private Vector3 defaultScale;
+    private BoxCollider2D boxCollider2D;
 
     private void Awake()
     {
         spriteRenderer = GetComponent<SpriteRenderer>();
         light2D = GetComponent<Light2D>();
+        boxCollider2D = GetComponent<BoxCollider2D>();
 
         Transform amountTransform = transform.Find("Amount");
         if (amountTransform != null)
@@ -152,6 +126,47 @@ public class ItemWorld : MonoBehaviour, IInteractable
             {
                 textMeshPro.SetText("");
             }
+        }
+        ApplyColliderFromDefinition();
+    }
+    private void ApplyColliderFromDefinition()
+    {
+        if (item == null || item.definition == null)
+            return;
+
+        var def = item.definition;
+
+        if (def.worldColliderType == WorldColliderType.None)
+        {
+            return;
+        }
+
+        Collider2D[] colliders = GetComponents<Collider2D>();
+        foreach (var c in colliders)
+        {
+            Destroy(c);
+        }
+
+        switch (def.worldColliderType)
+        {
+            case WorldColliderType.Box:
+                {
+                    BoxCollider2D box = gameObject.AddComponent<BoxCollider2D>();
+                    box.isTrigger = true;
+                    box.offset = def.boxOffset;
+                    box.size = def.boxSize;
+                    box.edgeRadius = def.boxEdgeRadius;
+                    break;
+                }
+
+            case WorldColliderType.Circle:
+                {
+                    CircleCollider2D circle = gameObject.AddComponent<CircleCollider2D>();
+                    circle.isTrigger = true;
+                    circle.offset = def.circleOffset;
+                    circle.radius = def.circleRadius;
+                    break;
+                }
         }
     }
 

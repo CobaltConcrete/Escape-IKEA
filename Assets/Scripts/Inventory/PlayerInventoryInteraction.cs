@@ -14,7 +14,7 @@ public class PlayerInventoryInteraction : MonoBehaviour
     [SerializeField] private Dialogue playerDialogue;
 
     private ItemWorld nearbyLoot;
-    [SerializeField] private float interactRadius = 1.2f;
+    [SerializeField] private float interactRadius = 0.45f;
     [SerializeField] private LayerMask interactableLayerMask;
     [SerializeField] private UI_InteractionPrompt interactionPromptUI;
 
@@ -93,13 +93,12 @@ public class PlayerInventoryInteraction : MonoBehaviour
     public void PickupLoot(ItemWorld itemWorld)
     {
         if (itemWorld == null) return;
-
         Item pickedUpItem = itemWorld.GetItem();
-
         if (pickedUpItem == null || pickedUpItem.definition == null) return;
         if (!pickedUpItem.IsLoot()) return;
 
         inventory.AddLoot(pickedUpItem);
+
         itemWorld.DestroySelf();
     }
     private void FindBestInteractable()
@@ -526,7 +525,8 @@ public class PlayerInventoryInteraction : MonoBehaviour
             return new Item
             {
                 definition = definition,
-                amount = totalAmount
+                amount = totalAmount,
+                worldScale = sampleItem.worldScale
             };
         }
         else
@@ -536,7 +536,8 @@ public class PlayerInventoryInteraction : MonoBehaviour
             return new Item
             {
                 definition = definition,
-                amount = 1
+                amount = 1,
+                worldScale = sampleItem.worldScale
             };
         }
     }
@@ -792,11 +793,8 @@ public class PlayerInventoryInteraction : MonoBehaviour
         if (equippedItem == null || equippedItem.definition == null)
             return;
 
-        Item droppedItem = new Item
-        {
-            definition = equippedItem.definition,
-            amount = equippedItem.amount
-        };
+        // 关键：保留完整数据，尤其是 worldScale
+        Item droppedItem = equippedItem.Clone();
 
         equipmentData.ClearSlot(equipTag);
 

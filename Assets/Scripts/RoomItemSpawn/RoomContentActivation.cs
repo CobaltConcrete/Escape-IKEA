@@ -10,9 +10,16 @@ public class RoomContentActivation : MonoBehaviour
     [SerializeField] private Transform enemyContainer;
     [SerializeField] private Transform itemContainer;
 
+    [Header("Respawn Settings")]
+    [SerializeField] private bool allowRespawn = true;
+    [SerializeField] private int roomsAwayToRespawn = 3;
+
     private static RoomContentActivation currentActiveRoom;
     private static readonly HashSet<RoomContentActivation> playerRooms = new HashSet<RoomContentActivation>();
     private static Transform playerTransform;
+
+    private int lastVisitedIndex = -1;
+    private bool needsRespawn = false;
 
     private void Awake()
     {
@@ -61,6 +68,7 @@ public class RoomContentActivation : MonoBehaviour
         if (currentActiveRoom == this)
         {
             currentActiveRoom.SetRoomContentActive(false);
+            currentActiveRoom.MarkForRespawn();
             currentActiveRoom = null;
         }
 
@@ -110,13 +118,51 @@ public class RoomContentActivation : MonoBehaviour
         if (currentActiveRoom != null)
         {
             currentActiveRoom.SetRoomContentActive(false);
+            currentActiveRoom.MarkForRespawn();
         }
 
         currentActiveRoom = bestRoom;
 
         if (currentActiveRoom != null)
         {
+            currentActiveRoom.OnPlayerEnteredThisRoom();
             currentActiveRoom.SetRoomContentActive(true);
+        }
+    }
+
+    private void OnPlayerEnteredThisRoom()
+    {
+        if (RoomVisitTracker.Instance == null) return;
+
+        int currentVisitIndex = RoomVisitTracker.Instance.RegisterRoomVisit();
+
+        if (allowRespawn && needsRespawn && lastVisitedIndex >= 0)
+        {
+            int roomsAway = currentVisitIndex - lastVisitedIndex;
+
+            if (roomsAway >= roomsAwayToRespawn)
+            {
+                RespawnRoomContent();
+                needsRespawn = false;
+            }
+        }
+
+        lastVisitedIndex = currentVisitIndex;
+    }
+
+    private void MarkForRespawn()
+    {
+        if (!allowRespawn) return;
+        needsRespawn = true;
+    }
+
+    private void RespawnRoomContent()
+    {
+        Debug.Log($"Respawning room content: {name}");
+
+        if (ItemSpawnManager.Instance != null)
+        {
+            ItemSpawnManager.Instance.RespawnRoom(gameObject);
         }
     }
 

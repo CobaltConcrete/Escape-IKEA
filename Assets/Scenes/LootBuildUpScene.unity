@@ -1230,6 +1230,7 @@ MonoBehaviour:
   attackDamage: 15
   attackRadius: 1.25
   attackKey: 106
+  bulletClearRadius: 1.6
 --- !u!1 &7339744899868522609
 GameObject:
   m_ObjectHideFlags: 0
