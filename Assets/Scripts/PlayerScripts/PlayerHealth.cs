@@ -23,9 +23,14 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
-        if (amount <= 0f) return;
+        if (amount <= 0f){
+            return;
+        }
         CurrentHealth = Mathf.Max(0f, CurrentHealth - amount);
         OnHealthChanged?.Invoke();
+        if (CurrentHealth <= 0){
+            PageManager.LoseGame();
+        }
     }
 
     public void Heal(float amount)
@@ -40,5 +45,9 @@ public class PlayerHealth : MonoBehaviour
         maxHealth = Mathf.Max(1f, newMax);
         CurrentHealth = Mathf.Min(CurrentHealth, maxHealth);
         OnHealthChanged?.Invoke();
+    }
+
+    public float getHealth(){
+        return CurrentHealth;
     }
 }

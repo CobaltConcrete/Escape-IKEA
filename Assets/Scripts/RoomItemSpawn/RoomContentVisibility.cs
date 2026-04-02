@@ -9,6 +9,7 @@ public class RoomContentVisibility : MonoBehaviour
     private EnemyWander enemyWander;
     private EnemyDashCharger enemyDashCharger;
     private EnemyAimerShooter enemyAimerShooter;
+    private CafeteriaBossPattern cafeteriaBossPattern;
     private EnemyCombat enemyCombat;
     private EnemyBullet enemyBullet;
 
@@ -21,6 +22,7 @@ public class RoomContentVisibility : MonoBehaviour
         enemyWander = GetComponent<EnemyWander>();
         enemyDashCharger = GetComponent<EnemyDashCharger>();
         enemyAimerShooter = GetComponent<EnemyAimerShooter>();
+        cafeteriaBossPattern = GetComponent<CafeteriaBossPattern>();
         enemyCombat = GetComponent<EnemyCombat>();
         enemyBullet = GetComponent<EnemyBullet>();
     }
@@ -52,7 +54,16 @@ public class RoomContentVisibility : MonoBehaviour
             enemyDashCharger.enabled = active;
 
         if (enemyAimerShooter != null)
-            enemyAimerShooter.enabled = active;
+            enemyAimerShooter.enabled = active && cafeteriaBossPattern == null;
+
+        if (cafeteriaBossPattern != null)
+            cafeteriaBossPattern.enabled = active;
+        else
+        {
+            cafeteriaBossPattern = GetComponent<CafeteriaBossPattern>();
+            if (cafeteriaBossPattern != null)
+                cafeteriaBossPattern.enabled = active;
+        }
 
         if (enemyCombat != null)
             enemyCombat.enabled = active;

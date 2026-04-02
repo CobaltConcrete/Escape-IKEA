@@ -754,13 +754,13 @@ MonoBehaviour:
     sortingOrder: 8
   - groupName: CafeteriaEmployee
     prefab: {fileID: 1626777669089237922, guid: f4f55aeea54d40b40b4154fdb751f326, type: 3}
-    spawnChance: 0.884
+    spawnChance: 0.65
     minCount: 1
-    maxCount: 3
+    maxCount: 2
     sortingOrder: 7
   - groupName: DistortedShopper
     prefab: {fileID: 3464154710725457275, guid: 73a96bd0a680f8949861c27cf368dbe9, type: 3}
-    spawnChance: 0.4
+    spawnChance: 1
     minCount: 1
     maxCount: 3
     sortingOrder: 6

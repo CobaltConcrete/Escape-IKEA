@@ -10,6 +10,10 @@ public class EnemyAimerShooter : MonoBehaviour
     [SerializeField] private float minAttackInterval = 2.8f;
     [SerializeField] private float maxAttackInterval = 5.2f;
     [SerializeField] private float aimDuration = 3f;
+    [SerializeField] private bool useBurstPattern = false;
+    [SerializeField] private int burstShots = 3;
+    [SerializeField] private float burstGap = 0.45f;
+    [SerializeField] private float burstPause = 2f;
 
     [Header("Tracking")]
     [SerializeField] private float trackingRange = 6f;
@@ -110,13 +114,25 @@ public class EnemyAimerShooter : MonoBehaviour
     {
         while (true)
         {
-            float nextDelay = GetRandomAttackInterval();
-
-            yield return new WaitForSeconds(nextDelay);
-
-            if (!isAttacking)
+            if (useBurstPattern)
             {
-                yield return AimAndShoot();
+                for (int i = 0; i < burstShots; i++)
+                {
+                    if (!isAttacking)
+                        yield return AimAndShoot();
+
+                    if (i < burstShots - 1)
+                        yield return new WaitForSeconds(burstGap);
+                }
+                yield return new WaitForSeconds(burstPause);
+            }
+            else
+            {
+                float nextDelay = GetRandomAttackInterval();
+                yield return new WaitForSeconds(nextDelay);
+
+                if (!isAttacking)
+                    yield return AimAndShoot();
             }
         }
     }
@@ -298,6 +314,8 @@ public class EnemyAimerShooter : MonoBehaviour
         {
             bulletObj.transform.SetParent(transform.parent, true);
         }
+        if (bulletObj.GetComponent<RoomContentVisibility>() == null)
+            bulletObj.AddComponent<RoomContentVisibility>();
 
         float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         bulletObj.transform.rotation = Quaternion.Euler(0f, 0f, angle);
@@ -313,5 +331,15 @@ public class EnemyAimerShooter : MonoBehaviour
         Transform origin = firePoint != null ? firePoint : transform;
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(origin.position, trackingRange);
+    }
+
+    public GameObject GetBulletPrefab()
+    {
+        return bulletPrefab;
+    }
+
+    public Transform GetFirePoint()
+    {
+        return firePoint;
     }
 }

@@ -166,7 +166,7 @@ LineRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1626777669089237922}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -290,7 +290,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1626777669089237922}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 00ed0252f4a87d04288706986854b601, type: 3}
   m_Name: 
@@ -299,6 +299,10 @@ MonoBehaviour:
   minAttackInterval: 1.4
   maxAttackInterval: 4.1
   aimDuration: 3
+  useBurstPattern: 1
+  burstShots: 3
+  burstGap: 0.45
+  burstPause: 2.4
   randomizeInitialDelay: 1
   trackingRange: 6
   cancelThreshold: 0.4
@@ -322,6 +326,8 @@ MonoBehaviour:
   damageCooldown: 0.75
   contactDamageRadius: 0.55
   contactDamageDistance: 0.01
+  onlyTakeDamageFromBehind: 0
+  behindDotThreshold: -0.1
 --- !u!114 &3081837168203019117
 MonoBehaviour:
   m_ObjectHideFlags: 0

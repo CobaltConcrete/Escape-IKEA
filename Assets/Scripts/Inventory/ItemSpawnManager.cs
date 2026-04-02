@@ -61,6 +61,11 @@ public class ItemSpawnManager : MonoBehaviour
     private RoomItemState CreateRoomItemState(GameObject roomInstance)
     {
         RoomItemState state = new RoomItemState();
+        if (IsTutorialRoom(roomInstance))
+        {
+            state.shouldSpawn = false;
+            return state;
+        }
 
         if (Random.value > roomSpawnChance)
         {
@@ -176,5 +181,12 @@ public class ItemSpawnManager : MonoBehaviour
     private string MakeRoomKey(int x, int y, int width, int height)
     {
         return $"{x}_{y}_{width}_{height}";
+    }
+
+    private bool IsTutorialRoom(GameObject roomInstance)
+    {
+        if (roomInstance == null) return false;
+        string roomName = roomInstance.name;
+        return roomName.Contains("SportsRoom") || roomName.Contains("Tutorial");
     }
 }
