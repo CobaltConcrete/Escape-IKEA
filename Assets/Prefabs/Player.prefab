@@ -296,10 +296,10 @@ MonoBehaviour:
   equipmentUI: {fileID: 0}
   equipmentData: {fileID: 0}
   playerDialogue: {fileID: 0}
-  interactRadius: 1.2
+  interactRadius: 0.45
   interactableLayerMask:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 6656
   interactionPromptUI: {fileID: 0}
   autoEquipWhenSlotEmpty: 1
   autoRefillUtilityWhenConsumed: 1

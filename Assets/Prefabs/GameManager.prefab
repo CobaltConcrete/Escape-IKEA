@@ -81,7 +81,9 @@ MonoBehaviour:
     m_Bits: 192
   spawnCheckRadius: 0.25
   maxPointAttemptsPerSpawn: 12
-  bonusValueBuffer: 500
+  extraRequiredSpawnBuffer: 1
+  maxAttemptsPerRequiredGroup: 30
+  bonusValueBuffer: 1500
   maxBonusSpawnAttempts: 50
 --- !u!114 &766821874428729140
 MonoBehaviour:
@@ -131,6 +133,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: db5389e4a31b86a4189c0c2169b8cbe0, type: 2}
   - {fileID: 11400000, guid: 1e89265057e8023419e1d5784083dbbd, type: 2}
   - {fileID: 11400000, guid: 19070407d5b12f84fb19ceaa00bcf179, type: 2}
+  - {fileID: 11400000, guid: 230f612b83bfa76499e82053f3288d0f, type: 2}
+  - {fileID: 11400000, guid: 6da3d6411d0270c4db136dd71f9267f2, type: 2}
   minListEntries: 3
   maxListEntries: 5
   minGoalMultiplier: 1.2

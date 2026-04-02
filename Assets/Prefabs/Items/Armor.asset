@@ -27,8 +27,16 @@ MonoBehaviour:
   minRequiredAmount: 1
   maxRequiredAmount: 3
   lootWorldPrefab: {fileID: 0}
+  shoppingListKey: 
   allowedRoomTypes: 
   bonusSpawnWeight: 1
-  worldDropScale: {x: 0.11000001, y: 0.11000001, z: 0.11000001}
+  worldDropScale: {x: 0.13, y: 0.13, z: 0.13}
+  spawnFootprint: {x: 1, y: 1}
+  worldColliderType: 0
+  boxOffset: {x: 0, y: 0}
+  boxSize: {x: 1, y: 1}
+  boxEdgeRadius: 0
+  circleOffset: {x: 0, y: 0}
+  circleRadius: 0.5
   worldTag: Item
   worldLayer: 11
