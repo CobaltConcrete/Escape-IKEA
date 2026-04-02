@@ -1345,14 +1345,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 808677320934935143, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
-      propertyPath: m_Value
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 1321239863346662718, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0.0000076293945
-      objectReference: {fileID: 0}
     - target: {fileID: 2525558533577613229, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
       propertyPath: m_Pivot.x
       value: 0
@@ -1433,22 +1425,6 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 2577172345082334354, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2577172345082334354, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2577172345082334354, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2610535552809118763, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: 0.000030517578
-      objectReference: {fileID: 0}
     - target: {fileID: 3740954505476501487, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
       propertyPath: playerInventoryInteraction
       value: 
@@ -1457,10 +1433,6 @@ PrefabInstance:
       propertyPath: playerMovement
       value: 
       objectReference: {fileID: 2033428277}
-    - target: {fileID: 5293556600883984716, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
-      propertyPath: m_Value
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8291567420406807307, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
       propertyPath: m_Name
       value: List_Eq_Item_Loot
@@ -1469,18 +1441,6 @@ PrefabInstance:
       propertyPath: playerInventoryInteraction
       value: 
       objectReference: {fileID: 2033428278}
-    - target: {fileID: 8876503631153761004, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8876503631153761004, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8876503631153761004, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 9123348581670823337, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
       propertyPath: playerInventoryInteraction
       value: 

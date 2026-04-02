@@ -17,6 +17,7 @@ public class PlayerUIScreenController : MonoBehaviour
     [SerializeField] private GameObject utilityQuickSlot;
     [SerializeField] private GameObject objectiveHint;
     [SerializeField] private GameObject dialogueBox;
+    [SerializeField] private GameObject controlText;
 
     private UIScreenState currentState = UIScreenState.None;
 
@@ -105,6 +106,11 @@ public class PlayerUIScreenController : MonoBehaviour
         if (objectiveHint != null)
         {
             objectiveHint.SetActive(!anyUIOpen);
+        }
+
+        if (controlText != null)
+        {
+            controlText.SetActive(!anyUIOpen);
         }
 
         Cursor.visible = anyUIOpen;
