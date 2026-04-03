@@ -11,7 +11,7 @@ public class PlayerInventoryInteraction : MonoBehaviour
     [SerializeField] private UI_LootInventory uiLootInventory;
     [SerializeField] private EquipmentUI equipmentUI;
     [SerializeField] private EquipmentData equipmentData;
-    [SerializeField] private Dialogue playerDialogue;
+    //[SerializeField] private Dialogue playerDialogue;
 
     private ItemWorld nearbyLoot;
     [SerializeField] private float interactRadius = 0.45f;
@@ -881,7 +881,6 @@ public class PlayerInventoryInteraction : MonoBehaviour
         if (!firstItemFound)
         {
             firstItemFound = true;
-            playerDialogue.ShowDialogue();
         }
 
         inventory.AddItem(pickedUpItem);
