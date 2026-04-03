@@ -16,7 +16,7 @@ public class PlayerUIScreenController : MonoBehaviour
     [Header("Hide When Any UI Opens")]
     [SerializeField] private GameObject utilityQuickSlot;
     [SerializeField] private GameObject objectiveHint;
-    [SerializeField] private GameObject dialogueBox;
+    //[SerializeField] private GameObject dialogueBox;
     [SerializeField] private GameObject controlText;
 
     private UIScreenState currentState = UIScreenState.None;
@@ -98,10 +98,10 @@ public class PlayerUIScreenController : MonoBehaviour
             utilityQuickSlot.SetActive(!anyUIOpen);
         }
 
-        if (dialogueBox != null)
-        {
-            dialogueBox.SetActive(!anyUIOpen);
-        }
+        //if (dialogueBox != null)
+        //{
+        //    dialogueBox.SetActive(!anyUIOpen);
+        //}
 
         if (objectiveHint != null)
         {

@@ -1260,7 +1260,7 @@ PrefabInstance:
     - target: {fileID: 107977642095276863, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
       propertyPath: playerDialogue
       value: 
-      objectReference: {fileID: 9169380337917153788}
+      objectReference: {fileID: 0}
     - target: {fileID: 107977642095276863, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
       propertyPath: uiLootInventory
       value: 
@@ -1538,17 +1538,6 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 80637340a9b5865418aeb9f93640db77, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &9169380337917153788 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 5825186007574492026, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
-  m_PrefabInstance: {fileID: 5039623533113990856}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9dd86f9cd2230c541a1d1cc189af35e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1660057539 &9223372036854775807
