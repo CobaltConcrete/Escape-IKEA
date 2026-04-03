@@ -7,11 +7,21 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private float attackRadius = 1.25f;
     [SerializeField] private KeyCode attackKey = KeyCode.J;
     [SerializeField] private float bulletClearRadius = 1.6f;
+    [SerializeField] private float attackCooldown = 0.4f;
+
+    private float cooldownRemaining;
 
     private void Update()
     {
+        cooldownRemaining -= Time.deltaTime;
+
         if (!WasAttackPressed())
             return;
+
+        if (cooldownRemaining > 0f)
+            return;
+
+        cooldownRemaining = attackCooldown;
 
         Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, attackRadius);
         HashSet<EnemyCombat> damagedEnemies = new HashSet<EnemyCombat>();

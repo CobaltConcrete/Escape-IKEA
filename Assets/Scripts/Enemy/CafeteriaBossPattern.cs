@@ -14,6 +14,12 @@ public class CafeteriaBossPattern : MonoBehaviour
     [SerializeField] private bool keepBulletsInBossRoom = true;
     [SerializeField] private bool bulletsBounceOnWalls = true;
 
+    [Header("Flee when chased")]
+    [SerializeField] private float fleeRadius = 4f;
+    [SerializeField] private float fleePushPerSecond = 3.5f;
+    [SerializeField] private float chaseDotThreshold = 0.2f;
+    [SerializeField] private float minPlayerSpeed = 0.35f;
+
     private Vector3 center;
     private float angle;
     private float shotTimer;
@@ -21,6 +27,9 @@ public class CafeteriaBossPattern : MonoBehaviour
     private bool attacking = true;
     private bool hasRoomBounds;
     private Bounds roomBounds;
+
+    private Transform playerTransform;
+    private Rigidbody2D playerRb;
 
     private void Awake()
     {
@@ -88,7 +97,49 @@ public class CafeteriaBossPattern : MonoBehaviour
         Vector2 tangent = new Vector2(-Mathf.Sin(angle), Mathf.Cos(angle));
         if (tangent.sqrMagnitude > 0.0001f)
             transform.right = tangent.normalized;
-        transform.position = center + new Vector3(x, y, 0f);
+
+        Vector3 pos = center + new Vector3(x, y, 0f);
+        EnsurePlayerRefs();
+
+        if (playerTransform != null && playerRb != null && fleeRadius > 0.01f)
+        {
+            Vector2 playerPos = playerTransform.position;
+            Vector2 bossPos = pos;
+            Vector2 toBoss = bossPos - playerPos;
+            float dist = toBoss.magnitude;
+            if (dist > 0.05f && dist < fleeRadius)
+            {
+                float speed = playerRb.linearVelocity.magnitude;
+                if (speed >= minPlayerSpeed)
+                {
+                    Vector2 toBossN = toBoss / dist;
+                    float toward = Vector2.Dot(playerRb.linearVelocity.normalized, toBossN);
+                    if (toward > chaseDotThreshold)
+                    {
+                        float proximity = 1f - Mathf.Clamp01(dist / fleeRadius);
+                        Vector2 flee = toBossN * (fleePushPerSecond * proximity * Time.deltaTime);
+                        pos += (Vector3)flee;
+                    }
+                }
+            }
+        }
+
+        if (hasRoomBounds)
+        {
+            pos.x = Mathf.Clamp(pos.x, roomBounds.min.x, roomBounds.max.x);
+            pos.y = Mathf.Clamp(pos.y, roomBounds.min.y, roomBounds.max.y);
+        }
+
+        transform.position = pos;
+    }
+
+    private void EnsurePlayerRefs()
+    {
+        if (playerTransform != null && playerRb != null) return;
+        GameObject p = GameObject.FindGameObjectWithTag("Player");
+        if (p == null) return;
+        playerTransform = p.transform;
+        playerRb = p.GetComponent<Rigidbody2D>();
     }
 
     private void ShootVolley()

@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+[ExecuteAlways]
 public class PlayerHealthUI : MonoBehaviour
 {
     [SerializeField] private PlayerHealth playerHealth;
@@ -15,6 +16,9 @@ public class PlayerHealthUI : MonoBehaviour
     [SerializeField] private Text bossHealthText;
     [SerializeField] private Color bossBarColor = Color.red;
 
+    [SerializeField] private Text runTimerText;
+    [SerializeField] private GameRunTimer runTimer;
+
     private EnemyCombat bossCombat;
     private RectTransform autoBossBarRoot;
 
@@ -28,6 +32,10 @@ public class PlayerHealthUI : MonoBehaviour
         ResolvePlayerHealth();
         if (playerHealth != null)
             playerHealth.OnHealthChanged += Refresh;
+        EnsureRunTimerHud();
+        EnsureBossBarHud();
+        if (!Application.isPlaying)
+            RefreshBossEditorPreview();
     }
 
     private void OnDisable()
@@ -39,16 +47,21 @@ public class PlayerHealthUI : MonoBehaviour
     private void Start()
     {
         ResolvePlayerHealth();
-        TryCreateBossBarFromPlayerBar();
+        EnsureBossBarHud();
+        EnsureRunTimerHud();
+        BindGameRunTimer();
         Refresh();
     }
 
     private void Update()
     {
+        if (!Application.isPlaying)
+            return;
+
         if (playerHealth == null)
             ResolvePlayerHealth();
         if (bossHealthBarFillRect == null && bossHealthFillImage == null)
-            TryCreateBossBarFromPlayerBar();
+            EnsureBossBarHud();
         ResolveBossCombat();
         Refresh();
     }
@@ -115,6 +128,12 @@ public class PlayerHealthUI : MonoBehaviour
 
     private void RefreshBoss()
     {
+        if (!Application.isPlaying)
+        {
+            RefreshBossEditorPreview();
+            return;
+        }
+
         if (!BossRoomController.IsPlayerInsideBossRoom())
         {
             SetBossBarVisible(false);
@@ -179,9 +198,84 @@ public class PlayerHealthUI : MonoBehaviour
             bossHealthText.gameObject.SetActive(visible);
     }
 
-    private void TryCreateBossBarFromPlayerBar()
+    /// <summary>
+    /// Editor: show full red boss bar under the player bar so you can see and edit it in the Scene view.
+    /// </summary>
+    private void RefreshBossEditorPreview()
     {
-        if (bossHealthBarFillRect != null || bossHealthFillImage != null) return;
+        EnsureBossBarHud();
+        if (bossHealthBarFillRect == null && bossHealthFillImage == null) return;
+
+        SetBossBarVisible(true);
+
+        if (bossHealthBarFillRect != null)
+        {
+            var parent = bossHealthBarFillRect.parent as RectTransform;
+            if (parent != null)
+            {
+                bossHealthBarFillRect.anchorMin = new Vector2(0f, 0f);
+                bossHealthBarFillRect.anchorMax = new Vector2(1f, 1f);
+                bossHealthBarFillRect.pivot = new Vector2(0.5f, 0.5f);
+                bossHealthBarFillRect.anchoredPosition = Vector2.zero;
+                bossHealthBarFillRect.sizeDelta = Vector2.zero;
+                bossHealthBarFillRect.offsetMin = Vector2.zero;
+                bossHealthBarFillRect.offsetMax = Vector2.zero;
+            }
+        }
+        else if (bossHealthFillImage != null && bossHealthFillImage.sprite != null)
+        {
+            bossHealthFillImage.type = Image.Type.Filled;
+            bossHealthFillImage.fillMethod = Image.FillMethod.Horizontal;
+            bossHealthFillImage.fillAmount = 1f;
+        }
+
+        if (bossHealthFillImage != null)
+            bossHealthFillImage.color = bossBarColor;
+
+        if (bossHealthText != null)
+            bossHealthText.text = "Boss HP";
+    }
+
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (Application.isPlaying) return;
+        EnsureBossBarHud();
+        RefreshBossEditorPreview();
+    }
+#endif
+
+    /// <summary>
+    /// Creates or finds the boss HP row (red bar under the player health bar). Exists in edit mode for Scene view authoring.
+    /// </summary>
+    private void EnsureBossBarHud()
+    {
+        if (bossHealthBarFillRect != null && bossHealthFillImage != null)
+        {
+            if (autoBossBarRoot == null && bossHealthBarFillRect != null)
+                autoBossBarRoot = bossHealthBarFillRect.parent as RectTransform;
+            return;
+        }
+
+        if (bossHealthBarFillRect == null || bossHealthFillImage == null)
+        {
+            Transform fillTf = transform.Find("BossHealthLine/Fill");
+            if (fillTf != null)
+            {
+                bossHealthBarFillRect = fillTf.GetComponent<RectTransform>();
+                bossHealthFillImage = fillTf.GetComponent<Image>();
+                autoBossBarRoot = fillTf.parent as RectTransform;
+
+                if (bossHealthText == null)
+                {
+                    Transform labelTf = transform.Find("BossHealthLine/BossHealthLabel");
+                    if (labelTf != null)
+                        bossHealthText = labelTf.GetComponent<Text>();
+                }
+            }
+        }
+
+        if (bossHealthBarFillRect != null && bossHealthFillImage != null) return;
 
         RectTransform playerBarRoot = null;
         if (healthBarFillRect != null)
@@ -223,6 +317,139 @@ public class PlayerHealthUI : MonoBehaviour
         bossHealthBarFillRect = fillRect;
         bossHealthFillImage = fillImage;
         autoBossBarRoot = bossRoot;
-        SetBossBarVisible(false);
+
+        GameObject labelObj = new GameObject("BossHealthLabel", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
+        RectTransform labelRt = labelObj.GetComponent<RectTransform>();
+        labelRt.SetParent(bossRoot, false);
+        labelRt.anchorMin = Vector2.zero;
+        labelRt.anchorMax = Vector2.one;
+        labelRt.offsetMin = Vector2.zero;
+        labelRt.offsetMax = Vector2.zero;
+        Text labelTxt = labelObj.GetComponent<Text>();
+        labelTxt.text = "Boss HP";
+        labelTxt.fontSize = 14;
+        labelTxt.alignment = TextAnchor.MiddleCenter;
+        labelTxt.color = Color.white;
+        labelTxt.raycastTarget = false;
+        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        if (font != null)
+            labelTxt.font = font;
+        bossHealthText = labelTxt;
+
+        if (Application.isPlaying)
+            SetBossBarVisible(false);
+    }
+
+    /// <summary>
+    /// Builds or finds the timer panel so it exists in the Scene view (edit mode) and at runtime.
+    /// </summary>
+    private void EnsureRunTimerHud()
+    {
+        RectTransform canvasRt = transform as RectTransform;
+        if (canvasRt == null) return;
+
+        if (runTimerText == null)
+        {
+            Transform found = transform.Find("RunTimerPanel/RunTimerText");
+            if (found != null)
+                runTimerText = found.GetComponent<Text>();
+        }
+
+        if (runTimerText == null)
+            CreateRunTimerHud(canvasRt);
+        else
+            ApplyRunTimerBottomRightLayout(runTimerText.rectTransform);
+    }
+
+    private void BindGameRunTimer()
+    {
+        if (!Application.isPlaying || runTimerText == null) return;
+
+        if (runTimer == null)
+            runTimer = GetComponent<GameRunTimer>();
+        if (runTimer == null)
+            runTimer = gameObject.AddComponent<GameRunTimer>();
+        runTimer.BindTimerText(runTimerText);
+    }
+
+    private void CreateRunTimerHud(RectTransform canvasRt)
+    {
+        const float margin = 18f;
+        const float panelW = 152f;
+        const float panelH = 48f;
+
+        GameObject panelObj = new GameObject("RunTimerPanel", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image));
+        RectTransform panelRt = panelObj.GetComponent<RectTransform>();
+        panelRt.SetParent(canvasRt, false);
+        panelRt.anchorMin = new Vector2(1f, 0f);
+        panelRt.anchorMax = new Vector2(1f, 0f);
+        panelRt.pivot = new Vector2(1f, 0f);
+        panelRt.anchoredPosition = new Vector2(-margin, margin);
+        panelRt.sizeDelta = new Vector2(panelW, panelH);
+
+        Image panelBg = panelObj.GetComponent<Image>();
+        panelBg.color = new Color(0.08f, 0.08f, 0.1f, 0.88f);
+        panelBg.raycastTarget = false;
+
+        GameObject textObj = new GameObject("RunTimerText", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text), typeof(Outline));
+        RectTransform textRt = textObj.GetComponent<RectTransform>();
+        textRt.SetParent(panelRt, false);
+        textRt.anchorMin = Vector2.zero;
+        textRt.anchorMax = Vector2.one;
+        textRt.offsetMin = new Vector2(10f, 6f);
+        textRt.offsetMax = new Vector2(-10f, -6f);
+
+        Text txt = textObj.GetComponent<Text>();
+        txt.text = "0:00";
+        txt.fontSize = 22;
+        txt.fontStyle = FontStyle.Bold;
+        txt.alignment = TextAnchor.MiddleCenter;
+        txt.color = Color.white;
+        txt.horizontalOverflow = HorizontalWrapMode.Overflow;
+        txt.verticalOverflow = VerticalWrapMode.Overflow;
+        txt.raycastTarget = false;
+
+        Outline outline = textObj.GetComponent<Outline>();
+        outline.effectColor = new Color(0f, 0f, 0f, 0.85f);
+        outline.effectDistance = new Vector2(1.25f, -1.25f);
+
+        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        if (font != null)
+            txt.font = font;
+
+        panelRt.SetAsLastSibling();
+
+        runTimerText = txt;
+    }
+
+    private void ApplyRunTimerBottomRightLayout(RectTransform textRt)
+    {
+        if (textRt == null) return;
+
+        RectTransform canvasRt = transform as RectTransform;
+        if (canvasRt == null) return;
+
+        RectTransform parent = textRt.parent as RectTransform;
+
+        if (parent != null && parent.name == "RunTimerPanel")
+        {
+            parent.SetParent(canvasRt, false);
+            parent.anchorMin = new Vector2(1f, 0f);
+            parent.anchorMax = new Vector2(1f, 0f);
+            parent.pivot = new Vector2(1f, 0f);
+            parent.anchoredPosition = new Vector2(-18f, 18f);
+            parent.sizeDelta = new Vector2(152f, 48f);
+            parent.SetAsLastSibling();
+            return;
+        }
+
+        // Legacy or misplaced timer: anchor directly on the canvas bottom-right so it stays visible.
+        textRt.SetParent(canvasRt, false);
+        textRt.anchorMin = new Vector2(1f, 0f);
+        textRt.anchorMax = new Vector2(1f, 0f);
+        textRt.pivot = new Vector2(1f, 0f);
+        textRt.anchoredPosition = new Vector2(-18f, 18f);
+        textRt.sizeDelta = new Vector2(152f, 48f);
+        textRt.SetAsLastSibling();
     }
 }
