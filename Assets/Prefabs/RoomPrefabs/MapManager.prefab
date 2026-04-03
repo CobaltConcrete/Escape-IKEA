@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2393752445699727749}
   - component: {fileID: 1800450506676520150}
+  - component: {fileID: 8689048688299628491}
   m_Layer: 0
   m_Name: MapManager
   m_TagString: Untagged
@@ -44,24 +45,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 43595e7826454c84ca2efa58f9c47b5f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxRows: 10
-  maxCols: 10
-  roomSize: {x: 10, y: 10}
+  maxCellRows: 5
+  maxCellCols: 5
+  unitCellSize: {x: 10, y: 10}
   roomPrefabs:
-  - prefab: {fileID: 0}
-    gridWidth: 0
-    gridHeight: 0
-  - prefab: {fileID: 0}
-    gridWidth: 0
-    gridHeight: 0
-  - prefab: {fileID: 0}
-    gridWidth: 0
-    gridHeight: 0
+  - prefab: {fileID: 520739178390693697, guid: 73d5731c322353548abcdc2dba641a55, type: 3}
+    cellWidth: 1
+    cellHeight: 1
+  - prefab: {fileID: 520739178390693697, guid: bbee8b4a520510543978a1d62940c057, type: 3}
+    cellWidth: 1
+    cellHeight: 1
+  - prefab: {fileID: 520739178390693697, guid: 4bd716260627e7840ba1144401006987, type: 3}
+    cellWidth: 1
+    cellHeight: 1
+  - prefab: {fileID: 3799256318316876202, guid: c4d2d50df3f99ab40bcea09ae0a43423, type: 3}
+    cellWidth: 2
+    cellHeight: 1
+  - prefab: {fileID: 6749980618424993291, guid: 1bcd1fd695be43e4bb841b192dcb8957, type: 3}
+    cellWidth: 1
+    cellHeight: 2
   startingRoomPrefab: {fileID: 520739178390693697, guid: e4eb12d6f16e2bd43b329256b6c55f40, type: 3}
   bossRoom:
-    prefab: {fileID: 0}
-    gridWidth: 1
-    gridHeight: 1
-  boundaryPrefabs:
-  - {fileID: 1863897285484584852, guid: f518a84cefcc9db43949d2c8d7cc76a4, type: 3}
+    prefab: {fileID: 652476656982324103, guid: 6cbba8c427f0f754484ce47aedd86c51, type: 3}
+    cellWidth: 2
+    cellHeight: 1
   player: {fileID: 0}
+  horizontalDoorPrefab: {fileID: 1156195886993432942, guid: b0acf097fa4134e42be67dbea88a1a29, type: 3}
+  verticalDoorPrefab: {fileID: 1755126114697834238, guid: fc3e25b03823353418d9f000136ad64b, type: 3}
+  horizontalBoundaryDoorPrefab: {fileID: 1156195886993432942, guid: b0acf097fa4134e42be67dbea88a1a29, type: 3}
+  verticalBoundaryDoorPrefab: {fileID: 1755126114697834238, guid: fc3e25b03823353418d9f000136ad64b, type: 3}
+--- !u!114 &8689048688299628491
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 740724861120031170}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 28a1a94e70a9b8d46ab922b303b65f5e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  counterText: {fileID: 0}

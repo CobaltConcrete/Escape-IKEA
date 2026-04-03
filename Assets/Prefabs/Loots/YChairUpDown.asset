@@ -1,0 +1,42 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a735814c985e7c48bde2bdca9fc5a74, type: 3}
+  m_Name: YChairUpDown
+  m_EditorClassIdentifier: 
+  itemName: Yellow Chair
+  icon: {fileID: -1287689501662393466, guid: df85dd5b37fc54ab79e712422dabf06d, type: 3}
+  stackable: 0
+  uiScale: 0.7
+  glowColor: {r: 0.97647065, g: 0.7607844, b: 0.11764707, a: 1}
+  itemCategory: 1
+  equipTag: 0
+  useEffect: 0
+  effectValue: 0
+  effectDuration: 0
+  lootValue: 500
+  canAppearInShoppingList: 1
+  minRequiredAmount: 1
+  maxRequiredAmount: 3
+  lootWorldPrefab: {fileID: 2955381025110779136, guid: c31ebe80315410741823139078e2977c, type: 3}
+  shoppingListKey: YellowChair
+  allowedRoomTypes: 05000000030000000200000006000000
+  bonusSpawnWeight: 1
+  worldDropScale: {x: 0.7, y: 0.7, z: 0.7}
+  spawnFootprint: {x: 1, y: 1}
+  worldColliderType: 1
+  boxOffset: {x: 0, y: 0}
+  boxSize: {x: 2, y: 2}
+  boxEdgeRadius: 0
+  circleOffset: {x: 0, y: 0}
+  circleRadius: 0.5
+  worldTag: Loot
+  worldLayer: 12

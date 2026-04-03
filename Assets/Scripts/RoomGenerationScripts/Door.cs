@@ -14,6 +14,7 @@ public class Door : MonoBehaviour
     [SerializeField] public bool isHorizontal = true; // determines slide direction
     [SerializeField] public Door linkedDoor;          // for boundary syncing
     [SerializeField] private bool isLocked = false;
+    private bool isBossDoor = false;
 
     [Header("Rendering")]
     [SerializeField] private SpriteRenderer spriteRenderer;
@@ -59,11 +60,26 @@ public class Door : MonoBehaviour
         float distToPanel = Vector3.Distance(player.position, transform.position);
         float dist = Mathf.Min(distToDoorway, distToPanel);
 
-        if (!isLocked && dist <= interactionRange)
+        if (dist <= interactionRange)
         {
             if (Input.GetKeyDown(interactKey) && !isMoving)
             {
-                ToggleDoor(true);
+                if (IsBlockedByBossObjective())
+                {
+                    ShowBossLockedNotice();
+                    return;
+                }
+
+                if (linkedDoor != null && linkedDoor.IsBlockedByBossObjective())
+                {
+                    ShowBossLockedNotice();
+                    return;
+                }
+
+                if (!isLocked)
+                {
+                    ToggleDoor(true);
+                }
             }
         }
 
@@ -71,10 +87,16 @@ public class Door : MonoBehaviour
         UpdateVisibility();
     }
 
-    public void Initialize(GameObject a, GameObject b)
+    public void Initialize(GameObject A, GameObject B)
     {
-        roomA = a;
-        roomB = b;
+        this.roomA = A;
+        this.roomB = B;
+
+        if ((A != null && A.CompareTag("BossRoom")) ||
+            (B != null && B.CompareTag("BossRoom")))
+        {
+            isBossDoor = true;
+        }
     }
 
     void UpdateVisibility()
@@ -104,11 +126,23 @@ public class Door : MonoBehaviour
     public void ToggleDoor(bool propagate)
     {
         if (isLocked) return;
+
+        if (IsBlockedByBossObjective())
+        {
+            ShowBossLockedNotice();
+            return;
+        }
+
         isOpen = !isOpen;
         isMoving = true;
 
         if (propagate && linkedDoor != null)
         {
+            if (linkedDoor.IsBlockedByBossObjective())
+            {
+                return;
+            }
+
             linkedDoor.ToggleDoor(false);
         }
     }
@@ -155,5 +189,15 @@ public class Door : MonoBehaviour
             transform.position = target;
             isMoving = false;
         }
+    }
+    private bool IsBlockedByBossObjective()
+    {
+        return isBossDoor &&
+               RunObjectiveManager.Instance != null &&
+               !RunObjectiveManager.Instance.IsObjectiveComplete();
+    }
+    private void ShowBossLockedNotice()
+    {
+        BossRoomNoticeUI.Instance?.ShowMessage("Complete all tasks to unlock this room");
     }
 }

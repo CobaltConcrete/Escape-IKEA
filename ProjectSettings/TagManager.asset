@@ -9,6 +9,8 @@ TagManager:
   - Item
   - Enemy
   - UI
+  - Loot
+  - BossRoom
   layers:
   - Default
   - TransparentFX
@@ -21,8 +23,8 @@ TagManager:
   - Player
   - Item
   - Enemy
-  - Interactable
-  - 
+  - Item
+  - Loot
   - 
   - 
   - 

@@ -1,0 +1,141 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4499290462588721395
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5149120132258613900}
+  - component: {fileID: 2223556627492133648}
+  - component: {fileID: 3058353267267602943}
+  - component: {fileID: 9150165226259502303}
+  - component: {fileID: 766821874428729140}
+  - component: {fileID: 3953837934740083215}
+  m_Layer: 0
+  m_Name: GameManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5149120132258613900
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4499290462588721395}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.5868438, y: -2.7798865, z: -4.3583736}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2223556627492133648
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4499290462588721395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 918cca68dbaae5e4cb3a70b801e049b4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  refreshInterval: 300
+  refreshOnlyIfObjectiveIncomplete: 1
+  extraSpawnCountPerRefresh: 3
+  maxRefreshCount: 2
+--- !u!114 &3058353267267602943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4499290462588721395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b9cc7c85cbb82a54cb23328549463f23, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &9150165226259502303
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4499290462588721395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 07c1c0beedf50664fb06791c579f39eb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  blockedLayerMask:
+    serializedVersion: 2
+    m_Bits: 192
+  spawnCheckRadius: 0.25
+  maxPointAttemptsPerSpawn: 12
+  extraRequiredSpawnBuffer: 1
+  maxAttemptsPerRequiredGroup: 30
+  bonusValueBuffer: 1500
+  maxBonusSpawnAttempts: 50
+--- !u!114 &766821874428729140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4499290462588721395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 42f16c289efdec14584a6458894b16b7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roomSpawnChance: 1
+  spawnableItems:
+  - itemPrefab: {fileID: 6201813141723428331, guid: 931ad0ceb46f2c94482a861b48bd9be6, type: 3}
+    spawnWeight: 1
+  - itemPrefab: {fileID: 5471021774987429058, guid: 9f6712e647264a547a912d553e190de5, type: 3}
+    spawnWeight: 1
+  - itemPrefab: {fileID: 5471021774987429058, guid: 590f5bf7b7f5e46469d8e79a051e1295, type: 3}
+    spawnWeight: 1
+  - itemPrefab: {fileID: 8285000707375923867, guid: a9d38d52224665842991800db8a4967b, type: 3}
+    spawnWeight: 1
+  - itemPrefab: {fileID: 9190976781513619552, guid: feb6cac6d5e251344b06932d218d5caa, type: 3}
+    spawnWeight: 1
+  - itemPrefab: {fileID: 6893116251842173615, guid: 7980763824a28744ea3c069e7f11f8f1, type: 3}
+    spawnWeight: 1
+  - itemPrefab: {fileID: 2875444163375626223, guid: 5e5061444e91cb446850a7aa1ad4e450, type: 3}
+    spawnWeight: 0.664
+  - itemPrefab: {fileID: 6568326992980098917, guid: fef15190ee5c4c14c90fff07cece10d4, type: 3}
+    spawnWeight: 0.419
+  spawnedItemName: SpawnedRoomItem
+--- !u!114 &3953837934740083215
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4499290462588721395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 073d6266f0e53334e8215365e5b683dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  allItemDefinitions:
+  - {fileID: 11400000, guid: 844cbf360c54956419f30758d3434eef, type: 2}
+  - {fileID: 11400000, guid: db5389e4a31b86a4189c0c2169b8cbe0, type: 2}
+  - {fileID: 11400000, guid: 1e89265057e8023419e1d5784083dbbd, type: 2}
+  - {fileID: 11400000, guid: 19070407d5b12f84fb19ceaa00bcf179, type: 2}
+  - {fileID: 11400000, guid: 230f612b83bfa76499e82053f3288d0f, type: 2}
+  - {fileID: 11400000, guid: 6da3d6411d0270c4db136dd71f9267f2, type: 2}
+  minListEntries: 3
+  maxListEntries: 5
+  minGoalMultiplier: 1.2
+  maxGoalMultiplier: 1.5
