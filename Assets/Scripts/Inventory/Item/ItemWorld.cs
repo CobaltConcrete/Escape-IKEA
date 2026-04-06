@@ -5,6 +5,8 @@ using CodeMonkey.Utils;
 
 public class ItemWorld : MonoBehaviour, IInteractable
 {
+    private Room currentRoom;
+
     public static ItemWorld SpawnItemWorld(Vector3 position, Item item)
     {
         return SpawnItemWorld(position, Quaternion.identity, Vector3.one, item);
@@ -69,6 +71,54 @@ public class ItemWorld : MonoBehaviour, IInteractable
         {
             canBePickedUpTimer -= Time.deltaTime;
         }
+
+        UpdateVisibility();
+    }
+
+    // Visibility functions
+    private void OnTriggerEnter2D(Collider2D other)
+    {
+        Room room = other.GetComponent<Room>();
+        if (room != null)
+        {
+            currentRoom = room;
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D other)
+    {
+        Room room = other.GetComponent<Room>();
+        if (room != null && room == currentRoom)
+        {
+            currentRoom = null;
+        }
+    }
+
+    private void UpdateVisibility()
+    {
+        if (spriteRenderer == null) return;
+
+        if (currentRoom == null)
+        {
+            spriteRenderer.enabled = false;
+            return;
+        }
+
+        spriteRenderer.enabled = IsRoomVisible(currentRoom.gameObject);
+    }
+
+    bool IsRoomVisible(GameObject room)
+    {
+        if (room == null) return false;
+
+        SpriteRenderer[] renderers = room.GetComponentsInChildren<SpriteRenderer>();
+        foreach (var sr in renderers)
+        {
+            if (sr.enabled)
+                return true;
+        }
+
+        return false;
     }
 
     public void SetCanBePickedUpTimer(float time)
