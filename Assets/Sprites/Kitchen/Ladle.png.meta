@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 3a76f4f7abb1e48cda7c022e25a01325
+guid: 34c645612c12341349fbcb76603a470a
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5996101261890546387
-    second: Microwave256_0
+      213: -4641098184274028752
+    second: Ladle_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Microwave256_0
+      name: Ladle_0
       rect:
         serializedVersion: 2
-        x: 47
-        y: 103
-        width: 118
-        height: 74
+        x: 95
+        y: 95
+        width: 112
+        height: 114
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d251eb7cba199cca0800000000000000
-      internalID: -5996101261890546387
+      spriteID: 037d2ae7ac1879fb0800000000000000
+      internalID: -4641098184274028752
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Microwave256_0: -5996101261890546387
+      Ladle_0: -4641098184274028752
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
