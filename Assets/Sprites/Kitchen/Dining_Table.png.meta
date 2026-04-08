@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 3a76f4f7abb1e48cda7c022e25a01325
+guid: 24c2db5e80cf04c7e9bed73b7c80025f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5996101261890546387
-    second: Microwave256_0
+      213: -6989816364347550636
+    second: Dining_Table_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Microwave256_0
+      name: Dining_Table_0
       rect:
         serializedVersion: 2
-        x: 47
-        y: 103
-        width: 118
-        height: 74
+        x: 2
+        y: 39
+        width: 124
+        height: 58
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: d251eb7cba199cca0800000000000000
-      internalID: -5996101261890546387
+      spriteID: 4541adddc0f2ffe90800000000000000
+      internalID: -6989816364347550636
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Microwave256_0: -5996101261890546387
+      Dining_Table_0: -6989816364347550636
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
