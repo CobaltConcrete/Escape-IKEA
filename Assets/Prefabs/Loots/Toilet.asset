@@ -10,30 +10,30 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a735814c985e7c48bde2bdca9fc5a74, type: 3}
-  m_Name: WChairLeftRight
+  m_Name: Toilet
   m_EditorClassIdentifier: 
-  itemName: White Chair
-  icon: {fileID: -1296523228350353732, guid: d431f389c69724d30874caa6e908fa74, type: 3}
+  itemName: Toilet
+  icon: {fileID: -2699615200178430186, guid: eae54ffce784549a892a1ec0d2771ee4, type: 3}
   stackable: 0
   uiScale: 0.7
-  glowColor: {r: 0.8392157, g: 0.84313726, b: 0.7411765, a: 1}
+  glowColor: {r: 0.33730364, g: 0, b: 1, a: 1}
   itemCategory: 1
   equipTag: 0
   useEffect: 0
   effectValue: 0
   effectDuration: 0
-  lootValue: 300
-  canAppearInShoppingList: 0
+  lootValue: 700
+  canAppearInShoppingList: 1
   minRequiredAmount: 1
   maxRequiredAmount: 3
-  shoppingListKey: WhiteChair
-  allowedRoomTypes: 03000000
+  shoppingListKey: Toilet
+  allowedRoomTypes: 01000000
   bonusSpawnWeight: 1
-  worldDropScale: {x: 0.7, y: 0.7, z: 0.7}
-  spawnFootprint: {x: 1, y: 1}
+  worldDropScale: {x: 0.8, y: 0.8, z: 0.8}
+  spawnFootprint: {x: 1.1, y: 1.1}
   worldColliderType: 1
   boxOffset: {x: 0, y: 0}
-  boxSize: {x: 2, y: 2}
+  boxSize: {x: 1.5, y: 1.5}
   boxEdgeRadius: 0
   circleOffset: {x: 0, y: 0}
   circleRadius: 0.5
