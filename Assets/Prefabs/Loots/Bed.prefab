@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7802225297280564428}
   - component: {fileID: -5187446036180141741}
   m_Layer: 12
-  m_Name: Chest
+  m_Name: Bed
   m_TagString: Loot
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -47,7 +47,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 895c7b0b55164e3428f6e1776c3cde1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemDefinition: {fileID: 11400000, guid: db5389e4a31b86a4189c0c2169b8cbe0, type: 2}
+  itemDefinition: {fileID: 11400000, guid: 2a1a42b089e13ad4fbc1c32c941833db, type: 2}
   amount: 1
 --- !u!212 &-8225381597860622731
 SpriteRenderer:
@@ -93,7 +93,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: ee1e8b2322ccd994799da53ab469626d, type: 3}
+  m_Sprite: {fileID: 3844635641330849691, guid: 361d5e27ef98b4f649d3676dd7c35c84, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
