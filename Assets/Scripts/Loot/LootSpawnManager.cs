@@ -300,8 +300,6 @@ public class LootSpawnManager : MonoBehaviour
     {
         if (itemDefinition == null)
             return false;
-        if (itemDefinition.lootWorldPrefab == null)
-            return false;
         if (itemDefinition.allowedRoomTypes == null || itemDefinition.allowedRoomTypes.Count == 0)
             return false;
 
