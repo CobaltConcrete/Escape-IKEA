@@ -7,19 +7,6 @@ public class BossRoomController : MonoBehaviour
     [SerializeField] private string clearMessage = "Boss defeated! Leave the store.";
     [SerializeField] private float winDoorDistance = 1.1f;
 
-    [Header("Exit signs (after boss defeat)")]
-    [Tooltip("Assign e.g. Assets/Sprites/Cafeteria/Exit.")]
-    [SerializeField] private Sprite exitSignSprite;
-    [Tooltip("How far past the doorway (toward the next room) along the wall normal.")]
-    [SerializeField] private float exitSignOutsideDistance = 0.52f;
-    [SerializeField] private float exitSignUniformScale = 1.38f;
-    [Tooltip("Added after outside push + rotation (fine-tune in editor if needed).")]
-    [SerializeField] private Vector3 exitSignExtraOffset = Vector3.zero;
-    [Tooltip("Extra degrees on top of auto rotation (left/right vs top/bottom doors).")]
-    [SerializeField] private float exitSignRotationOffsetZ = 0f;
-    [SerializeField] private float exitSignSortingOrder = 22f;
-    [SerializeField] private string exitSignSortingLayerName = "Player";
-
     private EnemyCombat bossCombat;
     private Collider2D roomTrigger;
     private bool encounterStarted;
@@ -28,9 +15,6 @@ public class BossRoomController : MonoBehaviour
     private Door[] bossRoomDoors;
     private bool winTriggered;
     private static int activeBossRoomPlayerCount;
-    private Transform exitSignsRoot;
-    private bool exitSignsSpawned;
-    private static bool warnedMissingExitSprite;
 
     private void Awake()
     {
@@ -60,16 +44,12 @@ public class BossRoomController : MonoBehaviour
         }
 
         if (bossDefeated)
-        {
-            EnsureExitSignsVisible();
             TryTriggerWinAtDoor();
-        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (!other.CompareTag("Player")) return;
-        CacheBossRoomDoors();
         activeBossRoomPlayerCount = 1;
         if (encounterStarted) return;
 
@@ -143,81 +123,6 @@ public class BossRoomController : MonoBehaviour
                 connected.Add(d);
         }
         bossRoomDoors = connected.ToArray();
-    }
-
-    private void EnsureExitSignsVisible()
-    {
-        if (exitSignsSpawned) return;
-        if (exitSignSprite == null)
-        {
-            if (!warnedMissingExitSprite)
-            {
-                warnedMissingExitSprite = true;
-                Debug.LogWarning("BossRoomController: assign Exit Sign Sprite (e.g. Sprites/Cafeteria/Exit) to show exit markers at doors.");
-            }
-            exitSignsSpawned = true;
-            return;
-        }
-
-        CacheBossRoomDoors();
-        if (bossRoomDoors == null || bossRoomDoors.Length == 0)
-        {
-            exitSignsSpawned = true;
-            return;
-        }
-
-        if (exitSignsRoot == null)
-        {
-            GameObject holder = new GameObject("BossRoomExitSigns");
-            holder.transform.SetParent(transform, false);
-            exitSignsRoot = holder.transform;
-        }
-
-        Vector3 roomCenter = roomTrigger != null ? roomTrigger.bounds.center : transform.position;
-
-        for (int i = 0; i < bossRoomDoors.Length; i++)
-        {
-            Door d = bossRoomDoors[i];
-            if (d == null) continue;
-
-            Vector3 doorWorld = d.GetDoorwayWorldPosition();
-            Vector2 delta = (Vector2)(doorWorld - roomCenter);
-
-            Vector2 outward;
-            if (d.isHorizontal)
-            {
-                float sy = Mathf.Sign(delta.y);
-                if (sy == 0f) sy = 1f;
-                outward = new Vector2(0f, sy);
-            }
-            else
-            {
-                float sx = Mathf.Sign(delta.x);
-                if (sx == 0f) sx = 1f;
-                outward = new Vector2(sx, 0f);
-            }
-
-            float zRot;
-            if (d.isHorizontal)
-                zRot = delta.y >= 0f ? 0f : 180f;
-            else
-                zRot = delta.x >= 0f ? -90f : 90f;
-            zRot += exitSignRotationOffsetZ;
-
-            GameObject sign = new GameObject("ExitSign");
-            sign.transform.SetParent(exitSignsRoot, false);
-            sign.transform.SetPositionAndRotation(
-                doorWorld + (Vector3)(outward * exitSignOutsideDistance) + exitSignExtraOffset,
-                Quaternion.Euler(0f, 0f, zRot));
-            sign.transform.localScale = Vector3.one * exitSignUniformScale;
-
-            SpriteRenderer sr = sign.AddComponent<SpriteRenderer>();
-            sr.sprite = exitSignSprite;
-            sr.sortingLayerName = exitSignSortingLayerName;
-            sr.sortingOrder = Mathf.RoundToInt(exitSignSortingOrder);
-        }
-
-        exitSignsSpawned = true;
     }
 
     private void TryTriggerWinAtDoor()

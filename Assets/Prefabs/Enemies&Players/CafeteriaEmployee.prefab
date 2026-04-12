@@ -299,7 +299,7 @@ MonoBehaviour:
   player: {fileID: 0}
   minAttackInterval: 1.4
   maxAttackInterval: 4.1
-  aimDuration: 1
+  aimDuration: 3
   useBurstPattern: 1
   burstShots: 3
   burstGap: 0.45

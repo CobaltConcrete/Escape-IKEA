@@ -40,14 +40,11 @@ public class LootSpawnManager : MonoBehaviour
         LootSpawnArea[] areas = FindObjectsByType<LootSpawnArea>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         foreach (LootSpawnArea area in areas)
         {
-            if (area == null)
-                continue;
-
-            if (area.RoomType == RoomType.Cafeteria)
-                continue;
-
-            area.ResetSpawnCount();
-            allSpawnAreas.Add(area);
+            if (area != null)
+            {
+                area.ResetSpawnCount();
+                allSpawnAreas.Add(area);
+            }
         }
     }
 
@@ -56,7 +53,9 @@ public class LootSpawnManager : MonoBehaviour
         foreach (LootSpawnArea area in allSpawnAreas)
         {
             if (area != null)
+            {
                 area.ResetSpawnCount();
+            }
         }
     }
 
@@ -76,13 +75,14 @@ public class LootSpawnManager : MonoBehaviour
         }
 
         Dictionary<string, int> spawnedCountByKey = new Dictionary<string, int>();
+        Dictionary<string, int> lootValueByKey = new Dictionary<string, int>();
 
         int guaranteedValue = 0;
 
+        // 1. �ȱ�֤ shopping list ÿһ�� loot ����ˢ�� required + buffer
         foreach (ShoppingListEntry entry in shoppingList)
         {
-            if (entry == null || entry.itemDefinition == null)
-                continue;
+            if (entry == null || entry.itemDefinition == null) continue;
 
             string key = entry.itemDefinition.GetShoppingListKey();
             int targetCount = entry.requiredAmount + extraRequiredSpawnBuffer;
@@ -95,6 +95,11 @@ public class LootSpawnManager : MonoBehaviour
                 continue;
             }
 
+            if (!lootValueByKey.ContainsKey(key))
+            {
+                lootValueByKey[key] = entry.itemDefinition.lootValue;
+            }
+
             int currentCount = GetSpawnedCountForKey(spawnedCountByKey, key);
             int attempts = 0;
 
@@ -104,7 +109,9 @@ public class LootSpawnManager : MonoBehaviour
 
                 ItemDefinition chosenVariant = GetRandomDefinitionFromGroup(groupPool);
                 if (chosenVariant == null)
+                {
                     break;
+                }
 
                 bool success = SpawnOneLoot(chosenVariant);
                 if (success)
@@ -123,6 +130,7 @@ public class LootSpawnManager : MonoBehaviour
             }
         }
 
+        // 2. ���׹���֮����ˢ bonus value
         int targetTotalValue = requiredGoalValue + bonusValueBuffer;
         int currentPotentialValue = guaranteedValue;
         int attemptsForBonus = 0;
@@ -135,19 +143,23 @@ public class LootSpawnManager : MonoBehaviour
 
             ItemDefinition bonusLoot = GetWeightedRandomBonusLoot(bonusPool);
             if (bonusLoot == null)
+            {
                 break;
+            }
 
             bool success = SpawnOneLoot(bonusLoot);
             if (success)
+            {
                 currentPotentialValue += bonusLoot.lootValue;
+            }
         }
 
         Debug.Log($"LootSpawnManager: Spawn generation complete. Potential value = {currentPotentialValue}, target = {targetTotalValue}");
 
+        // 3. �����һ�� required У��
         foreach (ShoppingListEntry entry in shoppingList)
         {
-            if (entry == null || entry.itemDefinition == null)
-                continue;
+            if (entry == null || entry.itemDefinition == null) continue;
 
             string key = entry.itemDefinition.GetShoppingListKey();
             int minimumRequired = entry.requiredAmount + extraRequiredSpawnBuffer;
@@ -190,11 +202,15 @@ public class LootSpawnManager : MonoBehaviour
 
             ItemDefinition bonusLoot = GetWeightedRandomBonusLoot(bonusPool);
             if (bonusLoot == null)
+            {
                 break;
+            }
 
             bool success = SpawnOneLoot(bonusLoot);
             if (success)
+            {
                 spawnedCount++;
+            }
         }
 
         Debug.Log($"LootSpawnManager: Spawned additional bonus loot = {spawnedCount}/{extraSpawnCount}");
@@ -204,19 +220,14 @@ public class LootSpawnManager : MonoBehaviour
     {
         List<ItemDefinition> result = new List<ItemDefinition>();
 
-        if (allLootDefinitions == null)
-            return result;
+        if (allLootDefinitions == null) return result;
 
         foreach (ItemDefinition itemDef in allLootDefinitions)
         {
-            if (itemDef == null)
-                continue;
-            if (!itemDef.IsLoot())
-                continue;
-            if (itemDef.lootValue <= 0)
-                continue;
-            if (itemDef.allowedRoomTypes == null || itemDef.allowedRoomTypes.Count == 0)
-                continue;
+            if (itemDef == null) continue;
+            if (!itemDef.IsLoot()) continue;
+            if (itemDef.lootValue <= 0) continue;
+            if (itemDef.allowedRoomTypes == null || itemDef.allowedRoomTypes.Count == 0) continue;
 
             result.Add(itemDef);
         }
@@ -227,15 +238,21 @@ public class LootSpawnManager : MonoBehaviour
     private ItemDefinition GetWeightedRandomBonusLoot(List<ItemDefinition> bonusPool)
     {
         if (bonusPool == null || bonusPool.Count == 0)
+        {
             return null;
+        }
 
         int totalWeight = 0;
 
         foreach (ItemDefinition itemDef in bonusPool)
+        {
             totalWeight += Mathf.Max(1, itemDef.bonusSpawnWeight);
+        }
 
         if (totalWeight <= 0)
+        {
             return null;
+        }
 
         int roll = Random.Range(0, totalWeight);
         int current = 0;
@@ -245,7 +262,9 @@ public class LootSpawnManager : MonoBehaviour
             current += Mathf.Max(1, itemDef.bonusSpawnWeight);
 
             if (roll < current)
+            {
                 return itemDef;
+            }
         }
 
         return bonusPool[bonusPool.Count - 1];
@@ -256,21 +275,21 @@ public class LootSpawnManager : MonoBehaviour
         List<ItemDefinition> result = new List<ItemDefinition>();
 
         if (string.IsNullOrWhiteSpace(key) || allLootDefinitions == null)
+        {
             return result;
+        }
 
         foreach (ItemDefinition def in allLootDefinitions)
         {
-            if (def == null)
-                continue;
-            if (!def.IsLoot())
-                continue;
-            if (def.lootValue <= 0)
-                continue;
-            if (def.allowedRoomTypes == null || def.allowedRoomTypes.Count == 0)
-                continue;
+            if (def == null) continue;
+            if (!def.IsLoot()) continue;
+            if (def.lootValue <= 0) continue;
+            if (def.allowedRoomTypes == null || def.allowedRoomTypes.Count == 0) continue;
 
             if (def.GetShoppingListKey() == key)
+            {
                 result.Add(def);
+            }
         }
 
         return result;
@@ -279,7 +298,9 @@ public class LootSpawnManager : MonoBehaviour
     private ItemDefinition GetRandomDefinitionFromGroup(List<ItemDefinition> groupPool)
     {
         if (groupPool == null || groupPool.Count == 0)
+        {
             return null;
+        }
 
         int index = Random.Range(0, groupPool.Count);
         return groupPool[index];
@@ -288,20 +309,22 @@ public class LootSpawnManager : MonoBehaviour
     private int GetSpawnedCountForKey(Dictionary<string, int> spawnedCountByKey, string key)
     {
         if (spawnedCountByKey == null || string.IsNullOrWhiteSpace(key))
+        {
             return 0;
+        }
 
         if (spawnedCountByKey.TryGetValue(key, out int count))
+        {
             return count;
+        }
 
         return 0;
     }
 
     private bool SpawnOneLoot(ItemDefinition itemDefinition)
     {
-        if (itemDefinition == null)
-            return false;
-        if (itemDefinition.allowedRoomTypes == null || itemDefinition.allowedRoomTypes.Count == 0)
-            return false;
+        if (itemDefinition == null) return false;
+        if (itemDefinition.allowedRoomTypes == null || itemDefinition.allowedRoomTypes.Count == 0) return false;
 
         List<LootSpawnArea> validAreas = GetValidAreasForLoot(itemDefinition);
 
@@ -332,15 +355,13 @@ public class LootSpawnManager : MonoBehaviour
 
         foreach (LootSpawnArea area in allSpawnAreas)
         {
-            if (area == null)
-                continue;
-            if (!area.CanSpawn())
-                continue;
-            if (area.RoomType == RoomType.Cafeteria)
-                continue;
+            if (area == null) continue;
+            if (!area.CanSpawn()) continue;
 
             if (itemDefinition.allowedRoomTypes.Contains(area.RoomType))
+            {
                 result.Add(area);
+            }
         }
 
         return result;
@@ -355,7 +376,9 @@ public class LootSpawnManager : MonoBehaviour
             Vector2 point = area.GetRandomPoint(footprint);
 
             if (!IsSpawnPointValid(point, footprint))
+            {
                 continue;
+            }
 
             SpawnLootObject(itemDefinition, point, area);
             return true;
@@ -375,7 +398,9 @@ public class LootSpawnManager : MonoBehaviour
         Transform parent = null;
 
         if (area != null && area.SpawnParent != null)
-            obj.transform.SetParent(area.SpawnParent, true);
+        {
+            parent = area.SpawnParent;
+        }
 
         Item item = new Item
         {
@@ -412,7 +437,10 @@ public class LootSpawnManager : MonoBehaviour
         for (int i = 0; i < list.Count; i++)
         {
             int randomIndex = Random.Range(i, list.Count);
-            (list[i], list[randomIndex]) = (list[randomIndex], list[i]);
+            T temp = list[i];
+            list[i] = list[randomIndex];
+            list[randomIndex] = temp;
         }
     }
+
 }
