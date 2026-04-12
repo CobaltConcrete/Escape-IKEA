@@ -5,7 +5,7 @@ AssetOrigin:
   productId: 312684
   packageName: "RPG Essentials \u2013 Icon Free Pack (25 items)"
   packageVersion: 1.0
-  assetPath: Assets/Pegasus Studios/Free General RPG Icons/Resources/Icons/Consumables/mana
+  assetPath: Assets/LukeImports/Pegasus Studios/Free General RPG Icons/Resources/Icons/Consumables/mana
     potion.png
   uploadId: 737142
 TextureImporter:
@@ -56,7 +56,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 32
+  spritePixelsToUnits: 4
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1

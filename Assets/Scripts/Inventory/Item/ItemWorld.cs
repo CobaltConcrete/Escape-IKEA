@@ -1,11 +1,14 @@
 using UnityEngine;
 using UnityEngine.Rendering.Universal;
+using UnityEngine.SceneManagement;
 using TMPro;
 using CodeMonkey.Utils;
 
 public class ItemWorld : MonoBehaviour, IInteractable
 {
     private Room currentRoom;
+
+    [SerializeField] private bool lockRoomOnSpawn = true;
 
     public static ItemWorld SpawnItemWorld(Vector3 position, Item item)
     {
@@ -39,6 +42,8 @@ public class ItemWorld : MonoBehaviour, IInteractable
         }
 
         itemWorld.SetItem(item);
+
+
         return itemWorld;
     }
 
@@ -71,54 +76,45 @@ public class ItemWorld : MonoBehaviour, IInteractable
         {
             canBePickedUpTimer -= Time.deltaTime;
         }
-
-        UpdateVisibility();
     }
 
-    // Visibility functions
-    private void OnTriggerEnter2D(Collider2D other)
+    public void SetRoom(Room room)
     {
-        Room room = other.GetComponent<Room>();
-        if (room != null)
+        if (lockRoomOnSpawn)
         {
             currentRoom = room;
         }
     }
 
-    private void OnTriggerExit2D(Collider2D other)
+    public Room GetRoom()
     {
-        Room room = other.GetComponent<Room>();
-        if (room != null && room == currentRoom)
-        {
-            currentRoom = null;
-        }
+        return currentRoom;
     }
 
-    private void UpdateVisibility()
+    public void SetRoomVisible(bool visible)
     {
-        if (spriteRenderer == null) return;
-
-        if (currentRoom == null)
+        // LukeScene 永远显示，方便测试
+        string sceneName = SceneManager.GetActiveScene().name;
+        if (sceneName == "LukeScene")
         {
-            spriteRenderer.enabled = false;
-            return;
+            visible = true;
         }
 
-        spriteRenderer.enabled = IsRoomVisible(currentRoom.gameObject);
-    }
-
-    bool IsRoomVisible(GameObject room)
-    {
-        if (room == null) return false;
-
-        SpriteRenderer[] renderers = room.GetComponentsInChildren<SpriteRenderer>();
-        foreach (var sr in renderers)
+        if (spriteRenderer != null)
         {
-            if (sr.enabled)
-                return true;
+            spriteRenderer.enabled = visible;
         }
 
-        return false;
+        if (textMeshPro != null)
+        {
+            textMeshPro.enabled = visible;
+        }
+
+        // Loot 本来就不发光；普通 item 才跟着显示状态走
+        if (light2D != null && item != null && !item.IsLoot())
+        {
+            light2D.enabled = visible;
+        }
     }
 
     public void SetCanBePickedUpTimer(float time)
@@ -153,12 +149,12 @@ public class ItemWorld : MonoBehaviour, IInteractable
         {
             if (item.IsLoot())
             {
-                // Loot
+                // Loot 不发光
                 light2D.enabled = false;
             }
             else
             {
-                // Item
+                // 普通 Item 发光
                 light2D.enabled = true;
                 light2D.color = item.GetColor();
                 light2D.intensity = 1f;
@@ -177,8 +173,10 @@ public class ItemWorld : MonoBehaviour, IInteractable
                 textMeshPro.SetText("");
             }
         }
+
         ApplyColliderFromDefinition();
     }
+
     private void ApplyColliderFromDefinition()
     {
         if (item == null || item.definition == null)
@@ -230,13 +228,33 @@ public class ItemWorld : MonoBehaviour, IInteractable
         Destroy(gameObject);
     }
 
-    internal static ItemWorld DropItem(Vector3 dropPosition, Item item)
+    internal static ItemWorld DropItem(Vector3 dropPosition, Item item, Transform parent = null, Room room = null)
     {
         Vector3 randomDir = UtilsClass.GetRandomDir();
 
-        ItemWorld itemWorld = SpawnItemWorld(dropPosition + randomDir * 1.1f, Quaternion.identity, item.worldScale, item);
+        ItemWorld itemWorld = SpawnItemWorld(
+            dropPosition + randomDir * 1.1f,
+            Quaternion.identity,
+            item.worldScale,
+            item
+        );
 
         if (itemWorld == null) return null;
+
+        if (parent != null)
+        {
+            itemWorld.transform.SetParent(parent, true);
+        }
+
+        if (room != null)
+        {
+            itemWorld.SetRoom(room);
+        }
+
+        Debug.LogWarning(
+            $"[DropItem] Spawned {itemWorld.name}, parent={(itemWorld.transform.parent != null ? itemWorld.transform.parent.name : "ROOT")}",
+            itemWorld
+        );
 
         itemWorld.SetCanBePickedUpTimer(0.25f);
 
@@ -279,6 +297,4 @@ public class ItemWorld : MonoBehaviour, IInteractable
     {
         return transform.position;
     }
-
-
 }

@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 1148303909692211348}
   - component: {fileID: -7194297125487669818}
   - component: {fileID: 3081837168203019117}
+  - component: {fileID: 3824440809145702961}
   m_Layer: 10
   m_Name: CafeteriaEmployee
   m_TagString: Enemy
@@ -303,7 +304,6 @@ MonoBehaviour:
   burstShots: 3
   burstGap: 0.45
   burstPause: 2.4
-  randomizeInitialDelay: 1
   trackingRange: 6
   cancelThreshold: 0.4
   bulletPrefab: {fileID: 5573476143328688710, guid: 7180c99457c77e041a061f4ca7371c35, type: 3}
@@ -338,6 +338,18 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c6392ff11c9b67f44890dc519402a091, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &3824440809145702961
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1626777669089237922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cfcb5cbf73c143a4cbd1f87435004d6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
 --- !u!1 &6020604292169883429

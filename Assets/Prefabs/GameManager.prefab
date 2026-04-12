@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 9150165226259502303}
   - component: {fileID: 766821874428729140}
   - component: {fileID: 3953837934740083215}
+  - component: {fileID: 4324293364085487361}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -49,7 +50,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   refreshInterval: 300
-  refreshOnlyIfObjectiveIncomplete: 1
+  refreshOnlyIfObjectiveIncomplete: 0
   extraSpawnCountPerRefresh: 3
   maxRefreshCount: 2
 --- !u!114 &3058353267267602943
@@ -139,3 +140,16 @@ MonoBehaviour:
   maxListEntries: 5
   minGoalMultiplier: 1.2
   maxGoalMultiplier: 1.5
+--- !u!114 &4324293364085487361
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4499290462588721395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6f46e02080e184b40bf9bc326573b511, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  visitsBeforeRespawn: 3

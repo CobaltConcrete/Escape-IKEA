@@ -38,7 +38,6 @@ public class ItemDefinition : ScriptableObject
     public bool canAppearInShoppingList = true;
     public int minRequiredAmount = 1;
     public int maxRequiredAmount = 3;
-    public GameObject lootWorldPrefab;
 
     [Header("Loot Group Settings")]
     public string shoppingListKey = "";
