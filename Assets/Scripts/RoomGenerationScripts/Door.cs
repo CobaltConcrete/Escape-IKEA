@@ -169,6 +169,12 @@ public class Door : MonoBehaviour
         return roomA == room || roomB == room;
     }
 
+    /// <summary>Fixed doorway position (does not move when the door panel slides open).</summary>
+    public Vector3 GetDoorwayWorldPosition()
+    {
+        return interactionPoint;
+    }
+
     public bool IsOpen()
     {
         return isOpen;
