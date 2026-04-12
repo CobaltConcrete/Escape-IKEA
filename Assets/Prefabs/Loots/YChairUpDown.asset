@@ -23,12 +23,12 @@ MonoBehaviour:
   effectValue: 0
   effectDuration: 0
   lootValue: 500
-  canAppearInShoppingList: 1
+  canAppearInShoppingList: 0
   minRequiredAmount: 1
   maxRequiredAmount: 3
   lootWorldPrefab: {fileID: 2955381025110779136, guid: c31ebe80315410741823139078e2977c, type: 3}
   shoppingListKey: YellowChair
-  allowedRoomTypes: 05000000030000000200000006000000
+  allowedRoomTypes: 03000000
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.7, y: 0.7, z: 0.7}
   spawnFootprint: {x: 1, y: 1}

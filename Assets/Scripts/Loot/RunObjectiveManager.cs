@@ -245,7 +245,8 @@ public class RunObjectiveManager : MonoBehaviour
 
     public bool IsObjectiveComplete()
     {
-        return IsShoppingListComplete() && currentCollectedValue >= requiredGoalValue;
+        //return IsShoppingListComplete() && currentCollectedValue >= requiredGoalValue;
+        return IsShoppingListComplete();
     }
     private void TryShowBossUnlockedNotice()
     {

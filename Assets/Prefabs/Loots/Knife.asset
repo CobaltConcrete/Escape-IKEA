@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a735814c985e7c48bde2bdca9fc5a74, type: 3}
-  m_Name: Table
+  m_Name: Knife
   m_EditorClassIdentifier: 
-  itemName: Table
-  icon: {fileID: -6989816364347550636, guid: c225cda7e0eec46debd2cc4efe8b6aec, type: 3}
+  itemName: Knife
+  icon: {fileID: 6764707825347140516, guid: 5418b94ddcf3e4f5ea668fa09b76aaff, type: 3}
   stackable: 0
   uiScale: 0.7
   glowColor: {r: 0.33730364, g: 0, b: 1, a: 1}
@@ -26,8 +26,8 @@ MonoBehaviour:
   canAppearInShoppingList: 1
   minRequiredAmount: 1
   maxRequiredAmount: 3
-  lootWorldPrefab: {fileID: 2955381025110779136, guid: d6928896177095e47a908cf153f49794, type: 3}
-  shoppingListKey: Table
+  lootWorldPrefab: {fileID: 2955381025110779136, guid: 9a955ae4580ad2440b6354f65f582cd6, type: 3}
+  shoppingListKey: Knife
   allowedRoomTypes: 04000000
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.7, y: 0.7, z: 0.7}

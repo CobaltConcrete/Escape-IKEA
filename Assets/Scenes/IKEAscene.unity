@@ -1658,6 +1658,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4454752908340480334, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: speed
+      value: 8
+      objectReference: {fileID: 0}
     - target: {fileID: 6640193719736659874, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
       propertyPath: mapManagerGO
       value: 
@@ -1778,6 +1782,14 @@ PrefabInstance:
       propertyPath: playerMovement
       value: 
       objectReference: {fileID: 2033428277}
+    - target: {fileID: 6475680920776364988, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 73.30002
+      objectReference: {fileID: 0}
+    - target: {fileID: 6475680920776364988, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 2.5000076
+      objectReference: {fileID: 0}
     - target: {fileID: 8291567420406807307, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
       propertyPath: m_Name
       value: List_Eq_Item_Loot
@@ -1825,6 +1837,70 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: maxListEntries
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: minListEntries
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: allItemDefinitions.Array.size
+      value: 13
+      objectReference: {fileID: 0}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 230f612b83bfa76499e82053f3288d0f, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 1e89265057e8023419e1d5784083dbbd, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 6da3d6411d0270c4db136dd71f9267f2, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[4]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 19070407d5b12f84fb19ceaa00bcf179, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[5]'
+      value: 
+      objectReference: {fileID: 11400000, guid: bfec35c656a1a2549a941bb57175ac9c, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[6]'
+      value: 
+      objectReference: {fileID: 11400000, guid: db5389e4a31b86a4189c0c2169b8cbe0, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[7]'
+      value: 
+      objectReference: {fileID: 11400000, guid: a3d5823394e3f244c97c3c5e44663460, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[8]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 3216495252b7d4548b192f807b5707a0, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[9]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 79b31894c35faff4ba4a0f3482720279, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[10]'
+      value: 
+      objectReference: {fileID: 11400000, guid: a1f7e3754b5f793438335bf87e504647, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[11]'
+      value: 
+      objectReference: {fileID: 11400000, guid: eea4d4b006f5e8d44a58a3a338360ebb, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[12]'
+      value: 
+      objectReference: {fileID: 11400000, guid: b5601529dbf2a0040af81dc08ce56583, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[13]'
+      value: 
+      objectReference: {fileID: 11400000, guid: b5601529dbf2a0040af81dc08ce56583, type: 2}
     - target: {fileID: 4499290462588721395, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: m_Name
       value: GameManager

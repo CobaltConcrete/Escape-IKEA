@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a735814c985e7c48bde2bdca9fc5a74, type: 3}
-  m_Name: Table
+  m_Name: FryPan
   m_EditorClassIdentifier: 
-  itemName: Table
-  icon: {fileID: -6989816364347550636, guid: c225cda7e0eec46debd2cc4efe8b6aec, type: 3}
+  itemName: Frying Pan
+  icon: {fileID: 995186738447775445, guid: 4f24abd5d8b814945a31cf33b95a6a2a, type: 3}
   stackable: 0
   uiScale: 0.7
   glowColor: {r: 0.33730364, g: 0, b: 1, a: 1}
@@ -26,8 +26,8 @@ MonoBehaviour:
   canAppearInShoppingList: 1
   minRequiredAmount: 1
   maxRequiredAmount: 3
-  lootWorldPrefab: {fileID: 2955381025110779136, guid: d6928896177095e47a908cf153f49794, type: 3}
-  shoppingListKey: Table
+  lootWorldPrefab: {fileID: 2955381025110779136, guid: 54874bc169d653f478374437b77a65fc, type: 3}
+  shoppingListKey: Frying Pan
   allowedRoomTypes: 04000000
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.7, y: 0.7, z: 0.7}

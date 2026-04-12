@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a735814c985e7c48bde2bdca9fc5a74, type: 3}
-  m_Name: Table
+  m_Name: Apron
   m_EditorClassIdentifier: 
-  itemName: Table
-  icon: {fileID: -6989816364347550636, guid: c225cda7e0eec46debd2cc4efe8b6aec, type: 3}
+  itemName: Apron
+  icon: {fileID: -5134162304728761883, guid: 5d8bd8f71ecd94a31a117474fdbd253d, type: 3}
   stackable: 0
   uiScale: 0.7
   glowColor: {r: 0.33730364, g: 0, b: 1, a: 1}
@@ -26,8 +26,8 @@ MonoBehaviour:
   canAppearInShoppingList: 1
   minRequiredAmount: 1
   maxRequiredAmount: 3
-  lootWorldPrefab: {fileID: 2955381025110779136, guid: d6928896177095e47a908cf153f49794, type: 3}
-  shoppingListKey: Table
+  lootWorldPrefab: {fileID: 2955381025110779136, guid: dc86fde78333a3f488b38baa7f7df107, type: 3}
+  shoppingListKey: Apron
   allowedRoomTypes: 04000000
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.7, y: 0.7, z: 0.7}

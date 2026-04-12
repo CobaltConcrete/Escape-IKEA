@@ -23,12 +23,12 @@ MonoBehaviour:
   effectValue: 0
   effectDuration: 0
   lootValue: 300
-  canAppearInShoppingList: 1
+  canAppearInShoppingList: 0
   minRequiredAmount: 1
   maxRequiredAmount: 3
   lootWorldPrefab: {fileID: 2955381025110779136, guid: 685123c21ecb5e342875b005af2d46f2, type: 3}
   shoppingListKey: WhiteChair
-  allowedRoomTypes: 05000000030000000200000004000000
+  allowedRoomTypes: 03000000
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.7, y: 0.7, z: 0.7}
   spawnFootprint: {x: 1, y: 1}

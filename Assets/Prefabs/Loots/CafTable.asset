@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a735814c985e7c48bde2bdca9fc5a74, type: 3}
-  m_Name: Table
+  m_Name: CafTable
   m_EditorClassIdentifier: 
-  itemName: Table
-  icon: {fileID: -6989816364347550636, guid: c225cda7e0eec46debd2cc4efe8b6aec, type: 3}
+  itemName: Cafeteria Table
+  icon: {fileID: 7947502558246424140, guid: f620c21d0f7c0429cab138407d7a7235, type: 3}
   stackable: 0
   uiScale: 0.7
   glowColor: {r: 0.33730364, g: 0, b: 1, a: 1}
@@ -22,21 +22,21 @@ MonoBehaviour:
   useEffect: 0
   effectValue: 0
   effectDuration: 0
-  lootValue: 600
-  canAppearInShoppingList: 1
+  lootValue: 700
+  canAppearInShoppingList: 0
   minRequiredAmount: 1
   maxRequiredAmount: 3
-  lootWorldPrefab: {fileID: 2955381025110779136, guid: d6928896177095e47a908cf153f49794, type: 3}
-  shoppingListKey: Table
-  allowedRoomTypes: 04000000
+  lootWorldPrefab: {fileID: 2955381025110779136, guid: 0810feb9964425a41a075ee66870a17f, type: 3}
+  shoppingListKey: Cafeteria Table
+  allowedRoomTypes: 03000000
   bonusSpawnWeight: 1
-  worldDropScale: {x: 0.7, y: 0.7, z: 0.7}
-  spawnFootprint: {x: 1.8, y: 1.2}
-  worldColliderType: 2
+  worldDropScale: {x: 0.8, y: 0.8, z: 0.8}
+  spawnFootprint: {x: 1.1, y: 1.1}
+  worldColliderType: 1
   boxOffset: {x: 0, y: 0}
-  boxSize: {x: 1, y: 1}
+  boxSize: {x: 1.5, y: 1.5}
   boxEdgeRadius: 0
   circleOffset: {x: 0, y: 0}
-  circleRadius: 2
+  circleRadius: 0.5
   worldTag: Loot
   worldLayer: 12
