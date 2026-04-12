@@ -1938,6 +1938,7 @@ GameObject:
   - component: {fileID: 4049492374165272118}
   - component: {fileID: 5609370691163766229}
   - component: {fileID: 5909522022788532126}
+  - component: {fileID: 5908432402617768914}
   m_Layer: 0
   m_Name: LivingRoom10x20y
   m_TagString: Untagged
@@ -2113,6 +2114,27 @@ MonoBehaviour:
   roomTrigger: {fileID: 5256496874783605114}
   enemyContainer: {fileID: 5640877987964570561}
   itemContainer: {fileID: 2025712274201392123}
+  ignoreRoomActivationInThisScene: 0
+--- !u!114 &5908432402617768914
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6749980618424993291}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0140c6c542f3296439a03f99e00c0aad, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemyParent: {fileID: 5640877987964570561}
+  enemyPrefabs:
+  - {fileID: 3464154710725457275, guid: 73a96bd0a680f8949861c27cf368dbe9, type: 3}
+  - {fileID: 6291527677918437734, guid: e473e2195ce4e41b6bfde2257fe2d519, type: 3}
+  - {fileID: 1626777669089237922, guid: f4f55aeea54d40b40b4154fdb751f326, type: 3}
+  spawnCount: 3
+  respawnExtraCount: 6
+  enemySpawnArea: {fileID: 1075559148016400893}
 --- !u!1 &6808611626934634575
 GameObject:
   m_ObjectHideFlags: 0

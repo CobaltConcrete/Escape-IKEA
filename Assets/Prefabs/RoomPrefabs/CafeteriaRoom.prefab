@@ -433,8 +433,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 624148864710777306}
-  - component: {fileID: 1259770237505365432}
   - component: {fileID: 186864520387980171}
+  - component: {fileID: 1259770237505365432}
   - component: {fileID: 7871331883554067030}
   - component: {fileID: 7640435745210340264}
   - component: {fileID: 4526436974333089289}
@@ -479,20 +479,6 @@ Transform:
   - {fileID: 991701997499075333}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1259770237505365432
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 652476656982324103}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6030bfa853803da49b38ec9de6d582c3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  explored: 0
-  roomVisuals: {fileID: 652476656982324103}
 --- !u!61 &186864520387980171
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -539,6 +525,20 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 20, y: 10}
   m_EdgeRadius: 0
+--- !u!114 &1259770237505365432
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 652476656982324103}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6030bfa853803da49b38ec9de6d582c3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  explored: 0
+  roomVisuals: {fileID: 652476656982324103}
 --- !u!114 &7871331883554067030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -596,8 +596,7 @@ MonoBehaviour:
   roomTrigger: {fileID: 186864520387980171}
   enemyContainer: {fileID: 6958675699673471726}
   itemContainer: {fileID: 1359586083509128961}
-  allowRespawn: 1
-  roomsAwayToRespawn: 3
+  ignoreRoomActivationInThisScene: 0
 --- !u!114 &6189421176342105510
 MonoBehaviour:
   m_ObjectHideFlags: 0

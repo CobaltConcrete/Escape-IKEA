@@ -67,13 +67,11 @@ public class LootSpawnManager : MonoBehaviour
 
         if (shoppingList == null || shoppingList.Count == 0)
         {
-            Debug.LogWarning("LootSpawnManager: shopping list is empty.");
             return;
         }
 
         if (allLootDefinitions == null || allLootDefinitions.Count == 0)
         {
-            Debug.LogWarning("LootSpawnManager: allLootDefinitions is empty.");
             return;
         }
 
@@ -376,22 +374,38 @@ public class LootSpawnManager : MonoBehaviour
 
     private void SpawnLootObject(ItemDefinition itemDefinition, Vector2 position, LootSpawnArea area)
     {
-        GameObject obj = Instantiate(itemDefinition.lootWorldPrefab, position, Quaternion.identity);
+        Transform parent = null;
 
         if (area != null && area.SpawnParent != null)
             obj.transform.SetParent(area.SpawnParent, true);
 
-        ItemWorld itemWorld = obj.GetComponent<ItemWorld>();
-        if (itemWorld != null)
+        Item item = new Item
         {
-            Item item = new Item
-            {
-                definition = itemDefinition,
-                amount = 1,
-                worldScale = Vector3.one
-            };
+            definition = itemDefinition,
+            amount = 1,
+            worldScale = itemDefinition.worldDropScale
+        };
 
-            itemWorld.SetItem(item);
+        ItemWorld itemWorld = ItemWorld.SpawnItemWorld(
+            position,
+            Quaternion.identity,
+            item.worldScale,
+            item
+        );
+
+        if (itemWorld == null) return;
+
+        // parent
+        if (parent != null)
+        {
+            itemWorld.transform.SetParent(parent, true);
+        }
+
+        // room
+        Room room = area != null ? area.GetComponentInParent<Room>() : null;
+        if (room != null)
+        {
+            itemWorld.SetRoom(room);
         }
     }
 

@@ -10,16 +10,14 @@ public class RoomContentActivation : MonoBehaviour
     [SerializeField] private Transform enemyContainer;
     [SerializeField] private Transform itemContainer;
 
-    [Header("Respawn Settings")]
-    [SerializeField] private bool allowRespawn = true;
-    [SerializeField] private int roomsAwayToRespawn = 3;
+    [Header("Debug / Test Scene Override")]
+    [SerializeField]
+    [Tooltip("If enabled, this room ignores room detection and keeps its contents active for test scenes.")]
+    private bool ignoreRoomActivationInThisScene = false;
 
     private static RoomContentActivation currentActiveRoom;
     private static readonly HashSet<RoomContentActivation> playerRooms = new HashSet<RoomContentActivation>();
     private static Transform playerTransform;
-
-    private int lastVisitedIndex = -1;
-    private bool needsRespawn = false;
 
     private void Awake()
     {
@@ -36,6 +34,12 @@ public class RoomContentActivation : MonoBehaviour
 
     private void Start()
     {
+        if (ignoreRoomActivationInThisScene)
+        {
+            SetRoomContentActive(true);
+            return;
+        }
+
         SetRoomContentActive(false);
         TryRegisterIfPlayerAlreadyInside();
         ReevaluateActiveRoom();
@@ -43,7 +47,11 @@ public class RoomContentActivation : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!collision.CompareTag("Player")) return;
+        if (ignoreRoomActivationInThisScene)
+            return;
+
+        if (!collision.CompareTag("Player"))
+            return;
 
         playerTransform = collision.transform;
         playerRooms.Add(this);
@@ -52,7 +60,11 @@ public class RoomContentActivation : MonoBehaviour
 
     private void OnTriggerStay2D(Collider2D collision)
     {
-        if (!collision.CompareTag("Player")) return;
+        if (ignoreRoomActivationInThisScene)
+            return;
+
+        if (!collision.CompareTag("Player"))
+            return;
 
         playerTransform = collision.transform;
         playerRooms.Add(this);
@@ -61,14 +73,17 @@ public class RoomContentActivation : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (!collision.CompareTag("Player")) return;
+        if (ignoreRoomActivationInThisScene)
+            return;
+
+        if (!collision.CompareTag("Player"))
+            return;
 
         playerRooms.Remove(this);
 
         if (currentActiveRoom == this)
         {
             currentActiveRoom.SetRoomContentActive(false);
-            currentActiveRoom.MarkForRespawn();
             currentActiveRoom = null;
         }
 
@@ -77,13 +92,16 @@ public class RoomContentActivation : MonoBehaviour
 
     private void TryRegisterIfPlayerAlreadyInside()
     {
-        if (roomTrigger == null) return;
+        if (roomTrigger == null)
+            return;
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
-        if (player == null) return;
+        if (player == null)
+            return;
 
         Collider2D playerCol = player.GetComponent<Collider2D>();
-        if (playerCol == null) return;
+        if (playerCol == null)
+            return;
 
         if (roomTrigger.bounds.Intersects(playerCol.bounds))
         {
@@ -94,14 +112,19 @@ public class RoomContentActivation : MonoBehaviour
 
     private static void ReevaluateActiveRoom()
     {
-        if (playerTransform == null) return;
+        if (playerTransform == null)
+            return;
 
         RoomContentActivation bestRoom = null;
         float bestDistance = float.MaxValue;
 
         foreach (RoomContentActivation room in playerRooms)
         {
-            if (room == null || room.roomTrigger == null) continue;
+            if (room == null || room.roomTrigger == null)
+                continue;
+
+            if (room.ignoreRoomActivationInThisScene)
+                continue;
 
             Vector2 closestPoint = room.roomTrigger.ClosestPoint(playerTransform.position);
             float dist = ((Vector2)playerTransform.position - closestPoint).sqrMagnitude;
@@ -113,12 +136,12 @@ public class RoomContentActivation : MonoBehaviour
             }
         }
 
-        if (bestRoom == currentActiveRoom) return;
+        if (bestRoom == currentActiveRoom)
+            return;
 
         if (currentActiveRoom != null)
         {
             currentActiveRoom.SetRoomContentActive(false);
-            currentActiveRoom.MarkForRespawn();
         }
 
         currentActiveRoom = bestRoom;
@@ -132,38 +155,22 @@ public class RoomContentActivation : MonoBehaviour
 
     private void OnPlayerEnteredThisRoom()
     {
-        if (RoomVisitTracker.Instance == null) return;
+        RoomVisitTracker.Instance?.RegisterRoomVisit(GetRoomKey());
 
-        int currentVisitIndex = RoomVisitTracker.Instance.RegisterRoomVisit();
-
-        if (allowRespawn && needsRespawn && lastVisitedIndex >= 0)
+        RoomEnemyRespawnAnchor respawnAnchor = GetComponentInChildren<RoomEnemyRespawnAnchor>();
+        if (respawnAnchor != null)
         {
-            int roomsAway = currentVisitIndex - lastVisitedIndex;
-
-            if (roomsAway >= roomsAwayToRespawn)
-            {
-                RespawnRoomContent();
-                needsRespawn = false;
-            }
+            respawnAnchor.OnPlayerEnteredRoom();
         }
-
-        lastVisitedIndex = currentVisitIndex;
+        else
+        {
+            Debug.LogWarning($"[RoomContentActivation] No RoomEnemyRespawnAnchor found in {name}");
+        }
     }
 
-    private void MarkForRespawn()
+    private string GetRoomKey()
     {
-        if (!allowRespawn) return;
-        needsRespawn = true;
-    }
-
-    private void RespawnRoomContent()
-    {
-        Debug.Log($"Respawning room content: {name}");
-
-        if (ItemSpawnManager.Instance != null)
-        {
-            ItemSpawnManager.Instance.RespawnRoom(gameObject);
-        }
+        return gameObject.GetInstanceID().ToString();
     }
 
     public void SetRoomContentActive(bool active)
@@ -174,7 +181,8 @@ public class RoomContentActivation : MonoBehaviour
 
     private void SetEnemiesActive(bool active)
     {
-        if (enemyContainer == null) return;
+        if (enemyContainer == null)
+            return;
 
         RoomContentVisibility[] contents = enemyContainer.GetComponentsInChildren<RoomContentVisibility>(true);
         foreach (RoomContentVisibility content in contents)
@@ -188,9 +196,18 @@ public class RoomContentActivation : MonoBehaviour
 
     private void SetItemsActive(bool active)
     {
-        if (itemContainer != null)
+        if (itemContainer == null)
+            return;
+
+        ItemWorld[] items = itemContainer.GetComponentsInChildren<ItemWorld>(true);
+        foreach (ItemWorld item in items)
         {
-            itemContainer.gameObject.SetActive(active);
+            if (item != null)
+            {
+                item.SetRoomVisible(active);
+            }
         }
+
+        itemContainer.gameObject.SetActive(active);
     }
 }

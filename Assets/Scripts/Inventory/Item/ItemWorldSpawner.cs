@@ -33,6 +33,14 @@ public class ItemWorldSpawner : MonoBehaviour
             transform.lossyScale,
             item
         );
+        if (spawned != null)
+        {
+            Room room = GetComponentInParent<Room>();
+            if (room != null)
+            {
+                spawned.SetRoom(room);
+            }
+        }
 
         if (spawned != null)
         {
