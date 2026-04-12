@@ -614,6 +614,13 @@ MonoBehaviour:
   bossNameHint: CafeteriaEmployee
   clearMessage: Boss defeated! Leave the store.
   winDoorDistance: 1.1
+  exitSignSprite: {fileID: -1922979618149193216, guid: 5eff9d0e664f4485e907ee231164642c, type: 3}
+  exitSignOutsideDistance: 0.52
+  exitSignUniformScale: 1.38
+  exitSignExtraOffset: {x: 0, y: 0, z: 0}
+  exitSignRotationOffsetZ: 0
+  exitSignSortingOrder: 22
+  exitSignSortingLayerName: Player
 --- !u!1 &1697749999502467874
 GameObject:
   m_ObjectHideFlags: 0

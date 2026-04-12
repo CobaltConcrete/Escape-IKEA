@@ -100,6 +100,12 @@ public class ItemSpawnManager : MonoBehaviour
             return state;
         }
 
+        if (roomInstance.CompareTag("BossRoom"))
+        {
+            state.shouldSpawn = false;
+            return state;
+        }
+
         if (Random.value > roomSpawnChance)
         {
             state.shouldSpawn = false;
