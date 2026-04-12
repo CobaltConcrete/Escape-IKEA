@@ -243,9 +243,13 @@ public class RunObjectiveManager : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Boss doors and run progression use this: every shopping-list line must be satisfied.
+    /// Extra value goal (<see cref="RequiredGoalValue"/>) is informational / scoring only.
+    /// </summary>
     public bool IsObjectiveComplete()
     {
-        return IsShoppingListComplete() && currentCollectedValue >= requiredGoalValue;
+        return IsShoppingListComplete();
     }
     private void TryShowBossUnlockedNotice()
     {

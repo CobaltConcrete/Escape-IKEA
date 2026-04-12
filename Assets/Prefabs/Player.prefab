@@ -143,7 +143,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.331, y: -0.07967734, z: 0.028791841}
-  m_LocalScale: {x: 0.6, y: 0.6, z: 1.2}
+  m_LocalScale: {x: 1, y: 1, z: 2}
   m_ConstrainProportionsScale: 1
   m_Children:
   - {fileID: 9086373605952938387}
@@ -279,6 +279,7 @@ MonoBehaviour:
   attackRadius: 1.25
   attackKey: 106
   bulletClearRadius: 1.6
+  attackCooldown: 0.4
 --- !u!114 &107977642095276863
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -295,7 +296,6 @@ MonoBehaviour:
   uiLootInventory: {fileID: 0}
   equipmentUI: {fileID: 0}
   equipmentData: {fileID: 0}
-  playerDialogue: {fileID: 0}
   interactRadius: 0.45
   interactableLayerMask:
     serializedVersion: 2
