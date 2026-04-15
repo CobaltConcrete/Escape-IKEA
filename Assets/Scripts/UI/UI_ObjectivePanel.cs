@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-public class UI_ObjectiveTextPanel : MonoBehaviour
+public class UI_ObjectivePanel : MonoBehaviour
 {
     [Header("Loot List")]
     [SerializeField] private Transform lootContainer;
@@ -98,8 +98,16 @@ public class UI_ObjectiveTextPanel : MonoBehaviour
     {
         if (valueText == null) return;
 
-        valueText.text =
-            $"Value: {RunObjectiveManager.Instance.CurrentCollectedValue} / {RunObjectiveManager.Instance.RequiredGoalValue}";
+        if (RunObjectiveManager.Instance.RequireGoalValueToUnlockBoss)
+        {
+            valueText.text =
+                $"Value: {RunObjectiveManager.Instance.CurrentCollectedValue} / {RunObjectiveManager.Instance.RequiredGoalValue}";
+        }
+        else
+        {
+            valueText.text =
+                $"Value: {RunObjectiveManager.Instance.CurrentCollectedValue}";
+        }
     }
 
     private void RefreshBossText()

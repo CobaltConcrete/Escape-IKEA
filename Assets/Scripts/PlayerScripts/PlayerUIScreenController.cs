@@ -41,6 +41,8 @@ public class PlayerUIScreenController : MonoBehaviour
 
     private void HandleInventoryToggle()
     {
+        UIScreenState previousState = currentState;
+
         switch (currentState)
         {
             case UIScreenState.None:
@@ -55,10 +57,14 @@ public class PlayerUIScreenController : MonoBehaviour
                 SetState(UIScreenState.Inventory);
                 break;
         }
+
+        PlayInventoryTransitionSound(previousState, currentState);
     }
 
     private void HandleObjectiveToggle()
     {
+        UIScreenState previousState = currentState;
+
         switch (currentState)
         {
             case UIScreenState.None:
@@ -72,6 +78,26 @@ public class PlayerUIScreenController : MonoBehaviour
             case UIScreenState.Objective:
                 SetState(UIScreenState.None);
                 break;
+        }
+
+        PlayInventoryTransitionSound(previousState, currentState);
+    }
+
+    private void PlayInventoryTransitionSound(UIScreenState previousState, UIScreenState newState)
+    {
+        if (SoundManager.Instance == null)
+            return;
+
+        bool inventoryWasOpen = previousState == UIScreenState.Inventory;
+        bool inventoryIsOpen = newState == UIScreenState.Inventory;
+
+        if (!inventoryWasOpen && inventoryIsOpen)
+        {
+            SoundManager.Instance.PlayInventoryOpen();
+        }
+        else if (inventoryWasOpen && !inventoryIsOpen)
+        {
+            SoundManager.Instance.PlayInventoryClose();
         }
     }
 

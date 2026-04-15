@@ -1,3 +1,4 @@
+using System.Collections;
 using System;
 using UnityEngine;
 
@@ -5,11 +6,14 @@ public class PlayerHealth : MonoBehaviour
 {
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] private float startingHealth = 100f;
+    [SerializeField] private float deathSceneDelay = 0.6f;
 
     public float MaxHealth => maxHealth;
     public float CurrentHealth { get; private set; }
 
     public event Action OnHealthChanged;
+
+    private bool isDead = false;
 
     private void Awake()
     {
@@ -23,19 +27,54 @@ public class PlayerHealth : MonoBehaviour
 
     public void TakeDamage(float amount)
     {
-        if (amount <= 0f){
+        if (amount <= 0f || isDead)
             return;
-        }
+
+        float previousHealth = CurrentHealth;
+
         CurrentHealth = Mathf.Max(0f, CurrentHealth - amount);
         OnHealthChanged?.Invoke();
-        if (CurrentHealth <= 0){
-            PageManager.LoseGame();
+
+        if (CurrentHealth < previousHealth)
+        {
+            if (SoundManager.Instance != null)
+            {
+                SoundManager.Instance.PlayPlayerHurt();
+            }
         }
+
+        if (CurrentHealth <= 0f && !isDead)
+        {
+            isDead = true;
+            StartCoroutine(HandleDeath());
+        }
+    }
+
+    private IEnumerator HandleDeath()
+    {
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.StopAmbient();
+
+            RoomLightBuzz[] allBuzz = FindObjectsOfType<RoomLightBuzz>();
+            foreach (var buzz in allBuzz)
+            {
+                buzz.StopBuzz();
+            }
+
+            SoundManager.Instance.PlayPlayerDeath();
+        }
+
+        yield return new WaitForSeconds(deathSceneDelay);
+
+        PageManager.LoseGame();
     }
 
     public void Heal(float amount)
     {
-        if (amount <= 0f) return;
+        if (amount <= 0f || isDead)
+            return;
+
         CurrentHealth = Mathf.Min(maxHealth, CurrentHealth + amount);
         OnHealthChanged?.Invoke();
     }
@@ -47,7 +86,8 @@ public class PlayerHealth : MonoBehaviour
         OnHealthChanged?.Invoke();
     }
 
-    public float getHealth(){
+    public float getHealth()
+    {
         return CurrentHealth;
     }
 }

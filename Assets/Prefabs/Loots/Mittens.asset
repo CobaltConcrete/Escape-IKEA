@@ -22,7 +22,7 @@ MonoBehaviour:
   useEffect: 0
   effectValue: 0
   effectDuration: 0
-  lootValue: 700
+  lootValue: 300
   canAppearInShoppingList: 1
   minRequiredAmount: 1
   maxRequiredAmount: 3

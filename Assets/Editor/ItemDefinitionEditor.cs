@@ -11,21 +11,25 @@ public class ItemDefinitionEditor : Editor
         ItemDefinition itemDefinition = (ItemDefinition)target;
 
         // Basic Info
+        EditorGUILayout.LabelField("Basic Info", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(serializedObject.FindProperty("itemName"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("icon"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("stackable"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("uiScale"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("glowColor"));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("description"));
 
         EditorGUILayout.Space();
 
         // Category
+        EditorGUILayout.LabelField("Category", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(serializedObject.FindProperty("itemCategory"));
 
         EditorGUILayout.Space();
 
         if (itemDefinition.itemCategory == ItemCategory.Normal)
         {
+            EditorGUILayout.LabelField("Normal Item Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("equipTag"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("useEffect"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("effectValue"));
@@ -33,15 +37,16 @@ public class ItemDefinitionEditor : Editor
         }
         else if (itemDefinition.itemCategory == ItemCategory.Loot)
         {
+            EditorGUILayout.LabelField("Loot Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("lootValue"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("canAppearInShoppingList"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("minRequiredAmount"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("maxRequiredAmount"));
-            //EditorGUILayout.PropertyField(serializedObject.FindProperty("lootWorldPrefab"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("shoppingListKey"));
 
             EditorGUILayout.Space();
 
+            EditorGUILayout.LabelField("Loot Spawn Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("allowedRoomTypes"), true);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("bonusSpawnWeight"));
         }
@@ -57,10 +62,10 @@ public class ItemDefinitionEditor : Editor
 
         // World Collider Settings
         EditorGUILayout.LabelField("World Collider Settings", EditorStyles.boldLabel);
-
         EditorGUILayout.PropertyField(serializedObject.FindProperty("worldColliderType"));
 
-        WorldColliderType type = (WorldColliderType)serializedObject.FindProperty("worldColliderType").enumValueIndex;
+        WorldColliderType type =
+            (WorldColliderType)serializedObject.FindProperty("worldColliderType").enumValueIndex;
 
         switch (type)
         {
