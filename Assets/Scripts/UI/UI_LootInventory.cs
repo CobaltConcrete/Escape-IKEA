@@ -104,6 +104,11 @@ public class UI_LootInventory : MonoBehaviour
             return;
         }
 
+        if (UI_ItemTooltip.Instance != null)
+        {
+            UI_ItemTooltip.Instance.Hide();
+        }
+
         foreach (Transform child in lootSlotContainer)
         {
             if (child == lootSlotTemplate) continue;
@@ -126,17 +131,35 @@ public class UI_LootInventory : MonoBehaviour
 
             slot.gameObject.SetActive(true);
 
+            UI_ItemSlotTooltipTrigger tooltipTrigger =
+                slot.GetComponent<UI_ItemSlotTooltipTrigger>();
+
+            if (tooltipTrigger == null)
+            {
+                tooltipTrigger = slot.gameObject.AddComponent<UI_ItemSlotTooltipTrigger>();
+            }
+
+            tooltipTrigger.SetItem(item);
+
             Button_UI buttonUI = slot.GetComponent<Button_UI>();
 
             if (buttonUI != null)
             {
                 buttonUI.ClickFunc = () =>
                 {
+                    if (SoundManager.Instance != null)
+                    {
+                        SoundManager.Instance.PlayButtonClick();
+                    }
                     // TODO: loot detail
                 };
 
                 buttonUI.MouseRightClickFunc = () =>
                 {
+                    if (SoundManager.Instance != null)
+                    {
+                        SoundManager.Instance.PlayButtonClick();
+                    }
                     if (player == null) return;
 
                     Item dropItem = new Item

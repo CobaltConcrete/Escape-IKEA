@@ -98,6 +98,11 @@ public class UI_Inventory : MonoBehaviour
             return;
         }
 
+        if (UI_ItemTooltip.Instance != null)
+        {
+            UI_ItemTooltip.Instance.Hide();
+        }
+
         foreach (Transform child in itemSlotContainer)
         {
             if (child == itemSlotTemplate) continue;
@@ -124,6 +129,16 @@ public class UI_Inventory : MonoBehaviour
 
             itemSlotRectTransform.gameObject.SetActive(true);
 
+            UI_ItemSlotTooltipTrigger tooltipTrigger =
+                itemSlotRectTransform.GetComponent<UI_ItemSlotTooltipTrigger>();
+
+            if (tooltipTrigger == null)
+            {
+                tooltipTrigger = itemSlotRectTransform.gameObject.AddComponent<UI_ItemSlotTooltipTrigger>();
+            }
+
+            tooltipTrigger.SetItem(item);
+
             Button_UI buttonUI = itemSlotRectTransform.GetComponent<Button_UI>();
             if (buttonUI == null)
             {
@@ -132,11 +147,21 @@ public class UI_Inventory : MonoBehaviour
 
             buttonUI.ClickFunc = () =>
             {
+                if (SoundManager.Instance != null)
+                {
+                    SoundManager.Instance.PlayButtonClick();
+                }
+
                 inventory.UseItem(item);
             };
 
             buttonUI.MouseRightClickFunc = () =>
             {
+                if (SoundManager.Instance != null)
+                {
+                    SoundManager.Instance.PlayButtonClick();
+                }
+
                 if (player == null) return;
 
                 Item duplicateItem = item.Clone();

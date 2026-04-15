@@ -99,6 +99,11 @@ public class PlayerInventoryInteraction : MonoBehaviour
 
         inventory.AddLoot(pickedUpItem);
 
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayItemPickup();
+        }
+
         itemWorld.DestroySelf();
     }
     private void FindBestInteractable()
@@ -825,36 +830,6 @@ public class PlayerInventoryInteraction : MonoBehaviour
                 return null;
         }
     }
-
-    //private void OnTriggerEnter2D(Collider2D collider)
-    //{
-    //    ItemWorld itemWorld = collider.GetComponent<ItemWorld>();
-
-    //    if (itemWorld != null && itemWorld.CanBePickedUp())
-    //    {
-    //        Item pickedUpItem = itemWorld.GetItem();
-    //        if (pickedUpItem == null || pickedUpItem.definition == null) return;
-
-    //        if (!firstItemFound)
-    //        {
-    //            firstItemFound = true;
-    //            playerDialogue.ShowDialogue();
-    //        }
-
-    //        if (pickedUpItem.IsLoot())
-    //        {
-    //            // Loot don't auto pick up, just record that there is a loot nearby
-    //            nearbyLoot = itemWorld;
-    //        }
-    //        else
-    //        {
-    //            // normal item pick up immediately
-    //            inventory.AddItem(pickedUpItem);
-    //            TryAutoEquipPickedUpItem(pickedUpItem);
-    //            itemWorld.DestroySelf();
-    //        }
-    //    }
-    //}
     private void OnTriggerEnter2D(Collider2D collider)
     {
         ItemWorld itemWorld = collider.GetComponent<ItemWorld>();
@@ -885,6 +860,11 @@ public class PlayerInventoryInteraction : MonoBehaviour
 
         inventory.AddItem(pickedUpItem);
         TryAutoEquipPickedUpItem(pickedUpItem);
+
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayItemPickup();
+        }
 
         itemWorld.DestroySelf();
     }

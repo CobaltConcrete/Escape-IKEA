@@ -21,6 +21,9 @@ public class RunObjectiveManager : MonoBehaviour
     [SerializeField] private float minGoalMultiplier = 1.2f;
     [SerializeField] private float maxGoalMultiplier = 1.5f;
 
+    [Header("Boss Unlock Requirements")]
+    [SerializeField] private bool requireGoalValueToUnlockBoss = false;
+
     private readonly List<ShoppingListEntry> currentShoppingList = new List<ShoppingListEntry>();
     private int requiredGoalValue;
     private int currentCollectedValue;
@@ -29,6 +32,7 @@ public class RunObjectiveManager : MonoBehaviour
     public IReadOnlyList<ShoppingListEntry> CurrentShoppingList => currentShoppingList;
     public int RequiredGoalValue => requiredGoalValue;
     public int CurrentCollectedValue => currentCollectedValue;
+    public bool RequireGoalValueToUnlockBoss => requireGoalValueToUnlockBoss;
 
     private void Awake()
     {
@@ -62,12 +66,12 @@ public class RunObjectiveManager : MonoBehaviour
         {
             this.inventory.OnLootListChanged += OnLootListChanged;
 
-            // sync with inventory status
+            // Sync with inventory status
             RecalculateObjectiveProgressFromInventory(this.inventory);
         }
         else
         {
-            // update UI if inventory is cleared
+            // Update UI if inventory is cleared
             currentCollectedValue = 0;
 
             foreach (ShoppingListEntry entry in currentShoppingList)
@@ -78,10 +82,12 @@ public class RunObjectiveManager : MonoBehaviour
             OnObjectiveProgressChanged?.Invoke();
         }
     }
+
     public List<ItemDefinition> GetAllItemDefinitions()
     {
         return allItemDefinitions;
     }
+
     private void OnLootListChanged(object sender, EventArgs e)
     {
         RecalculateObjectiveProgressFromInventory(inventory);
@@ -91,6 +97,7 @@ public class RunObjectiveManager : MonoBehaviour
     {
         currentShoppingList.Clear();
         currentCollectedValue = 0;
+        hasShownBossUnlockedNotice = false;
 
         List<ItemDefinition> eligibleLootPool = GetEligibleLootPool();
 
@@ -124,6 +131,7 @@ public class RunObjectiveManager : MonoBehaviour
         }
 
         GenerateGoalValue();
+
         if (LootSpawnManager.Instance != null)
         {
             LootSpawnManager.Instance.GenerateLootForObjective(
@@ -133,7 +141,7 @@ public class RunObjectiveManager : MonoBehaviour
             );
         }
 
-        // if inventory is bound, recalculate
+        // If inventory is bound, recalculate
         if (inventory != null)
         {
             RecalculateObjectiveProgressFromInventory(inventory);
@@ -142,7 +150,6 @@ public class RunObjectiveManager : MonoBehaviour
         {
             OnObjectiveProgressChanged?.Invoke();
         }
-
     }
 
     private List<ItemDefinition> GetEligibleLootPool()
@@ -218,7 +225,8 @@ public class RunObjectiveManager : MonoBehaviour
 
                 foreach (ShoppingListEntry entry in currentShoppingList)
                 {
-                    if (entry.itemDefinition != null && entry.itemDefinition.GetShoppingListKey() == item.definition.GetShoppingListKey())
+                    if (entry.itemDefinition != null &&
+                        entry.itemDefinition.GetShoppingListKey() == item.definition.GetShoppingListKey())
                     {
                         entry.collectedAmount += amount;
                         break;
@@ -230,6 +238,7 @@ public class RunObjectiveManager : MonoBehaviour
         OnObjectiveProgressChanged?.Invoke();
         TryShowBossUnlockedNotice();
     }
+
     public bool IsShoppingListComplete()
     {
         foreach (ShoppingListEntry entry in currentShoppingList)
@@ -243,10 +252,29 @@ public class RunObjectiveManager : MonoBehaviour
         return true;
     }
 
+    public bool IsGoalValueComplete()
+    {
+        return currentCollectedValue >= requiredGoalValue;
+    }
+
     public bool IsObjectiveComplete()
     {
+        if (requireGoalValueToUnlockBoss)
+        {
+            return IsShoppingListComplete() && IsGoalValueComplete();
+        }
+
         return IsShoppingListComplete();
     }
+
+    public void SetRequireGoalValueToUnlockBoss(bool requireGoalValue)
+    {
+        requireGoalValueToUnlockBoss = requireGoalValue;
+
+        OnObjectiveProgressChanged?.Invoke();
+        TryShowBossUnlockedNotice();
+    }
+
     private void TryShowBossUnlockedNotice()
     {
         if (hasShownBossUnlockedNotice)

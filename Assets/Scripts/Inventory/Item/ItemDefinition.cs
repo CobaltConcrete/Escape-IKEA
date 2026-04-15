@@ -7,6 +7,7 @@ public enum ItemCategory
     Normal,
     Loot
 }
+
 public enum WorldColliderType
 {
     None,
@@ -23,6 +24,9 @@ public class ItemDefinition : ScriptableObject
     public bool stackable;
     public float uiScale = 1f;
     public Color glowColor = Color.white;
+
+    [TextArea(3, 6)]
+    public string description;
 
     [Header("Category")]
     public ItemCategory itemCategory = ItemCategory.Normal;
@@ -84,5 +88,15 @@ public class ItemDefinition : ScriptableObject
         }
 
         return itemName;
+    }
+
+    public string GetDescription()
+    {
+        if (string.IsNullOrWhiteSpace(description))
+        {
+            return "";
+        }
+
+        return description.Trim();
     }
 }

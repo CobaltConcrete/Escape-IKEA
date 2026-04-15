@@ -22,12 +22,12 @@ MonoBehaviour:
   useEffect: 0
   effectValue: 0
   effectDuration: 0
-  lootValue: 700
+  lootValue: 1000
   canAppearInShoppingList: 1
   minRequiredAmount: 1
   maxRequiredAmount: 3
   shoppingListKey: Dishwasher
-  allowedRoomTypes: 04000000
+  allowedRoomTypes: 0400000005000000
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.8, y: 0.8, z: 0.8}
   spawnFootprint: {x: 1.1, y: 1.1}
