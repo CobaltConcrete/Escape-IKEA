@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 [System.Serializable]
@@ -30,8 +31,13 @@ public class MapManager : MonoBehaviour
     [SerializeField] private GameObject horizontalBoundaryDoorPrefab;
     [SerializeField] private GameObject verticalBoundaryDoorPrefab;
 
+    [Header("Room presentation")]
+    [Tooltip("Sprites/Generic/Floor_Connecting (32px @ 100 PPU). Tiled in a grid; wood tiles use Sprite Mask to room interior.")]
+    [SerializeField] private Sprite roomFloorTileSprite;
+
     private bool[,] occupied;
     private GameObject[,] roomGrid;
+    private GameObject _startingRoomInstance;
 
     private int bossX;
     private int bossY;
@@ -52,6 +58,9 @@ public class MapManager : MonoBehaviour
         {
             player.position = MapToWorld(centerX, centerY);
         }
+
+        if (_startingRoomInstance != null)
+            StartCoroutine(ShowOnlyStartingRoomAfterFirstFrame());
 
         // ===== LOOT SYSTEM INIT =====
         if (LootSpawnManager.Instance != null)
@@ -117,6 +126,8 @@ public class MapManager : MonoBehaviour
         
         occupied[centerX, centerY] = true;
         roomGrid[centerX, centerY] = startRoomObj;
+        _startingRoomInstance = startRoomObj;
+        ApplyRoomPresentation(startRoomObj);
 
         // Spawn boss room
         PlaceRoom(bossRoom, bossX, bossY);
@@ -198,6 +209,31 @@ public class MapManager : MonoBehaviour
                 roomGrid[x + dx, y + dy] = roomObj;
             }
         }
+
+        ApplyRoomPresentation(roomObj);
+    }
+
+    private IEnumerator ShowOnlyStartingRoomAfterFirstFrame()
+    {
+        yield return null;
+        if (_startingRoomInstance == null)
+            yield break;
+
+        Room room = _startingRoomInstance.GetComponent<Room>();
+        if (room != null)
+            room.ApplyAsCurrentVisibleRoom();
+    }
+
+    private void ApplyRoomPresentation(GameObject roomInstance)
+    {
+        if (roomInstance == null)
+            return;
+
+        RoomPresentation presentation = roomInstance.GetComponent<RoomPresentation>();
+        if (presentation == null)
+            presentation = roomInstance.AddComponent<RoomPresentation>();
+
+        presentation.Initialize(roomFloorTileSprite);
     }
 
     // ==================== Door Spawning stuff ====================

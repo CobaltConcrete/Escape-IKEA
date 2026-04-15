@@ -1,10 +1,16 @@
 fileFormatVersion: 2
-guid: 7c676b81110b648cb822a13bb35f88dc
+guid: 9961f11610d8f491ea320504317b927f
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -5515266580534268866
-    second: weights_0
+      213: -1341090406375734871
+    second: Hoop_0
+  - first:
+      213: 2662384165034553781
+    second: Hoop_1
+  - first:
+      213: -7640417796101528469
+    second: Hoop_2
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +106,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: weights_0
+      name: Hoop_0
       rect:
         serializedVersion: 2
-        x: 45
-        y: 43
-        width: 114
-        height: 72
+        x: 95
+        y: 107
+        width: 28
+        height: 28
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +121,52 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: e3ceba12446d573b0800000000000000
-      internalID: -5515266580534268866
+      spriteID: 9a14a4c716d736de0800000000000000
+      internalID: -1341090406375734871
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hoop_1
+      rect:
+        serializedVersion: 2
+        x: 123
+        y: 107
+        width: 28
+        height: 28
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 5b1728cca40b2f420800000000000000
+      internalID: 2662384165034553781
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hoop_2
+      rect:
+        serializedVersion: 2
+        x: 137
+        y: 133
+        width: 58
+        height: 62
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: b64abcfbe78c7f590800000000000000
+      internalID: -7640417796101528469
       vertices: []
       indices: 
       edges: []
@@ -135,7 +185,9 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      weights_0: -5515266580534268866
+      Hoop_0: -1341090406375734871
+      Hoop_1: 2662384165034553781
+      Hoop_2: -7640417796101528469
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
