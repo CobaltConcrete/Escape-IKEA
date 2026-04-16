@@ -27,7 +27,10 @@ MonoBehaviour:
   minRequiredAmount: 1
   maxRequiredAmount: 3
   lootWorldPrefab: {fileID: 0}
-  allowedRoomTypes: 
+  allowedRoomTypes:
+  - 2
+  - 4
+  - 5
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.11000001, y: 0.11000001, z: 0.11000001}
   worldTag: Item

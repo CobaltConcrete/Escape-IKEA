@@ -1998,16 +1998,24 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: maxListEntries
-      value: 6
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: minListEntries
-      value: 4
+      value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: allItemDefinitions.Array.size
-      value: 21
+      value: 23
       objectReference: {fileID: 0}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 844cbf360c54956419f30758d3434eef, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: db5389e4a31b86a4189c0c2169b8cbe0, type: 2}
     - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: 'allItemDefinitions.Array.data[2]'
       value: 
@@ -2087,7 +2095,11 @@ PrefabInstance:
     - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: 'allItemDefinitions.Array.data[21]'
       value: 
-      objectReference: {fileID: 11400000, guid: a40e23bc5b1203a49b91ce722d5eab78, type: 2}
+      objectReference: {fileID: 11400000, guid: 8f4ac70a5844413c928f01a3aa590a7a, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[22]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 9499537fcb244db39f953dd3f4ac1454, type: 2}
     - target: {fileID: 4324293364085487361, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: visitsBeforeRespawn
       value: 2

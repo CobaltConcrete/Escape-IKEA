@@ -3,9 +3,11 @@ using UnityEngine.Rendering.Universal;
 using UnityEngine.SceneManagement;
 using TMPro;
 using CodeMonkey.Utils;
+using static EquipmentEnum;
 
 public class ItemWorld : MonoBehaviour, IInteractable
 {
+    private const float WorldPickupColliderScale = 0.58f;
     private Room currentRoom;
 
     [SerializeField] private bool lockRoomOnSpawn = true;
@@ -54,6 +56,9 @@ public class ItemWorld : MonoBehaviour, IInteractable
     private float canBePickedUpTimer;
     private Vector3 defaultScale;
     private BoxCollider2D boxCollider2D;
+    private Transform contrastPlateTransform;
+
+    private static Sprite s_unitWhiteSprite;
 
     private void Awake()
     {
@@ -93,7 +98,7 @@ public class ItemWorld : MonoBehaviour, IInteractable
 
     public void SetRoomVisible(bool visible)
     {
-        // LukeScene 永远显示，方便测试
+        // LukeScene ???????????????
         string sceneName = SceneManager.GetActiveScene().name;
         if (sceneName == "LukeScene")
         {
@@ -105,12 +110,21 @@ public class ItemWorld : MonoBehaviour, IInteractable
             spriteRenderer.enabled = visible;
         }
 
+        if (contrastPlateTransform != null)
+        {
+            SpriteRenderer plateSr = contrastPlateTransform.GetComponent<SpriteRenderer>();
+            if (plateSr != null)
+            {
+                plateSr.enabled = visible;
+            }
+        }
+
         if (textMeshPro != null)
         {
             textMeshPro.enabled = visible;
         }
 
-        // Loot 本来就不发光；普通 item 才跟着显示状态走
+        // Loot ?????????????? item ????????????
         if (light2D != null && item != null && !item.IsLoot())
         {
             light2D.enabled = visible;
@@ -149,12 +163,12 @@ public class ItemWorld : MonoBehaviour, IInteractable
         {
             if (item.IsLoot())
             {
-                // Loot 不发光
+                // Loot ??????
                 light2D.enabled = false;
             }
             else
             {
-                // 普通 Item 发光
+                // ??? Item ????
                 light2D.enabled = true;
                 light2D.color = item.GetColor();
                 light2D.intensity = 1f;
@@ -175,6 +189,73 @@ public class ItemWorld : MonoBehaviour, IInteractable
         }
 
         ApplyColliderFromDefinition();
+
+        if (spriteRenderer != null)
+        {
+            spriteRenderer.sortingLayerName = "Item";
+            spriteRenderer.sortingOrder = 2;
+        }
+
+        ConfigureContrastBackdrop();
+    }
+
+    private static Sprite GetUnitWhiteSprite()
+    {
+        if (s_unitWhiteSprite != null)
+        {
+            return s_unitWhiteSprite;
+        }
+
+        Texture2D tex = Texture2D.whiteTexture;
+        s_unitWhiteSprite = Sprite.Create(
+            tex,
+            new Rect(0f, 0f, tex.width, tex.height),
+            new Vector2(0.5f, 0.5f),
+            100f);
+        return s_unitWhiteSprite;
+    }
+
+    private void ConfigureContrastBackdrop()
+    {
+        if (item?.definition == null || !item.definition.worldContrastBackdrop)
+        {
+            if (contrastPlateTransform != null)
+            {
+                Destroy(contrastPlateTransform.gameObject);
+                contrastPlateTransform = null;
+            }
+
+            return;
+        }
+
+        Transform existing = transform.Find("ContrastBackdrop");
+        GameObject plate = existing != null ? existing.gameObject : new GameObject("ContrastBackdrop");
+        plate.transform.SetParent(transform, false);
+        plate.transform.localPosition = Vector3.zero;
+        plate.transform.localRotation = Quaternion.identity;
+
+        float w = 0.55f;
+        float h = 0.55f;
+        if (spriteRenderer != null && spriteRenderer.sprite != null)
+        {
+            Vector3 bs = spriteRenderer.sprite.bounds.size;
+            w = Mathf.Max(0.08f, bs.x) * 1.45f;
+            h = Mathf.Max(0.08f, bs.y) * 1.45f;
+        }
+
+        plate.transform.localScale = new Vector3(w, h, 1f);
+        contrastPlateTransform = plate.transform;
+
+        SpriteRenderer plateSr = plate.GetComponent<SpriteRenderer>();
+        if (plateSr == null)
+        {
+            plateSr = plate.AddComponent<SpriteRenderer>();
+        }
+
+        plateSr.sprite = GetUnitWhiteSprite();
+        plateSr.color = new Color(1f, 1f, 1f, 0.94f);
+        plateSr.sortingLayerName = spriteRenderer != null ? spriteRenderer.sortingLayerName : "Item";
+        plateSr.sortingOrder = spriteRenderer != null ? spriteRenderer.sortingOrder - 1 : 1;
     }
 
     private void ApplyColliderFromDefinition()
@@ -200,9 +281,9 @@ public class ItemWorld : MonoBehaviour, IInteractable
             case WorldColliderType.Box:
                 {
                     BoxCollider2D box = gameObject.AddComponent<BoxCollider2D>();
-                    box.isTrigger = true;
+                    box.isTrigger = false;
                     box.offset = def.boxOffset;
-                    box.size = def.boxSize;
+                    box.size = def.boxSize * WorldPickupColliderScale;
                     box.edgeRadius = def.boxEdgeRadius;
                     break;
                 }
@@ -210,9 +291,9 @@ public class ItemWorld : MonoBehaviour, IInteractable
             case WorldColliderType.Circle:
                 {
                     CircleCollider2D circle = gameObject.AddComponent<CircleCollider2D>();
-                    circle.isTrigger = true;
+                    circle.isTrigger = false;
                     circle.offset = def.circleOffset;
-                    circle.radius = def.circleRadius;
+                    circle.radius = def.circleRadius * WorldPickupColliderScale;
                     break;
                 }
         }
@@ -275,26 +356,62 @@ public class ItemWorld : MonoBehaviour, IInteractable
         if (!CanBePickedUp()) return;
         if (item == null || item.definition == null) return;
 
+        if (!IsEligibleForWorldPickup())
+            return;
+
         if (item.IsLoot())
         {
             player.PickupLoot(this);
+            return;
         }
+
+        player.PickupNormalItemWorld(this);
     }
 
     public string GetInteractionText()
     {
         if (item == null || item.definition == null) return "";
 
-        if (item.IsLoot())
-        {
-            return "[F] Pick up " + item.definition.itemName;
-        }
+        if (!IsEligibleForWorldPickup())
+            return "";
 
-        return "";
+        if (item.IsLoot())
+            return "[F] Pick up " + item.definition.itemName;
+
+        return "[F] Pick up " + item.definition.itemName;
     }
 
     public Vector3 GetInteractionPosition()
     {
         return transform.position;
+    }
+
+    /// <summary>
+    /// World pickups: normal items (inventory) and shopping-list loot. List loot off-objective is not picked up or prompted.
+    /// </summary>
+    private bool IsEligibleForWorldPickup()
+    {
+        if (item == null || item.definition == null)
+            return false;
+
+        if (item.IsLoot())
+            return IsLootOnCurrentShoppingList();
+
+        return item.definition.IsNormalItem();
+    }
+
+    /// <summary>
+    /// Loot may only be picked up when it appears on the current run shopping list (when objectives are active).
+    /// </summary>
+    private bool IsLootOnCurrentShoppingList()
+    {
+        if (item == null || item.definition == null || !item.IsLoot())
+            return true;
+
+        RunObjectiveManager rom = RunObjectiveManager.Instance;
+        if (rom == null)
+            return true;
+
+        return rom.ContainsShoppingListKey(item.definition.GetShoppingListKey());
     }
 }

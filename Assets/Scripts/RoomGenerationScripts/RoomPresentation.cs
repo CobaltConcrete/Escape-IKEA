@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Rendering;
@@ -29,18 +30,19 @@ public class RoomPresentation : MonoBehaviour
     [SerializeField] private int floorMaskRangeFrontOrder = 15;
     [Header("Floor tiles")]
     [Tooltip("Uniform scale per tile. Spacing matches tile.bounds.size * this so tiles stay edge-to-edge with no gaps.")]
-    [SerializeField] [Min(0.01f)] private float floorTileScaleFactor = 2.05f;
-    [SerializeField] private string labelSortingLayerName = "UI";
-    [SerializeField] private int labelSortingOrder = 500;
-    [Tooltip("Label sits inside the room, this many units above the floor's bottom edge.")]
-    [SerializeField] private float labelBottomInsetInside = 0.38f;
-    [SerializeField] private float labelMaxFontSize = 8f;
-    [SerializeField] private float labelMinFontSize = 1f;
+    [SerializeField] [Min(0.01f)] private float floorTileScaleFactor = 1f;
+    [Tooltip("Use the same layer as floor tiles so world-space TMP sorts with the room; Player layer sorts after Floor, so the player draws on top.")]
+    [SerializeField] private string labelSortingLayerName = "Floor";
+    [SerializeField] private int labelSortingOrder = 20;
+    [Tooltip("Extra offset in world units after placing the label at the floor coverage center.")]
+    [SerializeField] private Vector2 labelOffsetFromRoomCenter = Vector2.zero;
+    [SerializeField] private float labelMaxFontSize = 5.5f;
+    [SerializeField] private float labelMinFontSize = 0.55f;
 
     private bool initialized;
     private float referencePixelsPerUnit = 100f;
 
-    public void Initialize(Sprite floorTileSprite)
+    public void Initialize(Sprite floorTileSprite, RoomDecorationCatalog roomDecorationCatalog = null)
     {
         if (initialized)
             return;
@@ -59,6 +61,9 @@ public class RoomPresentation : MonoBehaviour
 
         Room room = GetComponent<Room>();
         room?.RefreshRendererRegistry();
+
+        if (roomDecorationCatalog != null)
+            RoomDecorationPlacer.Place(transform, roomDecorationCatalog);
     }
 
     private static Transform FindLegacyFloor(Transform roomRoot)
@@ -136,6 +141,10 @@ public class RoomPresentation : MonoBehaviour
 
         int floorLayerId = SortingLayer.NameToID(floorSortingLayerName);
 
+        // Match the tiled floor art so the stretched backdrop is tan like the tiles (not prefab grey tint).
+        legacySr.sprite = tile;
+        legacySr.color = Color.white;
+        legacySr.drawMode = SpriteDrawMode.Simple;
         legacySr.enabled = true;
         legacySr.sortingLayerName = floorBackdropSortingLayerName;
         legacySr.sortingOrder = floorBackdropSortingOrder;
@@ -206,7 +215,8 @@ public class RoomPresentation : MonoBehaviour
                 cell.transform.SetParent(grid.transform, false);
                 cell.transform.position = pivotWorld;
                 cell.transform.rotation = Quaternion.identity;
-                cell.transform.localScale = new Vector3(scaleFactor, scaleFactor, 1f);
+                float overlap = 1f;
+                cell.transform.localScale = new Vector3(scaleFactor * overlap, scaleFactor * overlap, 1f);
 
                 SpriteRenderer sr = cell.AddComponent<SpriteRenderer>();
                 sr.sprite = tile;
@@ -268,30 +278,38 @@ public class RoomPresentation : MonoBehaviour
             return;
 
         if (!string.IsNullOrEmpty(tmp.text))
+        {
+            tmp.text = Regex.Replace(tmp.text, @"\s*\d+\s*[xX]\s*\d+\s*", " ", RegexOptions.IgnoreCase);
+            tmp.text = Regex.Replace(tmp.text, @"\s+", " ").Trim();
             tmp.text = tmp.text.ToUpperInvariant();
+        }
 
-        tmp.color = Color.black;
+        tmp.enableVertexGradient = false;
+        tmp.color = new Color32(0, 0, 0, 255);
+        tmp.fontStyle = FontStyles.Bold;
         tmp.raycastTarget = false;
         tmp.enableWordWrapping = false;
         tmp.overflowMode = TextOverflowModes.Overflow;
         tmp.horizontalAlignment = HorizontalAlignmentOptions.Center;
-        tmp.verticalAlignment = VerticalAlignmentOptions.Bottom;
+        tmp.verticalAlignment = VerticalAlignmentOptions.Middle;
 
         RectTransform rt = labelTr as RectTransform;
         if (rt != null)
         {
             rt.localScale = Vector3.one;
-            rt.pivot = new Vector2(0.5f, 0f);
+            rt.pivot = new Vector2(0.5f, 0.5f);
             float maxWidth = Mathf.Max(0.25f, floorBounds.size.x * 0.9f);
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, maxWidth);
-            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 4.5f);
+            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 3.2f);
         }
 
         float maxTextWidth = Mathf.Max(0.25f, floorBounds.size.x * 0.9f);
         FitLabelFontToRoomWidth(tmp, maxTextWidth);
 
-        float labelY = floorBounds.min.y + labelBottomInsetInside;
-        Vector3 labelPos = new Vector3(floorBounds.center.x, labelY, labelTr.position.z);
+        Vector3 labelPos = new Vector3(
+            floorBounds.center.x + labelOffsetFromRoomCenter.x,
+            floorBounds.center.y + labelOffsetFromRoomCenter.y,
+            labelTr.position.z);
         labelTr.position = SnapWorldPositionToPpuGrid(labelPos, pixelsPerUnit > 0.01f ? pixelsPerUnit : 100f);
 
         MeshRenderer meshRenderer = labelTr.GetComponent<MeshRenderer>();
@@ -299,6 +317,24 @@ public class RoomPresentation : MonoBehaviour
         {
             meshRenderer.sortingLayerName = labelSortingLayerName;
             meshRenderer.sortingOrder = labelSortingOrder;
+            if (meshRenderer.material != null)
+            {
+                meshRenderer.material.color = Color.white;
+            }
+        }
+
+        Material fontMat = tmp.fontMaterial;
+        if (fontMat != null)
+        {
+            if (fontMat.HasProperty("_FaceColor"))
+            {
+                fontMat.SetColor("_FaceColor", new Color32(0, 0, 0, 255));
+            }
+
+            if (fontMat.HasProperty("_FaceDilate"))
+            {
+                fontMat.SetFloat("_FaceDilate", 0.28f);
+            }
         }
 
         tmp.ForceMeshUpdate(true);

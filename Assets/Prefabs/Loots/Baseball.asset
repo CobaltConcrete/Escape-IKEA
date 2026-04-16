@@ -29,11 +29,11 @@ MonoBehaviour:
   shoppingListKey: Baseball
   allowedRoomTypes: 06000000
   bonusSpawnWeight: 1
-  worldDropScale: {x: 0.8, y: 0.8, z: 0.8}
-  spawnFootprint: {x: 1.1, y: 1.1}
+  worldDropScale: {x: 0.42, y: 0.42, z: 0.42}
+  spawnFootprint: {x: 0.8, y: 0.8}
   worldColliderType: 1
   boxOffset: {x: 0, y: 0}
-  boxSize: {x: 1.5, y: 1.5}
+  boxSize: {x: 1.1, y: 1.1}
   boxEdgeRadius: 0
   circleOffset: {x: 0, y: 0}
   circleRadius: 0.5

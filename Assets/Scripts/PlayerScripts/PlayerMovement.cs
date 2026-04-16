@@ -19,6 +19,8 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
     }
 
     void Update()

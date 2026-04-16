@@ -1,4 +1,5 @@
-﻿using TMPro;
+﻿using System.Collections;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -14,6 +15,13 @@ public class UI_ObjectivePanel : MonoBehaviour
 
     private void Start()
     {
+        RefreshUI();
+        StartCoroutine(CoRefreshAfterObjectiveInit());
+    }
+
+    private IEnumerator CoRefreshAfterObjectiveInit()
+    {
+        yield return null;
         RefreshUI();
     }
 

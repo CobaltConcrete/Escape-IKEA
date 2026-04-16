@@ -261,7 +261,7 @@ MonoBehaviour:
   interactRadius: 1.2
   interactableLayerMask:
     serializedVersion: 2
-    m_Bits: 2048
+    m_Bits: 6656
   interactionPromptUI: {fileID: 0}
   autoEquipWhenSlotEmpty: 1
   autoRefillUtilityWhenConsumed: 1

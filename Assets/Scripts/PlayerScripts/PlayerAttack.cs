@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using static EquipmentEnum;
 
 public class PlayerAttack : MonoBehaviour
 {
@@ -10,6 +11,14 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private float attackCooldown = 0.4f;
 
     private float cooldownRemaining;
+    private PlayerInventoryInteraction inventoryInteraction;
+
+    private void Awake()
+    {
+        inventoryInteraction = GetComponent<PlayerInventoryInteraction>();
+        if (inventoryInteraction == null)
+            inventoryInteraction = GetComponentInParent<PlayerInventoryInteraction>();
+    }
 
     private void Update()
     {
@@ -20,6 +29,16 @@ public class PlayerAttack : MonoBehaviour
 
         if (cooldownRemaining > 0f)
             return;
+
+        EquipmentData equipmentData = inventoryInteraction != null ? inventoryInteraction.EquipmentData : null;
+        Item equippedWeapon =
+            equipmentData != null ? equipmentData.GetEquippedItem(EquipTag.Weapon) : null;
+
+        if (equippedWeapon == null)
+        {
+            BossRoomNoticeUI.Instance?.ShowMessage("I have no weapon");
+            return;
+        }
 
         cooldownRemaining = attackCooldown;
 
