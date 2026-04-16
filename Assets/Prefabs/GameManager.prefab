@@ -143,6 +143,7 @@ MonoBehaviour:
   maxListEntries: 7
   minGoalMultiplier: 1.2
   maxGoalMultiplier: 1.5
+  requireGoalValueToUnlockBoss: 0
 --- !u!114 &4324293364085487361
 MonoBehaviour:
   m_ObjectHideFlags: 0

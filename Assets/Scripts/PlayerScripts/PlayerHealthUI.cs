@@ -4,38 +4,63 @@ using UnityEngine.UI;
 [ExecuteAlways]
 public class PlayerHealthUI : MonoBehaviour
 {
+    [Header("Player References")]
     [SerializeField] private PlayerHealth playerHealth;
+    [SerializeField] private PlayerInventoryInteraction playerInventoryInteraction;
 
+    [Header("Layout Roots")]
+    [SerializeField] private RectTransform barListRoot;
+
+    [Header("Health")]
+    [SerializeField] private RectTransform healthRowRoot;
     [SerializeField] private RectTransform healthBarFillRect;
-
-    [SerializeField] private float barWidthFallback = 200f;
     [SerializeField] private Image healthFillImage;
     [SerializeField] private Text healthText;
+    [SerializeField] private float barWidthFallback = 200f;
+    [SerializeField] private Color healthBarColor = new Color(0.2f, 0.9f, 0.3f, 1f);
+
+    [Header("Armor")]
+    [SerializeField] private RectTransform armorRowRoot;
+    [SerializeField] private RectTransform armorBarFillRect;
+    [SerializeField] private Image armorFillImage;
+    [SerializeField] private Text armorText;
+    [SerializeField] private Color armorBarColor = new Color(0.2f, 0.55f, 1f, 1f);
+
+    [Header("Boss")]
+    [SerializeField] private RectTransform bossRowRoot;
     [SerializeField] private RectTransform bossHealthBarFillRect;
     [SerializeField] private Image bossHealthFillImage;
     [SerializeField] private Text bossHealthText;
     [SerializeField] private Color bossBarColor = Color.red;
 
+    [Header("Run Timer")]
     [SerializeField] private Text runTimerText;
     [SerializeField] private GameRunTimer runTimer;
 
     private EnemyCombat bossCombat;
-    private RectTransform autoBossBarRoot;
 
     private void Awake()
     {
         ResolvePlayerHealth();
+        ResolvePlayerInventoryInteraction();
+        ResolveUiReferences();
     }
 
     private void OnEnable()
     {
         ResolvePlayerHealth();
+        ResolvePlayerInventoryInteraction();
+        ResolveUiReferences();
+
         if (playerHealth != null)
             playerHealth.OnHealthChanged += Refresh;
+
         EnsureRunTimerHud();
-        EnsureBossBarHud();
+
         if (!Application.isPlaying)
-            RefreshBossEditorPreview();
+        {
+            RefreshEditorPreview();
+        }
     }
 
     private void OnDisable()
@@ -47,7 +72,8 @@ public class PlayerHealthUI : MonoBehaviour
     private void Start()
     {
         ResolvePlayerHealth();
-        EnsureBossBarHud();
+        ResolvePlayerInventoryInteraction();
+        ResolveUiReferences();
         EnsureRunTimerHud();
         BindGameRunTimer();
         Refresh();
@@ -60,8 +86,11 @@ public class PlayerHealthUI : MonoBehaviour
 
         if (playerHealth == null)
             ResolvePlayerHealth();
-        if (bossHealthBarFillRect == null && bossHealthFillImage == null)
-            EnsureBossBarHud();
+
+        if (playerInventoryInteraction == null)
+            ResolvePlayerInventoryInteraction();
+
+        ResolveUiReferences();
         ResolveBossCombat();
         Refresh();
     }
@@ -72,279 +101,328 @@ public class PlayerHealthUI : MonoBehaviour
             playerHealth = Object.FindFirstObjectByType<PlayerHealth>();
     }
 
+    private void ResolvePlayerInventoryInteraction()
+    {
+        if (playerInventoryInteraction == null)
+            playerInventoryInteraction = Object.FindFirstObjectByType<PlayerInventoryInteraction>();
+    }
+
+    private void ResolveUiReferences()
+    {
+        if (barListRoot == null)
+        {
+            Transform t = transform.Find("BarList");
+            if (t != null)
+                barListRoot = t as RectTransform;
+        }
+
+        if (healthRowRoot == null)
+        {
+            Transform t = transform.Find("BarList/Healthbar");
+            if (t != null)
+                healthRowRoot = t as RectTransform;
+        }
+
+        if (healthBarFillRect == null)
+        {
+            Transform t = transform.Find("BarList/Healthbar/Fill");
+            if (t != null)
+                healthBarFillRect = t as RectTransform;
+        }
+
+        if (healthFillImage == null && healthBarFillRect != null)
+            healthFillImage = healthBarFillRect.GetComponent<Image>();
+
+        if (healthText == null)
+        {
+            Transform t = transform.Find("BarList/Healthbar/Image");
+            if (t != null)
+                healthText = t.GetComponent<Text>();
+        }
+
+        if (armorRowRoot == null)
+        {
+            Transform t = transform.Find("BarList/ArmorLine");
+            if (t != null)
+                armorRowRoot = t as RectTransform;
+        }
+
+        if (armorBarFillRect == null)
+        {
+            Transform t = transform.Find("BarList/ArmorLine/Fill");
+            if (t != null)
+                armorBarFillRect = t as RectTransform;
+        }
+
+        if (armorFillImage == null && armorBarFillRect != null)
+            armorFillImage = armorBarFillRect.GetComponent<Image>();
+
+        if (armorText == null)
+        {
+            Transform t = transform.Find("BarList/ArmorLine/ArmorLabel");
+            if (t != null)
+                armorText = t.GetComponent<Text>();
+        }
+
+        if (bossRowRoot == null)
+        {
+            Transform t = transform.Find("BarList/BossHealthLine");
+            if (t != null)
+                bossRowRoot = t as RectTransform;
+        }
+
+        if (bossHealthBarFillRect == null)
+        {
+            Transform t = transform.Find("BarList/BossHealthLine/Fill");
+            if (t != null)
+                bossHealthBarFillRect = t as RectTransform;
+        }
+
+        if (bossHealthFillImage == null && bossHealthBarFillRect != null)
+            bossHealthFillImage = bossHealthBarFillRect.GetComponent<Image>();
+
+        if (bossHealthText == null)
+        {
+            Transform t = transform.Find("BarList/BossHealthLine/BossHealthLabel");
+            if (t != null)
+                bossHealthText = t.GetComponent<Text>();
+        }
+    }
+
     private void Refresh()
     {
+        RefreshPlayerHealth();
+        RefreshArmor();
+        RefreshBoss();
+    }
+
+    private void RefreshPlayerHealth()
+    {
+        if (!Application.isPlaying)
+            return;
+
         if (playerHealth == null) return;
+
+        SetRowVisible(healthRowRoot, true);
 
         float t = playerHealth.MaxHealth > 0f
             ? Mathf.Clamp01(playerHealth.CurrentHealth / playerHealth.MaxHealth)
             : 0f;
 
-        if (healthBarFillRect != null)
-        {
-            var parent = healthBarFillRect.parent as RectTransform;
-            if (parent != null)
-            {
-                healthBarFillRect.anchorMin = new Vector2(0f, 0f);
-                healthBarFillRect.anchorMax = new Vector2(Mathf.Max(0.001f, t), 1f);
-                healthBarFillRect.pivot = new Vector2(0.5f, 0.5f);
-                healthBarFillRect.anchoredPosition = Vector2.zero;
-                healthBarFillRect.sizeDelta = Vector2.zero;
-                healthBarFillRect.offsetMin = Vector2.zero;
-                healthBarFillRect.offsetMax = Vector2.zero;
-            }
-        }
-        else if (healthFillImage != null && healthFillImage.sprite != null)
-        {
-            healthFillImage.type = Image.Type.Filled;
-            healthFillImage.fillMethod = Image.FillMethod.Horizontal;
-            healthFillImage.fillAmount = t;
-        }
-        else if (healthFillImage != null)
-        {
-            float full = barWidthFallback;
-            var rt = healthFillImage.rectTransform;
-            var p = rt.parent as RectTransform;
-            if (p != null && p.rect.width > 2f)
-                full = p.rect.width;
-            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, full * t);
-        }
+        SetBarFill(healthBarFillRect, healthFillImage, t);
 
         if (healthText != null)
         {
             healthText.text = $"{Mathf.Ceil(playerHealth.CurrentHealth):0} / {Mathf.Ceil(playerHealth.MaxHealth):0}";
         }
 
-        RefreshBoss();
+        if (healthFillImage != null)
+        {
+            healthFillImage.color = healthBarColor;
+        }
     }
 
-    private void ResolveBossCombat()
+    private void RefreshArmor()
     {
-        if (bossCombat != null) return;
-        CafeteriaBossPattern boss = Object.FindFirstObjectByType<CafeteriaBossPattern>();
-        if (boss == null) return;
-        bossCombat = boss.GetComponent<EnemyCombat>();
+        if (!Application.isPlaying)
+        {
+            if (armorFillImage != null)
+                armorFillImage.color = armorBarColor;
+
+            if (armorText != null)
+                armorText.text = "Armor";
+
+            SetRowVisible(armorRowRoot, true);
+            SetBarFill(armorBarFillRect, armorFillImage, 1f);
+            return;
+        }
+
+        if (playerInventoryInteraction == null)
+        {
+            SetRowVisible(armorRowRoot, false);
+            return;
+        }
+
+        Item armorItem = playerInventoryInteraction.GetEquippedArmorItem();
+        if (armorItem == null || !armorItem.IsArmor())
+        {
+            SetRowVisible(armorRowRoot, false);
+            return;
+        }
+
+        armorItem.InitializeRuntimeDataIfNeeded();
+
+        float max = armorItem.GetArmorMaxDurability();
+        float current = Mathf.Max(0f, armorItem.GetArmorCurrentDurability());
+        float t = max > 0f ? Mathf.Clamp01(current / max) : 0f;
+
+        SetRowVisible(armorRowRoot, true);
+        SetBarFill(armorBarFillRect, armorFillImage, t);
+
+        if (armorFillImage != null)
+            armorFillImage.color = armorBarColor;
+
+        if (armorText != null)
+            armorText.text = $"{Mathf.Ceil(current):0} / {Mathf.Ceil(max):0}";
     }
 
     private void RefreshBoss()
     {
         if (!Application.isPlaying)
         {
-            RefreshBossEditorPreview();
+            if (bossHealthFillImage != null)
+                bossHealthFillImage.color = bossBarColor;
+
+            if (bossHealthText != null)
+                bossHealthText.text = "Boss HP";
+
+            SetRowVisible(bossRowRoot, true);
+            SetBarFill(bossHealthBarFillRect, bossHealthFillImage, 1f);
             return;
         }
 
-        if (!BossRoomController.IsPlayerInsideBossRoom())
+        bool shouldShowBoss = false;
+
+        if (BossRoomController.IsPlayerInsideBossRoom())
         {
-            SetBossBarVisible(false);
-            if (bossHealthText != null) bossHealthText.text = "";
-            return;
+            if (bossCombat != null && bossCombat.GetCurrentHealth() > 0f)
+            {
+                shouldShowBoss = true;
+            }
         }
 
-        if (bossCombat == null)
+        if (!shouldShowBoss)
         {
-            SetBossBarVisible(false);
-            if (bossHealthText != null) bossHealthText.text = "";
+            SetRowVisible(bossRowRoot, false);
+
+            if (bossHealthText != null)
+                bossHealthText.text = "";
+
             return;
         }
 
-        if (bossCombat.GetCurrentHealth() <= 0f)
-        {
-            bossCombat = null;
-            SetBossBarVisible(false);
-            if (bossHealthText != null) bossHealthText.text = "";
-            return;
-        }
-
-        SetBossBarVisible(true);
         float max = bossCombat.GetMaxHealth();
         float current = bossCombat.GetCurrentHealth();
         float t = max > 0f ? Mathf.Clamp01(current / max) : 0f;
 
-        if (bossHealthBarFillRect != null)
-        {
-            bossHealthBarFillRect.anchorMin = new Vector2(0f, 0f);
-            bossHealthBarFillRect.anchorMax = new Vector2(Mathf.Max(0.001f, t), 1f);
-            bossHealthBarFillRect.anchoredPosition = Vector2.zero;
-            bossHealthBarFillRect.sizeDelta = Vector2.zero;
-            bossHealthBarFillRect.offsetMin = Vector2.zero;
-            bossHealthBarFillRect.offsetMax = Vector2.zero;
-        }
-        else if (bossHealthFillImage != null)
-        {
-            bossHealthFillImage.type = Image.Type.Filled;
-            bossHealthFillImage.fillMethod = Image.FillMethod.Horizontal;
-            bossHealthFillImage.fillAmount = t;
-        }
-
-        if (bossHealthText != null)
-        {
-            bossHealthText.text = $"{Mathf.Ceil(current):0} / {Mathf.Ceil(max):0}";
-        }
-    }
-
-    private void SetBossBarVisible(bool visible)
-    {
-        if (autoBossBarRoot != null)
-            autoBossBarRoot.gameObject.SetActive(visible);
-
-        if (bossHealthBarFillRect != null)
-            bossHealthBarFillRect.gameObject.SetActive(visible);
-
-        if (bossHealthFillImage != null)
-            bossHealthFillImage.gameObject.SetActive(visible);
-
-        if (bossHealthText != null)
-            bossHealthText.gameObject.SetActive(visible);
-    }
-
-    /// <summary>
-    /// Editor: show full red boss bar under the player bar so you can see and edit it in the Scene view.
-    /// </summary>
-    private void RefreshBossEditorPreview()
-    {
-        EnsureBossBarHud();
-        if (bossHealthBarFillRect == null && bossHealthFillImage == null) return;
-
-        SetBossBarVisible(true);
-
-        if (bossHealthBarFillRect != null)
-        {
-            var parent = bossHealthBarFillRect.parent as RectTransform;
-            if (parent != null)
-            {
-                bossHealthBarFillRect.anchorMin = new Vector2(0f, 0f);
-                bossHealthBarFillRect.anchorMax = new Vector2(1f, 1f);
-                bossHealthBarFillRect.pivot = new Vector2(0.5f, 0.5f);
-                bossHealthBarFillRect.anchoredPosition = Vector2.zero;
-                bossHealthBarFillRect.sizeDelta = Vector2.zero;
-                bossHealthBarFillRect.offsetMin = Vector2.zero;
-                bossHealthBarFillRect.offsetMax = Vector2.zero;
-            }
-        }
-        else if (bossHealthFillImage != null && bossHealthFillImage.sprite != null)
-        {
-            bossHealthFillImage.type = Image.Type.Filled;
-            bossHealthFillImage.fillMethod = Image.FillMethod.Horizontal;
-            bossHealthFillImage.fillAmount = 1f;
-        }
+        SetRowVisible(bossRowRoot, true);
+        SetBarFill(bossHealthBarFillRect, bossHealthFillImage, t);
 
         if (bossHealthFillImage != null)
             bossHealthFillImage.color = bossBarColor;
 
         if (bossHealthText != null)
-            bossHealthText.text = "Boss HP";
+            bossHealthText.text = $"{Mathf.Ceil(current):0} / {Mathf.Ceil(max):0}";
+    }
+
+    private void ResolveBossCombat()
+    {
+        if (bossCombat != null && bossCombat.GetCurrentHealth() > 0f)
+            return;
+
+        CafeteriaBossPattern boss = Object.FindFirstObjectByType<CafeteriaBossPattern>();
+        if (boss == null)
+        {
+            bossCombat = null;
+            return;
+        }
+
+        bossCombat = boss.GetComponent<EnemyCombat>();
+    }
+
+    private void SetRowVisible(RectTransform rowRoot, bool visible)
+    {
+        if (rowRoot != null && rowRoot.gameObject.activeSelf != visible)
+        {
+            rowRoot.gameObject.SetActive(visible);
+
+            if (Application.isPlaying)
+                LayoutRebuilder.ForceRebuildLayoutImmediate(barListRoot);
+        }
+    }
+
+    private void SetBarFill(RectTransform fillRect, Image fillImage, float t)
+    {
+        t = Mathf.Clamp01(t);
+
+        if (fillRect != null)
+        {
+            var parent = fillRect.parent as RectTransform;
+            if (parent != null)
+            {
+                fillRect.anchorMin = new Vector2(0f, 0f);
+                fillRect.anchorMax = new Vector2(Mathf.Max(0.001f, t), 1f);
+                fillRect.pivot = new Vector2(0.5f, 0.5f);
+                fillRect.anchoredPosition = Vector2.zero;
+                fillRect.sizeDelta = Vector2.zero;
+                fillRect.offsetMin = Vector2.zero;
+                fillRect.offsetMax = Vector2.zero;
+                return;
+            }
+        }
+
+        if (fillImage != null && fillImage.sprite != null)
+        {
+            fillImage.type = Image.Type.Filled;
+            fillImage.fillMethod = Image.FillMethod.Horizontal;
+            fillImage.fillAmount = t;
+            return;
+        }
+
+        if (fillImage != null)
+        {
+            float full = barWidthFallback;
+            var rt = fillImage.rectTransform;
+            var p = rt.parent as RectTransform;
+            if (p != null && p.rect.width > 2f)
+                full = p.rect.width;
+
+            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, full * t);
+        }
     }
 
 #if UNITY_EDITOR
     private void OnValidate()
     {
         if (Application.isPlaying) return;
-        EnsureBossBarHud();
-        RefreshBossEditorPreview();
+        if (!gameObject.scene.IsValid()) return;
+
+        ResolveUiReferences();
+        RefreshEditorPreview();
     }
 #endif
 
-    /// <summary>
-    /// Creates or finds the boss HP row (red bar under the player health bar). Exists in edit mode for Scene view authoring.
-    /// </summary>
-    private void EnsureBossBarHud()
+    private void RefreshEditorPreview()
     {
-        if (bossHealthBarFillRect != null && bossHealthFillImage != null)
-        {
-            if (autoBossBarRoot == null && bossHealthBarFillRect != null)
-                autoBossBarRoot = bossHealthBarFillRect.parent as RectTransform;
-            return;
-        }
+        SetRowVisible(healthRowRoot, true);
+        SetRowVisible(armorRowRoot, true);
+        SetRowVisible(bossRowRoot, true);
 
-        if (bossHealthBarFillRect == null || bossHealthFillImage == null)
-        {
-            Transform fillTf = transform.Find("BossHealthLine/Fill");
-            if (fillTf != null)
-            {
-                bossHealthBarFillRect = fillTf.GetComponent<RectTransform>();
-                bossHealthFillImage = fillTf.GetComponent<Image>();
-                autoBossBarRoot = fillTf.parent as RectTransform;
+        SetBarFill(healthBarFillRect, healthFillImage, 1f);
+        SetBarFill(armorBarFillRect, armorFillImage, 1f);
+        SetBarFill(bossHealthBarFillRect, bossHealthFillImage, 1f);
 
-                if (bossHealthText == null)
-                {
-                    Transform labelTf = transform.Find("BossHealthLine/BossHealthLabel");
-                    if (labelTf != null)
-                        bossHealthText = labelTf.GetComponent<Text>();
-                }
-            }
-        }
+        if (healthFillImage != null)
+            healthFillImage.color = healthBarColor;
 
-        if (bossHealthBarFillRect != null && bossHealthFillImage != null) return;
+        if (armorFillImage != null)
+            armorFillImage.color = armorBarColor;
 
-        RectTransform playerBarRoot = null;
-        if (healthBarFillRect != null)
-            playerBarRoot = healthBarFillRect.parent as RectTransform;
-        if (playerBarRoot == null && healthFillImage != null)
-            playerBarRoot = healthFillImage.rectTransform.parent as RectTransform;
-        if (playerBarRoot == null && healthFillImage != null)
-            playerBarRoot = healthFillImage.rectTransform;
-        if (playerBarRoot == null) return;
+        if (bossHealthFillImage != null)
+            bossHealthFillImage.color = bossBarColor;
 
-        RectTransform parent = playerBarRoot.parent as RectTransform;
-        if (parent == null) return;
+        if (healthText != null) healthText.text = "HP";
+        if (armorText != null) armorText.text = "Armor";
+        if (bossHealthText != null) bossHealthText.text = "Boss HP";
 
-        GameObject bossRootObj = new GameObject("BossHealthLine", typeof(RectTransform), typeof(Image));
-        RectTransform bossRoot = bossRootObj.GetComponent<RectTransform>();
-        bossRoot.SetParent(parent, false);
-        bossRoot.anchorMin = playerBarRoot.anchorMin;
-        bossRoot.anchorMax = playerBarRoot.anchorMax;
-        bossRoot.pivot = playerBarRoot.pivot;
-        bossRoot.sizeDelta = playerBarRoot.sizeDelta;
-        float y = playerBarRoot.anchoredPosition.y - Mathf.Max(12f, playerBarRoot.rect.height + 6f);
-        bossRoot.anchoredPosition = new Vector2(playerBarRoot.anchoredPosition.x, y);
-        int playerIndex = playerBarRoot.GetSiblingIndex();
-        bossRoot.SetSiblingIndex(Mathf.Min(playerIndex + 1, parent.childCount - 1));
-
-        Image rootImage = bossRootObj.GetComponent<Image>();
-        rootImage.color = new Color(0f, 0f, 0f, 0.45f);
-
-        GameObject fillObj = new GameObject("Fill", typeof(RectTransform), typeof(Image));
-        RectTransform fillRect = fillObj.GetComponent<RectTransform>();
-        fillRect.SetParent(bossRoot, false);
-        fillRect.anchorMin = new Vector2(0f, 0f);
-        fillRect.anchorMax = new Vector2(1f, 1f);
-        fillRect.offsetMin = Vector2.zero;
-        fillRect.offsetMax = Vector2.zero;
-        Image fillImage = fillObj.GetComponent<Image>();
-        fillImage.color = bossBarColor;
-
-        bossHealthBarFillRect = fillRect;
-        bossHealthFillImage = fillImage;
-        autoBossBarRoot = bossRoot;
-
-        GameObject labelObj = new GameObject("BossHealthLabel", typeof(RectTransform), typeof(CanvasRenderer), typeof(Text));
-        RectTransform labelRt = labelObj.GetComponent<RectTransform>();
-        labelRt.SetParent(bossRoot, false);
-        labelRt.anchorMin = Vector2.zero;
-        labelRt.anchorMax = Vector2.one;
-        labelRt.offsetMin = Vector2.zero;
-        labelRt.offsetMax = Vector2.zero;
-        Text labelTxt = labelObj.GetComponent<Text>();
-        labelTxt.text = "Boss HP";
-        labelTxt.fontSize = 14;
-        labelTxt.alignment = TextAnchor.MiddleCenter;
-        labelTxt.color = Color.white;
-        labelTxt.raycastTarget = false;
-        Font font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
-        if (font != null)
-            labelTxt.font = font;
-        bossHealthText = labelTxt;
-
-        if (Application.isPlaying)
-            SetBossBarVisible(false);
+        //if (Application.isPlaying && barListRoot != null)
+        //    LayoutRebuilder.ForceRebuildLayoutImmediate(barListRoot);
     }
 
-    /// <summary>
-    /// Builds or finds the timer panel so it exists in the Scene view (edit mode) and at runtime.
-    /// </summary>
     private void EnsureRunTimerHud()
     {
+        if (!gameObject.scene.IsValid()) return;
+
         RectTransform canvasRt = transform as RectTransform;
         if (canvasRt == null) return;
 
@@ -367,8 +445,13 @@ public class PlayerHealthUI : MonoBehaviour
 
         if (runTimer == null)
             runTimer = GetComponent<GameRunTimer>();
+
         if (runTimer == null)
-            runTimer = gameObject.AddComponent<GameRunTimer>();
+        {
+            Debug.LogWarning("PlayerHealthUI: No GameRunTimer found on HealthUI.");
+            return;
+        }
+
         runTimer.BindTimerText(runTimerText);
     }
 
@@ -384,7 +467,7 @@ public class PlayerHealthUI : MonoBehaviour
         panelRt.anchorMin = new Vector2(1f, 0f);
         panelRt.anchorMax = new Vector2(1f, 0f);
         panelRt.pivot = new Vector2(1f, 0f);
-        panelRt.anchoredPosition = new Vector2(-margin, margin);
+        panelRt.anchoredPosition = new Vector2(-18f, 18f);
         panelRt.sizeDelta = new Vector2(panelW, panelH);
 
         Image panelBg = panelObj.GetComponent<Image>();
@@ -418,7 +501,6 @@ public class PlayerHealthUI : MonoBehaviour
             txt.font = font;
 
         panelRt.SetAsLastSibling();
-
         runTimerText = txt;
     }
 
@@ -443,7 +525,6 @@ public class PlayerHealthUI : MonoBehaviour
             return;
         }
 
-        // Legacy or misplaced timer: anchor directly on the canvas bottom-right so it stays visible.
         textRt.SetParent(canvasRt, false);
         textRt.anchorMin = new Vector2(1f, 0f);
         textRt.anchorMax = new Vector2(1f, 0f);

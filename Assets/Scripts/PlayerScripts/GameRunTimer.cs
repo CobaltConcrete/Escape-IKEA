@@ -7,11 +7,18 @@ public class GameRunTimer : MonoBehaviour
     [SerializeField] private Text timerText;
 
     [Tooltip("Run time in seconds. When greater than zero, the HUD shows time remaining and the player loses if it hits zero before winning. At zero, the clock counts up with no time limit.")]
-    [SerializeField] private float runTimeLimitSeconds = 300f;
+    [HideInInspector] public float runTimeLimitSeconds = 300f;
+    [SerializeField] private int runTimeMinutes = 5;
+    [SerializeField] private int runTimeSeconds = 0;
 
     private float elapsed;
     private bool loseTriggered;
 
+    private void Awake()
+    {
+        RecalculateTotalSeconds();
+        RefreshDisplay();
+    }
     private void Update()
     {
         if (loseTriggered) return;
@@ -35,6 +42,10 @@ public class GameRunTimer : MonoBehaviour
         int seconds = Mathf.FloorToInt(displaySeconds % 60f);
         timerText.text = $"{minutes}:{seconds:00}";
     }
+    private void RecalculateTotalSeconds()
+    {
+        runTimeLimitSeconds = Mathf.Max(0f, runTimeMinutes * 60f + runTimeSeconds);
+    }
 
     private void TryLoseFromTimeout()
     {
@@ -52,4 +63,19 @@ public class GameRunTimer : MonoBehaviour
         loseTriggered = false;
         RefreshDisplay();
     }
+#if UNITY_EDITOR
+    private void OnValidate()
+    {
+        if (runTimeSeconds >= 60)
+        {
+            runTimeMinutes += runTimeSeconds / 60;
+            runTimeSeconds %= 60;
+        }
+
+        if (runTimeSeconds < 0) runTimeSeconds = 0;
+        if (runTimeMinutes < 0) runTimeMinutes = 0;
+
+        RecalculateTotalSeconds();
+    }
+#endif
 }

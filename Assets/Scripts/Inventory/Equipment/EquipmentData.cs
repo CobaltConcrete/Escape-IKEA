@@ -22,9 +22,16 @@ public class EquipmentData : MonoBehaviour
         }
     }
 
+    public Item GetEquippedArmor()
+    {
+        return equippedArmor;
+    }
+
     public Item EquipItem(Item item)
     {
         if (item == null) return null;
+
+        item.InitializeRuntimeDataIfNeeded();
 
         EquipTag equipTag = ItemEquipClassifier.GetEquipTag(item);
         Item oldItem = null;
@@ -72,6 +79,13 @@ public class EquipmentData : MonoBehaviour
                 break;
         }
 
+        return removedItem;
+    }
+
+    public Item UnequipArmor()
+    {
+        Item removedItem = equippedArmor;
+        equippedArmor = null;
         return removedItem;
     }
 

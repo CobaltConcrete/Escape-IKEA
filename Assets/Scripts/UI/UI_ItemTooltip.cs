@@ -9,13 +9,22 @@ public class UI_ItemTooltip : MonoBehaviour
     [SerializeField] private RectTransform root;
     [SerializeField] private RectTransform contentRoot;
     [SerializeField] private Canvas parentCanvas;
+
     [SerializeField] private TextMeshProUGUI titleText;
+    [SerializeField] private TextMeshProUGUI durabilityText;
     [SerializeField] private TextMeshProUGUI descriptionText;
+    [SerializeField] private GameObject spacerAfterTitle;
+    [SerializeField] private GameObject spacerAfterDurability;
+
     [SerializeField] private Vector2 mouseOffset = new Vector2(16f, -16f);
 
     private RectTransform canvasRectTransform;
     private Camera uiCamera;
     private bool isShowing;
+
+    private Item currentItem;
+    public Item CurrentItem => currentItem;
+    public bool IsShowing => isShowing;
 
     private void Awake()
     {
@@ -58,6 +67,7 @@ public class UI_ItemTooltip : MonoBehaviour
     {
         if (!isShowing) return;
 
+        RefreshCurrentItemVisuals();
         UpdatePosition();
     }
 
@@ -69,31 +79,19 @@ public class UI_ItemTooltip : MonoBehaviour
             return;
         }
 
-        if (titleText != null)
-        {
-            string itemName = string.IsNullOrWhiteSpace(item.definition.itemName)
-                ? "ITEM"
-                : item.definition.itemName.ToUpper();
-
-            titleText.text = itemName;
-        }
-
-        if (descriptionText != null)
-        {
-            string desc = item.definition.GetDescription();
-            descriptionText.text = string.IsNullOrWhiteSpace(desc) ? "" : desc;
-        }
+        currentItem = item;
 
         if (root != null)
         {
             root.gameObject.SetActive(true);
         }
 
-        // 先清一下旧位置，避免沿用上一帧的奇怪偏移
         if (contentRoot != null)
         {
             contentRoot.anchoredPosition = Vector2.zero;
         }
+
+        RefreshCurrentItemVisuals();
 
         Canvas.ForceUpdateCanvases();
 
@@ -109,6 +107,7 @@ public class UI_ItemTooltip : MonoBehaviour
     public void Hide()
     {
         isShowing = false;
+        currentItem = null;
 
         if (root != null)
         {
@@ -119,6 +118,7 @@ public class UI_ItemTooltip : MonoBehaviour
     private void HideImmediate()
     {
         isShowing = false;
+        currentItem = null;
 
         if (root != null)
         {
@@ -126,13 +126,92 @@ public class UI_ItemTooltip : MonoBehaviour
         }
     }
 
+    private void RefreshCurrentItemVisuals()
+    {
+        if (currentItem == null || currentItem.definition == null)
+        {
+            Hide();
+            return;
+        }
+
+        bool hasDurability = false;
+        bool hasDescription = false;
+
+        // ===== Title =====
+        if (titleText != null)
+        {
+            string itemName = string.IsNullOrWhiteSpace(currentItem.definition.itemName)
+                ? "ITEM"
+                : currentItem.definition.itemName.ToUpper();
+
+            titleText.text = itemName;
+        }
+
+        // ===== Durability =====
+        if (durabilityText != null)
+        {
+            if (currentItem.IsArmor())
+            {
+                currentItem.InitializeRuntimeDataIfNeeded();
+
+                float current = Mathf.Max(0f, currentItem.GetArmorCurrentDurability());
+                float max = currentItem.GetArmorMaxDurability();
+
+                durabilityText.gameObject.SetActive(true);
+                durabilityText.text = $"Durability: {Mathf.CeilToInt(current)}/{Mathf.CeilToInt(max)}";
+
+                hasDurability = true;
+            }
+            else
+            {
+                durabilityText.gameObject.SetActive(false);
+                durabilityText.text = "";
+            }
+        }
+
+        // ===== Description =====
+        if (descriptionText != null)
+        {
+            string desc = currentItem.definition.GetDescription();
+
+            if (string.IsNullOrWhiteSpace(desc))
+            {
+                descriptionText.gameObject.SetActive(false);
+                descriptionText.text = "";
+            }
+            else
+            {
+                descriptionText.gameObject.SetActive(true);
+                descriptionText.text = desc;
+
+                hasDescription = true;
+            }
+        }
+
+        // ===== Spacer 控制（关键就在这里）=====
+        if (spacerAfterTitle != null)
+        {
+            // 只有 durability 存在才需要 title -> durability 间距
+            spacerAfterTitle.SetActive(hasDurability);
+        }
+
+        if (spacerAfterDurability != null)
+        {
+            // 只有 durability + description 都存在才需要间距
+            spacerAfterDurability.SetActive(hasDurability && hasDescription);
+        }
+
+        // ===== 刷新布局 =====
+        if (contentRoot != null)
+        {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(contentRoot);
+        }
+    }
+
     private void UpdatePosition()
     {
         if (contentRoot == null || canvasRectTransform == null)
             return;
-
-        Canvas.ForceUpdateCanvases();
-        LayoutRebuilder.ForceRebuildLayoutImmediate(contentRoot);
 
         Vector2 localPoint;
         bool success = RectTransformUtility.ScreenPointToLocalPointInRectangle(
@@ -151,21 +230,17 @@ public class UI_ItemTooltip : MonoBehaviour
         float canvasHalfWidth = canvasRectTransform.rect.width * 0.5f;
         float canvasHalfHeight = canvasRectTransform.rect.height * 0.5f;
 
-        // 手感参数（已经帮你调好了）
-        float gapX = 27f;   // 往右
-        float gapY = 29f;   // 往下（稍微更大一点防挡鼠标）
+        float gapX = 27f;
+        float gapY = 29f;
 
-        // 默认：鼠标右下
         float posX = localPoint.x + gapX;
         float posY = localPoint.y - gapY;
 
-        // 右边超出 → 翻到左边
         if (posX + tooltipWidth > canvasHalfWidth)
         {
             posX = localPoint.x - tooltipWidth - gapX;
         }
 
-        // 下边超出 → 翻到上边
         if (posY - tooltipHeight < -canvasHalfHeight)
         {
             posY = localPoint.y + tooltipHeight + gapY;

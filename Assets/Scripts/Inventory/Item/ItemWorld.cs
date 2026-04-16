@@ -93,6 +93,31 @@ public class ItemWorld : MonoBehaviour, IInteractable
             canBePickedUpTimer -= Time.deltaTime;
         }
     }
+    private void OnTriggerStay2D(Collider2D collider)
+    {
+        if (!CanBePickedUp())
+        {
+            return;
+        }
+
+        if (item == null || item.definition == null)
+        {
+            return;
+        }
+
+        if (item.IsLoot())
+        {
+            return;
+        }
+
+        PlayerInventoryInteraction player = collider.GetComponent<PlayerInventoryInteraction>();
+        if (player == null)
+        {
+            return;
+        }
+
+        player.PickupNormalItem(this);
+    }
 
     public void SetRoom(Room room)
     {
@@ -350,7 +375,7 @@ public class ItemWorld : MonoBehaviour, IInteractable
             itemWorld
         );
 
-        itemWorld.SetCanBePickedUpTimer(0.25f);
+        itemWorld.SetCanBePickedUpTimer(0.8f);
 
         Rigidbody2D rb = itemWorld.GetComponent<Rigidbody2D>();
         if (rb != null)

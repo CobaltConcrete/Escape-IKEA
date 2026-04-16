@@ -179,6 +179,34 @@ public class PlayerInventoryInteraction : MonoBehaviour
 
         itemWorld.DestroySelf();
     }
+    public Item GetEquippedArmorItem()
+    {
+        if (equipmentData == null)
+        {
+            return null;
+        }
+
+        return equipmentData.GetEquippedArmor();
+    }
+
+    public void BreakEquippedArmor()
+    {
+        if (equipmentData == null)
+        {
+            return;
+        }
+
+        Item brokenArmor = equipmentData.UnequipArmor();
+        if (brokenArmor == null)
+        {
+            return;
+        }
+
+        if (equipmentUI != null)
+        {
+            equipmentUI.RefreshAllSlots();
+        }
+    }
 
     /// <summary>Weapon world pickup that does not use <see cref="ItemWorld"/> (e.g. bat prefab).</summary>
     public void PickupWeaponFromWorld(ItemDefinition definition, int pickupAmount, GameObject pickupObject)
@@ -404,6 +432,8 @@ public class PlayerInventoryInteraction : MonoBehaviour
 
         // Weapon / Armor replacement
         Item itemClone = pickedItem.Clone();
+        itemClone.InitializeRuntimeDataIfNeeded();
+
         Item oldEquippedItem = equipmentUI.EquipItem(itemClone);
 
         if (pickedItem.IsStackable())
@@ -698,23 +728,27 @@ public class PlayerInventoryInteraction : MonoBehaviour
 
             inventory.RemoveAllByDefinition(definition);
 
-            return new Item
+            Item newItem = new Item
             {
                 definition = definition,
                 amount = totalAmount,
                 worldScale = sampleItem.worldScale
             };
+            newItem.InitializeRuntimeDataIfNeeded();
+            return newItem;
         }
         else
         {
             inventory.RemoveOneItem(sampleItem);
 
-            return new Item
+            Item newItem = new Item
             {
                 definition = definition,
                 amount = 1,
                 worldScale = sampleItem.worldScale
             };
+            newItem.InitializeRuntimeDataIfNeeded();
+            return newItem;
         }
     }
 
@@ -795,6 +829,8 @@ public class PlayerInventoryInteraction : MonoBehaviour
     private void AutoEquipItem(Item item)
     {
         Item itemToEquip = item.Clone();
+        itemToEquip.InitializeRuntimeDataIfNeeded();
+
         Item oldItem = equipmentUI.EquipItem(itemToEquip);
 
         if (ItemEquipClassifier.GetEquipTag(itemToEquip) == EquipTag.Utility)
@@ -881,6 +917,8 @@ public class PlayerInventoryInteraction : MonoBehaviour
             int originalIndex = inventory.GetItemIndex(item);
 
             Item itemToEquip = item.Clone();
+            itemToEquip.InitializeRuntimeDataIfNeeded();
+
             Item oldItem = equipmentUI.EquipItem(itemToEquip);
 
             if (ItemEquipClassifier.GetEquipTag(itemToEquip) == EquipTag.Utility)
@@ -1005,6 +1043,35 @@ public class PlayerInventoryInteraction : MonoBehaviour
             default:
                 return null;
         }
+    }
+    public void RefreshEquipmentAndInventoryUI()
+    {
+        if (equipmentUI != null)
+        {
+            equipmentUI.RefreshAllSlots();
+        }
+    }
+    private void OnTriggerEnter2D(Collider2D collider)
+    {
+        ItemWorld itemWorld = collider.GetComponent<ItemWorld>();
+        if (itemWorld == null)
+        {
+            return;
+        }
+
+        Item pickedUpItem = itemWorld.GetItem();
+        if (pickedUpItem == null || pickedUpItem.definition == null)
+        {
+            return;
+        }
+
+        // Loot still uses F interact only
+        if (pickedUpItem.IsLoot())
+        {
+            return;
+        }
+
+        PickupNormalItem(itemWorld);
     }
     private void OnTriggerExit2D(Collider2D collider)
     {
