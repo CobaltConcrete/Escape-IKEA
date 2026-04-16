@@ -11,6 +11,7 @@ public static class RoomDecorationPlacer
     private const float PlacementGrid = 0.25f;
     private const float DoorClearanceHalfWidth = 0.9f;
     private const float DoorClearanceDepth = 0.95f;
+    private const float DecorationColliderScale = 0.78f;
     private const float MinPropScale = 0.8f;
     private const float MaxPropScale = 1.2f;
 
@@ -191,6 +192,7 @@ public static class RoomDecorationPlacer
         sr.sprite = sprite;
         sr.sortingLayerName = "Floor";
         sr.sortingOrder = sortingOrder;
+        AddBlockingCollider(go, sprite);
         return go;
     }
 
@@ -443,6 +445,24 @@ public static class RoomDecorationPlacer
         sr.sprite = entry.sprite;
         sr.sortingLayerName = entry.sortingLayerName;
         sr.sortingOrder = entry.sortingOrder;
+        AddBlockingCollider(go, entry.sprite);
+    }
+
+    private static void AddBlockingCollider(GameObject target, Sprite sprite)
+    {
+        if (target == null || sprite == null)
+            return;
+
+        BoxCollider2D box = target.GetComponent<BoxCollider2D>();
+        if (box == null)
+            box = target.AddComponent<BoxCollider2D>();
+
+        box.isTrigger = false;
+        Vector2 spriteSize = sprite.bounds.size;
+        box.size = new Vector2(
+            Mathf.Max(0.18f, spriteSize.x * DecorationColliderScale),
+            Mathf.Max(0.18f, spriteSize.y * DecorationColliderScale));
+        box.offset = Vector2.zero;
     }
 
     /// <summary>World-space position for a sports-room bat (or other scripted pickups) using the same anchor rules as catalog rows.</summary>
