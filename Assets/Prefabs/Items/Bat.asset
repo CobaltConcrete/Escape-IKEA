@@ -1,0 +1,44 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a735814c985e7c48bde2bdca9fc5a74, type: 3}
+  m_Name: Bat
+  m_EditorClassIdentifier: 
+  itemName: Bat
+  icon: {fileID: -2320234325026898368, guid: fd25f2ca724fe4d29b3059f01d9f6154, type: 3}
+  stackable: 0
+  uiScale: 1
+  glowColor: {r: 1, g: 1, b: 1, a: 1}
+  description: 
+  itemCategory: 0
+  equipTag: 1
+  useEffect: 0
+  effectValue: 0
+  effectDuration: 0
+  lootValue: 0
+  canAppearInShoppingList: 1
+  minRequiredAmount: 1
+  maxRequiredAmount: 3
+  shoppingListKey: 
+  allowedRoomTypes:
+  - 6
+  bonusSpawnWeight: 1
+  worldDropScale: {x: 0.9, y: 0.9, z: 0.9}
+  spawnFootprint: {x: 0.5, y: 0.5}
+  worldContrastBackdrop: 1
+  worldColliderType: 1
+  boxOffset: {x: 0, y: 0}
+  boxSize: {x: 1, y: 1}
+  boxEdgeRadius: 0
+  circleOffset: {x: 0, y: 0}
+  circleRadius: 0.5
+  worldTag: Item
+  worldLayer: 11

@@ -11,10 +11,12 @@ public class PlayerInventoryInteraction : MonoBehaviour
     [SerializeField] private UI_LootInventory uiLootInventory;
     [SerializeField] private EquipmentUI equipmentUI;
     [SerializeField] private EquipmentData equipmentData;
+
+    public EquipmentData EquipmentData => equipmentData;
     //[SerializeField] private Dialogue playerDialogue;
 
     private ItemWorld nearbyLoot;
-    [SerializeField] private float interactRadius = 0.45f;
+    [SerializeField] private float interactRadius = 0.9f;
     [SerializeField] private LayerMask interactableLayerMask;
     [SerializeField] private UI_InteractionPrompt interactionPromptUI;
 
@@ -97,6 +99,10 @@ public class PlayerInventoryInteraction : MonoBehaviour
         if (pickedUpItem == null || pickedUpItem.definition == null) return;
         if (!pickedUpItem.IsLoot()) return;
 
+        RunObjectiveManager rom = RunObjectiveManager.Instance;
+        if (rom != null && !rom.NeedsMoreOfShoppingListKey(pickedUpItem.definition.GetShoppingListKey()))
+            return;
+
         inventory.AddLoot(pickedUpItem);
 
         if (SoundManager.Instance != null)
@@ -106,6 +112,124 @@ public class PlayerInventoryInteraction : MonoBehaviour
 
         itemWorld.DestroySelf();
     }
+
+    /// <summary>Living-room container child pickup path (not ItemWorld): grants loot and destroys pickup object.</summary>
+    public void PickupLootDefinitionFromWorld(ItemDefinition definition, int pickupAmount, GameObject pickupObject)
+    {
+        if (definition == null || pickupObject == null || !definition.IsLoot())
+            return;
+
+        RunObjectiveManager rom = RunObjectiveManager.Instance;
+        if (rom != null && !rom.NeedsMoreOfShoppingListKey(definition.GetShoppingListKey()))
+            return;
+
+        Vector3 ws = pickupObject.transform.lossyScale.sqrMagnitude > 1e-8f
+            ? pickupObject.transform.lossyScale
+            : Vector3.one;
+
+        Item pickedUpItem = new Item
+        {
+            definition = definition,
+            amount = Mathf.Max(1, pickupAmount),
+            worldScale = ws
+        };
+
+        inventory.AddLoot(pickedUpItem);
+
+        if (SoundManager.Instance != null)
+            SoundManager.Instance.PlayItemPickup();
+
+        Destroy(pickupObject);
+    }
+
+    /// <summary>
+    /// Picks up a normal (non-loot) world item when the player presses F. Weapons do not auto-pick up on overlap.
+    /// </summary>
+    public void PickupNormalItemWorld(ItemWorld itemWorld)
+    {
+        if (itemWorld == null || !itemWorld.CanBePickedUp())
+        {
+            return;
+        }
+
+        Item pickedUpItem = itemWorld.GetItem();
+        if (pickedUpItem == null || pickedUpItem.definition == null)
+        {
+            return;
+        }
+
+        if (pickedUpItem.IsLoot())
+        {
+            return;
+        }
+
+        if (!firstItemFound)
+        {
+            firstItemFound = true;
+        }
+
+        inventory.AddItem(pickedUpItem);
+        AutoEquipWeaponImmediately(pickedUpItem);
+        TryAutoEquipPickedUpItem(pickedUpItem);
+
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayItemPickup();
+        }
+
+        itemWorld.DestroySelf();
+    }
+
+    /// <summary>Weapon world pickup that does not use <see cref="ItemWorld"/> (e.g. bat prefab).</summary>
+    public void PickupWeaponFromWorld(ItemDefinition definition, int pickupAmount, GameObject pickupObject)
+    {
+        if (definition == null || pickupObject == null)
+            return;
+
+        if (definition.IsLoot())
+            return;
+
+        Vector3 ws = pickupObject.transform.lossyScale.sqrMagnitude > 1e-8f
+            ? pickupObject.transform.lossyScale
+            : Vector3.one;
+
+        Item pickedUpItem = new Item
+        {
+            definition = definition,
+            amount = Mathf.Max(1, pickupAmount),
+            worldScale = ws
+        };
+
+        if (!firstItemFound)
+        {
+            firstItemFound = true;
+        }
+
+        inventory.AddItem(pickedUpItem);
+        AutoEquipWeaponImmediately(pickedUpItem);
+        TryAutoEquipPickedUpItem(pickedUpItem);
+
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayItemPickup();
+        }
+
+        Destroy(pickupObject);
+    }
+    private void AutoEquipWeaponImmediately(Item pickedUpItem)
+    {
+        if (pickedUpItem == null || pickedUpItem.definition == null)
+            return;
+        if (!ItemEquipClassifier.IsEquipable(pickedUpItem))
+            return;
+        if (ItemEquipClassifier.GetEquipTag(pickedUpItem) != EquipTag.Weapon)
+            return;
+        if (equipmentUI == null || equipmentData == null)
+            return;
+
+        AutoEquipItem(pickedUpItem);
+    }
+
     private void FindBestInteractable()
     {
         currentInteractable = null;
@@ -116,12 +240,28 @@ public class PlayerInventoryInteraction : MonoBehaviour
             interactableLayerMask
         );
 
+        // Fallback for mis-layered interactables (e.g. weapon prefab layer drift during authoring).
+        // Keeps prompt/pickup functional even if layer mask config is stale.
+        if (hits == null || hits.Length == 0)
+        {
+            hits = Physics2D.OverlapCircleAll(
+                transform.position,
+                interactRadius
+            );
+        }
+
         float bestDistance = float.MaxValue;
 
         foreach (Collider2D hit in hits)
         {
             IInteractable interactable = hit.GetComponent<IInteractable>();
+            if (interactable == null)
+                interactable = hit.GetComponentInParent<IInteractable>();
             if (interactable == null) continue;
+
+            string prompt = interactable.GetInteractionText();
+            if (string.IsNullOrEmpty(prompt))
+                continue;
 
             float distance = Vector2.Distance(transform.position, hit.transform.position);
 
@@ -129,6 +269,37 @@ public class PlayerInventoryInteraction : MonoBehaviour
             {
                 bestDistance = distance;
                 currentInteractable = interactable;
+            }
+        }
+
+        // Final fallback: discover nearby interactables by component distance, not collider overlap.
+        // This makes pickup robust even if a prefab collider is offset, too small, or misconfigured.
+        if (currentInteractable == null)
+        {
+            MonoBehaviour[] behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            for (int i = 0; i < behaviours.Length; i++)
+            {
+                MonoBehaviour behaviour = behaviours[i];
+                if (behaviour == null)
+                    continue;
+                if (behaviour == this)
+                    continue;
+                if (behaviour is not IInteractable interactable)
+                    continue;
+
+                string prompt = interactable.GetInteractionText();
+                if (string.IsNullOrEmpty(prompt))
+                    continue;
+
+                float distance = Vector2.Distance(transform.position, interactable.GetInteractionPosition());
+                if (distance > interactRadius * 2f)
+                    continue;
+
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    currentInteractable = interactable;
+                }
             }
         }
 
@@ -661,7 +832,12 @@ public class PlayerInventoryInteraction : MonoBehaviour
                 break;
 
             case ItemUseEffect.SpeedBoost:
-                playerMovement.BoostSpeedFor10Seconds();
+                if (playerMovement != null)
+                {
+                    float boostedSpeed = def.effectValue > 0f ? def.effectValue : 10f;
+                    float duration = def.effectDuration > 0f ? def.effectDuration : 10f;
+                    playerMovement.BoostSpeedForDuration(boostedSpeed, duration);
+                }
                 FlashBlue();
                 break;
 
@@ -798,7 +974,7 @@ public class PlayerInventoryInteraction : MonoBehaviour
         if (equippedItem == null || equippedItem.definition == null)
             return;
 
-        // 关键：保留完整数据，尤其是 worldScale
+        // ???????????????????????? worldScale
         Item droppedItem = equippedItem.Clone();
 
         equipmentData.ClearSlot(equipTag);
@@ -829,44 +1005,6 @@ public class PlayerInventoryInteraction : MonoBehaviour
             default:
                 return null;
         }
-    }
-    private void OnTriggerEnter2D(Collider2D collider)
-    {
-        ItemWorld itemWorld = collider.GetComponent<ItemWorld>();
-
-        if (itemWorld == null || !itemWorld.CanBePickedUp())
-        {
-            return;
-        }
-
-        Item pickedUpItem = itemWorld.GetItem();
-
-        if (pickedUpItem == null || pickedUpItem.definition == null)
-        {
-            return;
-        }
-
-        // Loot don't auto pick up, leave it to F interact
-        if (pickedUpItem.IsLoot())
-        {
-            return;
-        }
-
-        // normal item pick up immediately
-        if (!firstItemFound)
-        {
-            firstItemFound = true;
-        }
-
-        inventory.AddItem(pickedUpItem);
-        TryAutoEquipPickedUpItem(pickedUpItem);
-
-        if (SoundManager.Instance != null)
-        {
-            SoundManager.Instance.PlayItemPickup();
-        }
-
-        itemWorld.DestroySelf();
     }
     private void OnTriggerExit2D(Collider2D collider)
     {

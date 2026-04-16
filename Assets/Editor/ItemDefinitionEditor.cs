@@ -57,6 +57,7 @@ public class ItemDefinitionEditor : Editor
         EditorGUILayout.LabelField("World Display Settings", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(serializedObject.FindProperty("worldDropScale"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("spawnFootprint"));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("worldContrastBackdrop"));
 
         EditorGUILayout.Space();
 

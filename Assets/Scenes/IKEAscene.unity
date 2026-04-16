@@ -1679,11 +1679,11 @@ PrefabInstance:
       objectReference: {fileID: 6281745019174675742}
     - target: {fileID: 1822560432590618026, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
       propertyPath: maxHealth
-      value: 150
+      value: 1500
       objectReference: {fileID: 0}
     - target: {fileID: 1822560432590618026, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
       propertyPath: startingHealth
-      value: 150
+      value: 1500
       objectReference: {fileID: 0}
     - target: {fileID: 2186692304189018441, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
       propertyPath: m_Name
@@ -1917,6 +1917,18 @@ PrefabInstance:
       propertyPath: m_Value
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 6475680920776364988, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 73.29999
+      objectReference: {fileID: 0}
+    - target: {fileID: 6475680920776364988, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 8133067366552632106, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 4
+      objectReference: {fileID: 0}
     - target: {fileID: 8291567420406807307, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
       propertyPath: m_Name
       value: List_Eq_Item_Loot
@@ -1998,16 +2010,24 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: maxListEntries
-      value: 6
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: minListEntries
-      value: 4
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: allItemDefinitions.Array.size
-      value: 21
+      value: 25
       objectReference: {fileID: 0}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 844cbf360c54956419f30758d3434eef, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: db5389e4a31b86a4189c0c2169b8cbe0, type: 2}
     - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: 'allItemDefinitions.Array.data[2]'
       value: 
@@ -2087,7 +2107,19 @@ PrefabInstance:
     - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: 'allItemDefinitions.Array.data[21]'
       value: 
-      objectReference: {fileID: 11400000, guid: a40e23bc5b1203a49b91ce722d5eab78, type: 2}
+      objectReference: {fileID: 11400000, guid: 8f4ac70a5844413c928f01a3aa590a7a, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[22]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 9499537fcb244db39f953dd3f4ac1454, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[23]'
+      value: 
+      objectReference: {fileID: 11400000, guid: b8f6877baf33410c87e5166b78aeab4f, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[24]'
+      value: 
+      objectReference: {fileID: 11400000, guid: c7dc95f9c77f4e10bcf4474439131548, type: 2}
     - target: {fileID: 4324293364085487361, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: visitsBeforeRespawn
       value: 2

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class RunObjectiveManager : MonoBehaviour
@@ -11,11 +12,15 @@ public class RunObjectiveManager : MonoBehaviour
     public event Action OnObjectiveProgressChanged;
 
     [Header("All Item Definitions")]
+    [Tooltip("Pool the run draws shopping-list lines from: each entry is a Loot ItemDefinition (pickup rules, allowed rooms, shoppingListKey). Room props stay as catalog sprites unless a decoration row uses the same ItemDefinition with Pickup only when on shopping list.")]
     [SerializeField] private List<ItemDefinition> allItemDefinitions = new List<ItemDefinition>();
+    [Header("Prefab-First Objective Source")]
+    [SerializeField] private RoomPrefabSpawnCatalog prefabSpawnCatalog;
 
     [Header("Shopping List Settings")]
-    [SerializeField] private int minListEntries = 3;
-    [SerializeField] private int maxListEntries = 5;
+    [Tooltip("Number of distinct shopping-list lines (unique loot keys) per run. Capped at maxListEntries even when room-coverage wants more.")]
+    [SerializeField] private int minListEntries = 7;
+    [SerializeField] private int maxListEntries = 7;
 
     [Header("Goal Value Settings")]
     [SerializeField] private float minGoalMultiplier = 1.2f;
@@ -93,44 +98,155 @@ public class RunObjectiveManager : MonoBehaviour
         RecalculateObjectiveProgressFromInventory(inventory);
     }
 
-    public void GenerateNewRunObjective()
+    /// <summary>Builds shopping list + value goal only. Call before the map is generated so room decor can branch on the list.</summary>
+    public void GenerateShoppingListAndGoals()
     {
         currentShoppingList.Clear();
         currentCollectedValue = 0;
         hasShownBossUnlockedNotice = false;
 
-        List<ItemDefinition> eligibleLootPool = GetEligibleLootPool();
-
-        if (eligibleLootPool.Count == 0)
+        if (TryGenerateShoppingListFromPrefabMetadata())
         {
-            Debug.LogWarning("RunObjectiveManager: No eligible loot items found.");
+            GenerateGoalValue();
             OnObjectiveProgressChanged?.Invoke();
             return;
         }
 
-        int entryCount = UnityEngine.Random.Range(minListEntries, maxListEntries + 1);
-        entryCount = Mathf.Min(entryCount, eligibleLootPool.Count);
+        List<ItemDefinition> eligibleLootPool = GetEligibleLootPool();
 
-        for (int i = 0; i < entryCount; i++)
+        if (eligibleLootPool.Count == 0)
         {
-            int randomIndex = UnityEngine.Random.Range(0, eligibleLootPool.Count);
-            ItemDefinition chosenLoot = eligibleLootPool[randomIndex];
-            eligibleLootPool.RemoveAt(randomIndex);
+            int rawLen = allItemDefinitions != null ? allItemDefinitions.Count : 0;
+            int nullRefs = 0;
+            if (allItemDefinitions != null)
+            {
+                for (int i = 0; i < allItemDefinitions.Count; i++)
+                {
+                    if (allItemDefinitions[i] == null)
+                        nullRefs++;
+                }
+            }
+
+            Debug.LogWarning(
+                $"RunObjectiveManager: No eligible loot items (shopping list empty). " +
+                $"Serialized list length={rawLen}, null references={nullRefs}. " +
+                $"Assign non-null ItemDefinition assets on RunObjectiveManager and ensure itemCategory is Loot, lootValue > 0, and canAppearInShoppingList is enabled.");
+            OnObjectiveProgressChanged?.Invoke();
+            return;
+        }
+
+        int spawnBuffer = LootSpawnManager.Instance != null
+            ? LootSpawnManager.Instance.ExtraRequiredSpawnBuffer
+            : 2;
+
+        List<ItemDefinition> generatablePool = BuildGeneratableLootPool(eligibleLootPool, spawnBuffer);
+        if (generatablePool.Count == 0)
+        {
+            Debug.LogWarning(
+                "RunObjectiveManager: No loot types passed spawn-capacity checks; falling back to full eligible pool (spawn may fail for some lines).");
+            generatablePool = new List<ItemDefinition>(eligibleLootPool);
+        }
+
+        int minCap = Mathf.Max(1, Mathf.Min(minListEntries, maxListEntries));
+        int maxCap = Mathf.Max(minCap, maxListEntries);
+
+        int desiredListSize = UnityEngine.Random.Range(minCap, maxCap + 1);
+        int targetEntries = Mathf.Min(desiredListSize, generatablePool.Count, maxCap);
+
+        if (targetEntries < minCap)
+        {
+            Debug.LogWarning(
+                $"RunObjectiveManager: Map only supports {generatablePool.Count} distinct winnable loot lines; list size will be {targetEntries} (wanted at least {minCap}). Add more room types or loot definitions.");
+        }
+
+        List<ItemDefinition> prioritized = BuildRoomCoveragePriorityList(generatablePool);
+        int coverageCap = Mathf.Min(prioritized.Count, generatablePool.Count, maxCap);
+        if (coverageCap > targetEntries)
+        {
+            if (prioritized.Count > maxCap)
+            {
+                Debug.LogWarning(
+                    $"RunObjectiveManager: Room-coverage ordering includes {prioritized.Count} loot types; capping shopping list at maxListEntries ({maxCap}).");
+            }
+
+            targetEntries = coverageCap;
+        }
+
+        for (int i = 0; i < prioritized.Count && currentShoppingList.Count < targetEntries; i++)
+        {
+            ItemDefinition chosenLoot = prioritized[i];
+            int areas;
+            if (LootSpawnManager.Instance != null)
+            {
+                LootSpawnManager.Instance.RefreshSpawnAreas();
+                if (LootSpawnManager.Instance.LootSpawnAreaCount > 0)
+                    areas = LootSpawnManager.Instance.CountAreasThatCanHoldRequiredLoot(chosenLoot);
+                else
+                    areas = 32;
+            }
+            else
+            {
+                areas = 32;
+            }
+
+            int effectiveBuffer = LootSpawnManager.Instance != null
+                ? LootSpawnManager.Instance.GetRequiredBufferForDefinition(chosenLoot)
+                : spawnBuffer;
+            int maxByMap = Mathf.Max(0, areas - effectiveBuffer);
+            if (maxByMap < 1)
+            {
+                Debug.LogWarning(
+                    $"RunObjectiveManager: Skipping '{chosenLoot.itemName}' — not enough loot areas ({areas}) for required buffer ({effectiveBuffer}).");
+                continue;
+            }
 
             int minAmount = Mathf.Max(1, chosenLoot.minRequiredAmount);
             int maxAmount = Mathf.Max(minAmount, chosenLoot.maxRequiredAmount);
+            maxAmount = Mathf.Min(maxAmount, maxByMap);
+            minAmount = Mathf.Min(minAmount, maxAmount);
+
+            int requiredAmount = UnityEngine.Random.Range(minAmount, maxAmount + 1);
+            requiredAmount = Mathf.Min(requiredAmount, areas);
 
             ShoppingListEntry entry = new ShoppingListEntry
             {
                 itemDefinition = chosenLoot,
-                requiredAmount = UnityEngine.Random.Range(minAmount, maxAmount + 1),
+                requiredAmount = requiredAmount,
                 collectedAmount = 0
             };
 
             currentShoppingList.Add(entry);
         }
 
+        if (currentShoppingList.Count < targetEntries)
+        {
+            Debug.LogWarning(
+                $"RunObjectiveManager: Built {currentShoppingList.Count} shopping-list lines instead of {targetEntries} (ran out of spawn-feasible loot types).");
+        }
+
+        if (currentShoppingList.Count == 0)
+        {
+            Debug.LogWarning("RunObjectiveManager: Shopping list has zero entries after generation.");
+            OnObjectiveProgressChanged?.Invoke();
+            return;
+        }
+
         GenerateGoalValue();
+        OnObjectiveProgressChanged?.Invoke();
+    }
+
+    /// <summary>Spawns world loot for <see cref="CurrentShoppingList"/> after rooms exist. Call from <see cref="MapManager"/> after <see cref="MapManager"/> builds the map.</summary>
+    public void SpawnLootForCurrentObjective()
+    {
+        if (currentShoppingList.Count == 0)
+            return;
+
+        if (RoomPrefabObjectiveSpawner.Instance != null &&
+            RoomPrefabObjectiveSpawner.Instance.TrySpawnFromObjective(currentShoppingList))
+        {
+            OnObjectiveProgressChanged?.Invoke();
+            return;
+        }
 
         if (LootSpawnManager.Instance != null)
         {
@@ -141,7 +257,6 @@ public class RunObjectiveManager : MonoBehaviour
             );
         }
 
-        // If inventory is bound, recalculate
         if (inventory != null)
         {
             RecalculateObjectiveProgressFromInventory(inventory);
@@ -152,18 +267,74 @@ public class RunObjectiveManager : MonoBehaviour
         }
     }
 
+    /// <summary>Full run setup: shopping list + goals, then world loot (same as calling the two split methods in order).</summary>
+    public void GenerateNewRunObjective()
+    {
+        GenerateShoppingListAndGoals();
+        SpawnLootForCurrentObjective();
+    }
+
+    public bool ContainsShoppingListKey(string shoppingListKey)
+    {
+        string targetKey = NormalizeShoppingListKey(shoppingListKey);
+        if (string.IsNullOrEmpty(targetKey))
+            return false;
+
+        for (int i = 0; i < currentShoppingList.Count; i++)
+        {
+            ShoppingListEntry e = currentShoppingList[i];
+            if (e == null)
+                continue;
+            if (string.Equals(NormalizeShoppingListKey(e.GetShoppingListKey()), targetKey, StringComparison.Ordinal))
+                return true;
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// True only when this key is on the shopping list and its required count is not yet met.
+    /// </summary>
+    public bool NeedsMoreOfShoppingListKey(string shoppingListKey)
+    {
+        string targetKey = NormalizeShoppingListKey(shoppingListKey);
+        if (string.IsNullOrEmpty(targetKey))
+            return false;
+
+        for (int i = 0; i < currentShoppingList.Count; i++)
+        {
+            ShoppingListEntry e = currentShoppingList[i];
+            if (e == null)
+                continue;
+            if (!string.Equals(NormalizeShoppingListKey(e.GetShoppingListKey()), targetKey, StringComparison.Ordinal))
+                continue;
+
+            return e.collectedAmount < e.requiredAmount;
+        }
+
+        return false;
+    }
+
     private List<ItemDefinition> GetEligibleLootPool()
     {
         List<ItemDefinition> result = new List<ItemDefinition>();
         HashSet<string> seenKeys = new HashSet<string>();
 
+        if (allItemDefinitions == null)
+        {
+            return result;
+        }
+
         foreach (ItemDefinition itemDef in allItemDefinitions)
         {
-            if (itemDef == null) continue;
-            if (!itemDef.IsLoot()) continue;
-            if (!itemDef.canAppearInShoppingList) continue;
-            if (itemDef.lootValue <= 0) continue;
-
+            if (itemDef == null)
+                continue;
+            if (!itemDef.IsLoot())
+                continue;
+            if (!itemDef.canAppearInShoppingList)
+                continue;
+            if (itemDef.lootValue <= 0)
+                continue;
             string key = itemDef.GetShoppingListKey();
 
             if (seenKeys.Contains(key))
@@ -176,6 +347,126 @@ public class RunObjectiveManager : MonoBehaviour
         }
 
         return result;
+    }
+
+    /// <summary>
+    /// Loot that can meet <see cref="LootSpawnManager.ExtraRequiredSpawnBuffer"/> on top of at least <see cref="ItemDefinition.minRequiredAmount"/> given one pickup per room per definition.
+    /// </summary>
+    private static List<ItemDefinition> BuildGeneratableLootPool(List<ItemDefinition> eligible, int spawnBuffer)
+    {
+        List<ItemDefinition> generatable = new List<ItemDefinition>();
+        if (eligible == null)
+            return generatable;
+
+        if (LootSpawnManager.Instance == null)
+        {
+            generatable.AddRange(eligible);
+            return generatable;
+        }
+
+        LootSpawnManager.Instance.RefreshSpawnAreas();
+        if (LootSpawnManager.Instance.LootSpawnAreaCount == 0)
+        {
+            generatable.AddRange(eligible);
+            return generatable;
+        }
+
+        for (int i = 0; i < eligible.Count; i++)
+        {
+            ItemDefinition def = eligible[i];
+            if (def == null)
+                continue;
+
+            int areas = LootSpawnManager.Instance.CountAreasThatCanHoldRequiredLoot(def);
+            int effectiveBuffer = LootSpawnManager.Instance.GetRequiredBufferForDefinition(def);
+            if (areas >= def.minRequiredAmount + effectiveBuffer)
+                generatable.Add(def);
+        }
+
+        return generatable;
+    }
+
+    private static void ShuffleItemList(List<ItemDefinition> list)
+    {
+        if (list == null || list.Count < 2)
+            return;
+
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = UnityEngine.Random.Range(0, i + 1);
+            ItemDefinition tmp = list[i];
+            list[i] = list[j];
+            list[j] = tmp;
+        }
+    }
+
+    /// <summary>
+    /// Greedy room-coverage seed: picks loot definitions so each room type has at least one shopping-list line when possible.
+    /// Remaining definitions are shuffled and appended.
+    /// </summary>
+    private static List<ItemDefinition> BuildRoomCoveragePriorityList(List<ItemDefinition> generatablePool)
+    {
+        List<ItemDefinition> ordered = new List<ItemDefinition>();
+        if (generatablePool == null || generatablePool.Count == 0)
+            return ordered;
+
+        HashSet<RoomType> uncovered = new HashSet<RoomType>();
+        foreach (RoomType rt in Enum.GetValues(typeof(RoomType)))
+        {
+            if (rt != RoomType.None)
+                uncovered.Add(rt);
+        }
+
+        HashSet<ItemDefinition> remaining = new HashSet<ItemDefinition>(generatablePool.Where(d => d != null));
+        while (uncovered.Count > 0 && remaining.Count > 0)
+        {
+            ItemDefinition best = null;
+            int bestCover = 0;
+
+            foreach (ItemDefinition def in remaining)
+            {
+                if (def == null || def.allowedRoomTypes == null || def.allowedRoomTypes.Count == 0)
+                    continue;
+
+                int cover = 0;
+                for (int i = 0; i < def.allowedRoomTypes.Count; i++)
+                {
+                    if (uncovered.Contains(def.allowedRoomTypes[i]))
+                        cover++;
+                }
+
+                if (cover > bestCover)
+                {
+                    bestCover = cover;
+                    best = def;
+                }
+                else if (cover == bestCover && cover > 0 && UnityEngine.Random.value < 0.5f)
+                {
+                    // Break ties randomly so one key (e.g. Baseball) does not dominate every run.
+                    best = def;
+                }
+            }
+
+            if (best == null || bestCover == 0)
+                break;
+
+            ordered.Add(best);
+            remaining.Remove(best);
+
+            for (int i = 0; i < best.allowedRoomTypes.Count; i++)
+                uncovered.Remove(best.allowedRoomTypes[i]);
+        }
+
+        if (uncovered.Count > 0)
+        {
+            string missing = string.Join(", ", uncovered);
+            Debug.LogWarning($"RunObjectiveManager: Could not guarantee coverage for room types: {missing}");
+        }
+
+        List<ItemDefinition> tail = new List<ItemDefinition>(remaining);
+        ShuffleItemList(tail);
+        ordered.AddRange(tail);
+        return ordered;
     }
 
     private void GenerateGoalValue()
@@ -223,10 +514,12 @@ public class RunObjectiveManager : MonoBehaviour
 
                 currentCollectedValue += item.definition.lootValue * amount;
 
+                string itemKey = NormalizeShoppingListKey(item.definition.GetShoppingListKey());
                 foreach (ShoppingListEntry entry in currentShoppingList)
                 {
-                    if (entry.itemDefinition != null &&
-                        entry.itemDefinition.GetShoppingListKey() == item.definition.GetShoppingListKey())
+                    if (string.IsNullOrEmpty(itemKey))
+                        continue;
+                    if (string.Equals(NormalizeShoppingListKey(entry.GetShoppingListKey()), itemKey, StringComparison.Ordinal))
                     {
                         entry.collectedAmount += amount;
                         break;
@@ -237,6 +530,113 @@ public class RunObjectiveManager : MonoBehaviour
 
         OnObjectiveProgressChanged?.Invoke();
         TryShowBossUnlockedNotice();
+    }
+
+    public void RegisterCollectedByKey(string shoppingListKey, int amount, int unitValue)
+    {
+        string targetKey = NormalizeShoppingListKey(shoppingListKey);
+        if (string.IsNullOrWhiteSpace(targetKey) || amount <= 0)
+            return;
+
+        bool changed = false;
+        for (int i = 0; i < currentShoppingList.Count; i++)
+        {
+            ShoppingListEntry entry = currentShoppingList[i];
+            if (entry == null)
+                continue;
+            if (!string.Equals(NormalizeShoppingListKey(entry.GetShoppingListKey()), targetKey, StringComparison.Ordinal))
+                continue;
+            if (entry.collectedAmount >= entry.requiredAmount)
+                break;
+
+            entry.collectedAmount += amount;
+            if (entry.collectedAmount > entry.requiredAmount)
+                entry.collectedAmount = entry.requiredAmount;
+            changed = true;
+
+            int valuePerItem = entry.itemDefinition != null ? entry.itemDefinition.lootValue : entry.unitValue;
+            if (valuePerItem <= 0)
+                valuePerItem = Mathf.Max(0, unitValue);
+            currentCollectedValue += Mathf.Max(0, valuePerItem * amount);
+            break;
+        }
+
+        if (changed)
+        {
+            OnObjectiveProgressChanged?.Invoke();
+            TryShowBossUnlockedNotice();
+        }
+    }
+
+    private bool TryGenerateShoppingListFromPrefabMetadata()
+    {
+        if (prefabSpawnCatalog == null)
+            return false;
+
+        Dictionary<string, ShoppingListEntry> uniqueByKey = new Dictionary<string, ShoppingListEntry>(StringComparer.Ordinal);
+        foreach (RoomPrefabSpawnCatalog.RoomPool pool in prefabSpawnCatalog.Pools)
+        {
+            if (pool == null || pool.prefabs == null)
+                continue;
+            for (int i = 0; i < pool.prefabs.Count; i++)
+            {
+                GameObject prefab = pool.prefabs[i];
+                if (prefab == null)
+                    continue;
+                RoomSpawnPrefabDefinition def = prefab.GetComponent<RoomSpawnPrefabDefinition>();
+                if (def == null)
+                {
+                    continue;
+                }
+                if (def.spawnCategory != RoomSpawnCategory.Item || !def.canAppearInShoppingList)
+                    continue;
+                string normalizedKey = NormalizeShoppingListKey(def.shoppingListKey);
+                if (string.IsNullOrWhiteSpace(normalizedKey) || def.lootValue <= 0)
+                    continue;
+                if (!uniqueByKey.ContainsKey(normalizedKey))
+                {
+                    uniqueByKey[normalizedKey] = new ShoppingListEntry
+                    {
+                        shoppingListKey = normalizedKey,
+                        displayName = def.GetResolvedDisplayName(),
+                        unitValue = def.lootValue,
+                        roomType = def.roomType,
+                        requiredAmount = 1,
+                        collectedAmount = 0
+                    };
+                }
+
+            }
+        }
+
+        if (uniqueByKey.Count == 0)
+            return false;
+
+        List<ShoppingListEntry> poolDefs = new List<ShoppingListEntry>(uniqueByKey.Values);
+        for (int i = poolDefs.Count - 1; i > 0; i--)
+        {
+            int j = UnityEngine.Random.Range(0, i + 1);
+            (poolDefs[i], poolDefs[j]) = (poolDefs[j], poolDefs[i]);
+        }
+
+        // Design rule (for now): exactly 7 unique shopping-list lines.
+        const int targetUniqueEntries = 7;
+
+        int targetEntries = Mathf.Min(targetUniqueEntries, poolDefs.Count);
+
+        for (int i = 0; i < targetEntries; i++)
+        {
+            ShoppingListEntry seed = poolDefs[i];
+            seed.requiredAmount = Mathf.Max(1, seed.requiredAmount);
+            currentShoppingList.Add(seed);
+        }
+
+        return currentShoppingList.Count > 0;
+    }
+
+    private static string NormalizeShoppingListKey(string key)
+    {
+        return string.IsNullOrWhiteSpace(key) ? string.Empty : key.Trim().ToLowerInvariant();
     }
 
     public bool IsShoppingListComplete()
