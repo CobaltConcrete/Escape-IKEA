@@ -58,7 +58,7 @@ public static class RoomPrefabStaticPlacer
                 continue;
             if (roomType == RoomType.Cafeteria && IsCafeteriaLayoutPiece(prefab))
                 continue;
-            RoomSpawnPrefabDefinition def = prefab.GetComponent<RoomSpawnPrefabDefinition>();
+            RoomSpawnPrefabDefinition def = GetRoomSpawnDefinition(prefab);
             if (def == null)
                 continue;
             if (def.spawnCategory == RoomSpawnCategory.Weapon)
@@ -427,7 +427,7 @@ public static class RoomPrefabStaticPlacer
             if (bedRenderer != null)
                 bedRenderer.flipX = (i % 2) == 1;
 
-            RoomSpawnPrefabDefinition bedDef = bedPrefab.GetComponent<RoomSpawnPrefabDefinition>();
+            RoomSpawnPrefabDefinition bedDef = GetRoomSpawnDefinition(bedPrefab);
             EnsureShoppingListPickupComponent(bed, bedDef);
             bed.SetActive(true);
             used.Add(bed.transform.position);
@@ -443,7 +443,8 @@ public static class RoomPrefabStaticPlacer
                 StripLegacySpawnerPath(lamp);
                 NormalizeSpawnedVisuals(lamp);
                 ClampInstanceInsideRoom(lamp, roomRoot);
-                EnsureShoppingListPickupComponent(lamp, lampPrefab.GetComponent<RoomSpawnPrefabDefinition>());
+                RoomSpawnPrefabDefinition lampDef = GetRoomSpawnDefinition(lampPrefab);
+                EnsureShoppingListPickupComponent(lamp, lampDef);
                 lamp.SetActive(true);
                 used.Add(lamp.transform.position);
                 spawnedAny = true;
@@ -456,7 +457,8 @@ public static class RoomPrefabStaticPlacer
                 StripLegacySpawnerPath(drawer);
                 NormalizeSpawnedVisuals(drawer);
                 ClampInstanceInsideRoom(drawer, roomRoot);
-                EnsureShoppingListPickupComponent(drawer, drawerPrefab.GetComponent<RoomSpawnPrefabDefinition>());
+                RoomSpawnPrefabDefinition drawerDef = GetRoomSpawnDefinition(drawerPrefab);
+                EnsureShoppingListPickupComponent(drawer, drawerDef);
                 drawer.SetActive(true);
                 used.Add(drawer.transform.position);
                 spawnedAny = true;
@@ -662,6 +664,17 @@ public static class RoomPrefabStaticPlacer
 
         return null;
     }
+    private static RoomSpawnPrefabDefinition GetRoomSpawnDefinition(GameObject obj)
+    {
+        if (obj == null)
+            return null;
+
+        RoomSpawnPrefabDefinition def = obj.GetComponent<RoomSpawnPrefabDefinition>();
+        if (def == null)
+            def = obj.GetComponentInChildren<RoomSpawnPrefabDefinition>(true);
+
+        return def;
+    }
 
     private static bool IsBedroomLayoutPiece(GameObject prefab)
     {
@@ -849,16 +862,28 @@ public static class RoomPrefabStaticPlacer
 
     private static void EnsureShoppingListPickupComponent(GameObject instance, RoomSpawnPrefabDefinition def)
     {
-        if (instance == null || def == null)
+        if (instance == null)
             return;
+
+        if (def == null)
+            def = instance.GetComponent<RoomSpawnPrefabDefinition>();
+
+        if (def == null)
+            def = instance.GetComponentInChildren<RoomSpawnPrefabDefinition>(true);
+
+        if (def == null)
+            return;
+
         if (!def.canAppearInShoppingList)
             return;
+
         string key = def.shoppingListKey;
         if (string.IsNullOrWhiteSpace(key))
             return;
 
-        if (instance.GetComponent<RoomGeneratedPickup>() == null)
-            instance.AddComponent<RoomGeneratedPickup>();
+        RoomGeneratedPickup pickup = instance.GetComponent<RoomGeneratedPickup>();
+        if (pickup == null)
+            pickup = instance.AddComponent<RoomGeneratedPickup>();
     }
 
     private static void StripLegacySpawnerPath(GameObject instance)
@@ -911,7 +936,10 @@ public static class RoomPrefabStaticPlacer
         if (makePushableProp)
             ConfigurePushablePropPhysics(instance);
         if (!skipShoppingListPickup)
-            EnsureShoppingListPickupComponent(instance, prefab.GetComponent<RoomSpawnPrefabDefinition>());
+        {
+            RoomSpawnPrefabDefinition def = GetRoomSpawnDefinition(prefab);
+            EnsureShoppingListPickupComponent(instance, def);
+        }
         instance.SetActive(true);
         return instance;
     }
@@ -964,7 +992,7 @@ public static class RoomPrefabStaticPlacer
         {
             Vector2 size = sr.sprite.bounds.size;
             box.size = new Vector2(Mathf.Max(0.45f, size.x * 0.8f), Mathf.Max(0.45f, size.y * 0.8f));
-            box.offset = sr.transform.localPosition;
+            box.offset = (Vector2)sr.transform.localPosition;
         }
         box.isTrigger = false;
 

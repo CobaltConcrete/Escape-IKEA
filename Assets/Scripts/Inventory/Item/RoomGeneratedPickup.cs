@@ -12,24 +12,35 @@ public class RoomGeneratedPickup : MonoBehaviour, IInteractable
     {
         if (metadata == null)
             metadata = GetComponent<RoomSpawnPrefabDefinition>();
+
+        if (metadata == null)
+            metadata = GetComponentInChildren<RoomSpawnPrefabDefinition>(true);
+
+        if (metadata == null)
+        {
+            Debug.LogWarning($"RoomGeneratedPickup on {name} could not find RoomSpawnPrefabDefinition.", this);
+            return;
+        }
+
         EnsureSolidLootColliders();
     }
 
     public void Interact(PlayerInventoryInteraction player)
     {
+        if (player == null)
+            return;
+
         if (!CanPickup())
             return;
 
-        if (RunObjectiveManager.Instance != null)
+        ItemDefinition matchedDefinition = FindMatchingLootDefinition();
+        if (matchedDefinition == null)
         {
-            RunObjectiveManager.Instance.RegisterCollectedByKey(
-                metadata.shoppingListKey,
-                1,
-                metadata.lootValue);
+            Debug.LogWarning($"RoomGeneratedPickup on {name} could not find matching loot ItemDefinition.", this);
+            return;
         }
 
-        if (destroyOnPickup)
-            Destroy(gameObject);
+        player.PickupLootDefinitionFromWorld(matchedDefinition, 1, gameObject);
     }
 
     public string GetInteractionText()
@@ -66,68 +77,119 @@ public class RoomGeneratedPickup : MonoBehaviour, IInteractable
     {
         if (metadata == null)
             return false;
-        // Some prefabs may still be mis-tagged while data migration is in progress.
-        // If it has a shopping-list key and that key is needed, allow pickup prompt/collection.
-        if (metadata.spawnCategory != RoomSpawnCategory.Item && string.IsNullOrWhiteSpace(metadata.shoppingListKey))
-            return false;
-        if (string.IsNullOrWhiteSpace(metadata.shoppingListKey))
-            return false;
-        return RunObjectiveManager.Instance != null &&
-               RunObjectiveManager.Instance.NeedsMoreOfShoppingListKey(metadata.shoppingListKey);
+
+        return !string.IsNullOrWhiteSpace(metadata.shoppingListKey);
+    }
+    private ItemDefinition FindMatchingLootDefinition()
+    {
+        if (metadata == null)
+            return null;
+
+        string targetKey = NormalizeKey(metadata.shoppingListKey);
+        if (string.IsNullOrEmpty(targetKey))
+            return null;
+
+        RunObjectiveManager rom = RunObjectiveManager.Instance;
+        if (rom == null)
+            return null;
+
+        var allDefs = rom.GetAllItemDefinitions();
+        if (allDefs == null)
+            return null;
+
+        for (int i = 0; i < allDefs.Count; i++)
+        {
+            ItemDefinition def = allDefs[i];
+            if (def == null)
+                continue;
+            if (!def.IsLoot())
+                continue;
+
+            if (NormalizeKey(def.GetShoppingListKey()) == targetKey)
+                return def;
+        }
+
+        return null;
     }
 
+    private string NormalizeKey(string key)
+    {
+        return string.IsNullOrWhiteSpace(key) ? string.Empty : key.Trim().ToLowerInvariant();
+    }
+
+    //private void EnsureSolidLootColliders()
+    //{
+    //    if (metadata == null || string.IsNullOrWhiteSpace(metadata.shoppingListKey))
+    //        return;
+
+    //    bool useTriggerCollider = ShouldUseTriggerCollider();
+
+    //    // Prefab auth can be messy during migration; remove any 3D colliders and
+    //    // ensure there is always one reliable 2D collider for interaction + blocking.
+    //    Collider[] legacy3d = GetComponentsInChildren<Collider>(true);
+    //    for (int i = 0; i < legacy3d.Length; i++)
+    //    {
+    //        if (legacy3d[i] != null)
+    //            Destroy(legacy3d[i]);
+    //    }
+
+    //    BoxCollider2D rootBox = GetComponent<BoxCollider2D>();
+    //    if (rootBox == null)
+    //    {
+    //        rootBox = gameObject.AddComponent<BoxCollider2D>();
+    //    }
+
+    //    SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>(true);
+
+    //    if (sr != null && sr.sprite != null)
+    //    {
+    //        Vector2 spriteSize = sr.sprite.bounds.size;
+
+    //        if (spriteSize.x > 0.01f && spriteSize.y > 0.01f)
+    //        {
+    //            rootBox.size = spriteSize * colliderRadiusScale;
+    //            rootBox.offset = (Vector2)sr.transform.localPosition;
+    //        }
+    //        else
+    //        {
+    //            rootBox.size = new Vector2(0.9f, 0.9f) * colliderRadiusScale;
+    //            rootBox.offset = Vector2.zero;
+    //        }
+    //    }
+    //    else
+    //    {
+    //        rootBox.size = new Vector2(0.9f, 0.9f) * colliderRadiusScale;
+    //        rootBox.offset = Vector2.zero;
+    //    }
+
+    //    rootBox.isTrigger = useTriggerCollider;
+
+    //    Collider2D[] colliders = GetComponentsInChildren<Collider2D>(true);
+    //    for (int i = 0; i < colliders.Length; i++)
+    //    {
+    //        Collider2D c = colliders[i];
+    //        if (c == null)
+    //            continue;
+
+    //        c.isTrigger = useTriggerCollider;
+    //    }
+    //}
     private void EnsureSolidLootColliders()
     {
         if (metadata == null || string.IsNullOrWhiteSpace(metadata.shoppingListKey))
             return;
 
-        bool useTriggerCollider = ShouldUseTriggerCollider();
-
-        // Prefab auth can be messy during migration; remove any 3D colliders and
-        // ensure there is always one reliable 2D collider for interaction + blocking.
-        Collider[] legacy3d = GetComponentsInChildren<Collider>(true);
-        for (int i = 0; i < legacy3d.Length; i++)
-        {
-            if (legacy3d[i] != null)
-                Destroy(legacy3d[i]);
-        }
-
         Collider2D[] colliders = GetComponentsInChildren<Collider2D>(true);
-        BoxCollider2D rootBox = GetComponent<BoxCollider2D>();
-        if (rootBox == null)
+
+        if (colliders == null || colliders.Length == 0)
         {
-            rootBox = gameObject.AddComponent<BoxCollider2D>();
+            Debug.LogWarning($"[Pickup] {name} has no 2D collider.", this);
         }
 
-        SpriteRenderer sr = GetComponentInChildren<SpriteRenderer>(true);
-        if (sr != null && sr.sprite != null)
-        {
-            Vector2 size = sr.sprite.bounds.size;
-            if (size.x > 0.01f && size.y > 0.01f)
-            {
-                rootBox.size = size * colliderRadiusScale;
-                rootBox.offset = sr.transform.localPosition;
-            }
-            else
-            {
-                rootBox.size = new Vector2(0.9f, 0.9f) * colliderRadiusScale;
-            }
-        }
-        else
-        {
-            rootBox.size = new Vector2(0.9f, 0.9f) * colliderRadiusScale;
-        }
-        rootBox.isTrigger = useTriggerCollider;
-
-        colliders = GetComponentsInChildren<Collider2D>(true);
-        for (int i = 0; i < colliders.Length; i++)
-        {
-            Collider2D c = colliders[i];
-            if (c == null)
-                continue;
-
-            c.isTrigger = useTriggerCollider;
-        }
+        // 不改 isTrigger
+        // 不改 size
+        // 不改 offset
+        // 不删 collider
     }
 
     private bool ShouldUseTriggerCollider()
