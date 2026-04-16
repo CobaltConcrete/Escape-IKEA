@@ -1071,7 +1071,7 @@ public class PlayerInventoryInteraction : MonoBehaviour
             return;
         }
 
-        PickupNormalItem(itemWorld);
+        PickupNormalItemWorld(itemWorld);
     }
     private void OnTriggerExit2D(Collider2D collider)
     {
