@@ -39,23 +39,7 @@ public class RoomPrefabObjectiveSpawner : MonoBehaviour
 
     private void SpawnWeapons(LootSpawnArea[] areas, Dictionary<string, int> roomKeySpawnCount)
     {
-        for (int i = 0; i < areas.Length; i++)
-        {
-            LootSpawnArea area = areas[i];
-            if (area == null || area.RoomType != RoomType.SportsRoom)
-                continue;
-            List<GameObject> weapons = prefabSpawnCatalog.GetPrefabs(RoomType.SportsRoom, RoomSpawnCategory.Weapon);
-            if (weapons.Count == 0)
-            {
-                Debug.LogWarning("RoomPrefabObjectiveSpawner: No SportsRoom weapon prefabs configured in prefab spawn catalog.");
-                continue;
-            }
-            GameObject prefab = weapons[Random.Range(0, weapons.Count)];
-            RoomSpawnPrefabDefinition def = prefab.GetComponent<RoomSpawnPrefabDefinition>();
-            if (def == null)
-                continue;
-            TrySpawnOnePrefab(prefab, new[] { area }, roomKeySpawnCount, def.roomType, def.shoppingListKey, sideBias: true);
-        }
+        // Bat spawning is handled directly by MapManager via sportsBatPickupPrefab so there is only one source of truth.
     }
 
     private bool TrySpawnOnePrefab(
@@ -106,6 +90,8 @@ public class RoomPrefabObjectiveSpawner : MonoBehaviour
                         parent = spawnedItems;
                 }
                 GameObject obj = Instantiate(prefab, point, Quaternion.identity, parent);
+                if (IsWeaponPrefab(prefab))
+                    obj.name = SportsRoomBatPlacer.BatInstanceName;
                 obj.SetActive(false);
                 StripLegacySpawnerPath(obj);
                 EnsureInteractionComponent(obj, prefab, shoppingListKey);
@@ -130,8 +116,8 @@ public class RoomPrefabObjectiveSpawner : MonoBehaviour
 
         Vector3 world = RoomDecorationPlacer.GetAnchoredWorldPosition(
             roomRoot,
-            RoomDecorInteriorAnchor.InteriorMiddleLeft,
-            new Vector3(0.7f + attempt * 0.05f, 0.2f, 0f));
+            RoomDecorInteriorAnchor.InteriorTopLeft,
+            new Vector3(1.05f + attempt * 0.08f, -1.05f, 0f));
         return new Vector2(world.x, world.y);
     }
 
@@ -156,6 +142,15 @@ public class RoomPrefabObjectiveSpawner : MonoBehaviour
 
         if (obj.GetComponent<RoomGeneratedPickup>() == null)
             obj.AddComponent<RoomGeneratedPickup>();
+    }
+
+    private static bool IsWeaponPrefab(GameObject prefab)
+    {
+        if (prefab == null)
+            return false;
+
+        RoomSpawnPrefabDefinition def = prefab.GetComponent<RoomSpawnPrefabDefinition>();
+        return def != null && def.spawnCategory == RoomSpawnCategory.Weapon;
     }
 
     private static void EnsureWeaponPickupComponent(GameObject obj)

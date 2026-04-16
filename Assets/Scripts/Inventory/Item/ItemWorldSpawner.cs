@@ -7,6 +7,7 @@ public class ItemWorldSpawner : MonoBehaviour
 
     [SerializeField] private ItemDefinition itemDefinition;
     [SerializeField] private int amount = 1;
+    [SerializeField] private string spawnedObjectName;
 
     public ItemDefinition ItemDefinition => itemDefinition;
 
@@ -49,6 +50,8 @@ public class ItemWorldSpawner : MonoBehaviour
             {
                 spawned.SetRoom(room);
             }
+            if (!string.IsNullOrWhiteSpace(spawnedObjectName))
+                spawned.name = spawnedObjectName;
         }
 
         if (spawned != null)

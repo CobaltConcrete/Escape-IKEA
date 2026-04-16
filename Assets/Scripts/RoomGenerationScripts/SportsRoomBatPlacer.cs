@@ -1,18 +1,15 @@
 using UnityEngine;
 
 /// <summary>
-/// Spawns the bat weapon pickup in sports rooms (not part of the weighted ItemSpawnManager list).
+/// Spawns the sports-room bat from the single item-prefab source.
 /// </summary>
 public static class SportsRoomBatPlacer
 {
     public const string BatInstanceName = "SportsBatPickup";
-    private const string ResourcesBatPath = "BatPickup";
 
     public static void TrySpawnBat(GameObject roomRoot, GameObject batSpawnerPrefab)
     {
         if (roomRoot == null)
-            return;
-        if (RoomPrefabObjectiveSpawner.Instance != null)
             return;
 
         if (!RoomLootSpawnTypeHelper.TryGetRoomType(roomRoot.transform, out RoomType roomType) ||
@@ -21,14 +18,10 @@ public static class SportsRoomBatPlacer
             return;
         }
 
-        GameObject prefab = batSpawnerPrefab;
-        if (prefab == null || !HasWeaponPickupComponent(prefab))
-            prefab = Resources.Load<GameObject>(ResourcesBatPath);
-
-        if (prefab == null)
+        if (batSpawnerPrefab == null || batSpawnerPrefab.GetComponent<ItemWorldSpawner>() == null)
         {
             Debug.LogWarning(
-                $"SportsRoomBatPlacer: Assign a bat pickup prefab on MapManager, or add Resources/{ResourcesBatPath}.prefab (WeaponWorldPickup + Bat ItemDefinition).",
+                "SportsRoomBatPlacer: Assign the single bat item prefab with ItemWorldSpawner on MapManager.",
                 roomRoot);
             return;
         }
@@ -40,8 +33,11 @@ public static class SportsRoomBatPlacer
         if (parent.Find(BatInstanceName) != null)
             return;
 
-        GameObject instance = Object.Instantiate(prefab, parent);
+        GameObject instance = Object.Instantiate(batSpawnerPrefab, parent);
         instance.name = BatInstanceName;
+        ItemWorldSpawner spawner = instance.GetComponent<ItemWorldSpawner>();
+        if (spawner != null)
+            spawner.SetSpawnParent(parent);
 
         // Keep prefab-authored transform scale as authoritative for bat size.
         // (Do not overwrite with ItemDefinition worldDropScale.)
@@ -78,23 +74,5 @@ public static class SportsRoomBatPlacer
         }
 
         return preferredWorld;
-    }
-
-    private static bool HasWeaponPickupComponent(GameObject prefab)
-    {
-        if (prefab == null)
-            return false;
-
-        MonoBehaviour[] behaviours = prefab.GetComponents<MonoBehaviour>();
-        for (int i = 0; i < behaviours.Length; i++)
-        {
-            MonoBehaviour behaviour = behaviours[i];
-            if (behaviour == null)
-                continue;
-            if (string.Equals(behaviour.GetType().Name, "WeaponWorldPickup", System.StringComparison.Ordinal))
-                return true;
-        }
-
-        return false;
     }
 }

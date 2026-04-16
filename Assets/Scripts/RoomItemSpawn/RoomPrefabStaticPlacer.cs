@@ -174,8 +174,8 @@ public static class RoomPrefabStaticPlacer
         {
             Vector3 tablePos = RoomDecorationPlacer.GetAnchoredWorldPosition(
                 roomRoot,
-                RoomDecorInteriorAnchor.InteriorBottomCenter,
-                new Vector3(0f, 0.72f, 0f));
+                RoomDecorInteriorAnchor.InteriorBottomLeft,
+                new Vector3(1.35f, 0.92f, 0f));
             GameObject table = SpawnConfiguredPrefab(tablePrefab, tablePos, parent, roomRoot);
             if (table != null)
             {

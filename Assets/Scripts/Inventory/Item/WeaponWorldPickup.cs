@@ -6,7 +6,6 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class WeaponWorldPickup : MonoBehaviour, IInteractable
 {
-    private const float GenericWeaponColliderScale = 0.55f;
     private const float BatColliderScale = 1.15f;
     private const string GlowChildName = "_BatGlow";
 
@@ -25,29 +24,22 @@ public class WeaponWorldPickup : MonoBehaviour, IInteractable
 
     private void Awake()
     {
-        ResolveWeaponDefinition();
-        EnsureWeaponCollider2D();
-        ShrinkBlockingColliderFootprint();
-        EnsureBatGlow();
+        ConfigureBatPickup();
     }
 
     private void OnEnable()
     {
-        ResolveWeaponDefinition();
-        EnsureWeaponCollider2D();
-        ShrinkBlockingColliderFootprint();
-        EnsureBatGlow();
+        ConfigureBatPickup();
     }
 
     public void Interact(PlayerInventoryInteraction player)
     {
-        ItemDefinition resolvedDefinition = ResolveWeaponDefinition();
-        if (player == null || resolvedDefinition == null)
+        if (player == null)
             return;
         if (!CanPickup())
             return;
 
-        player.PickupWeaponFromWorld(resolvedDefinition, amount, gameObject);
+        player.PickupWeaponFromWorld(weaponDefinition, amount, gameObject);
     }
 
     public string GetInteractionText()
@@ -92,25 +84,21 @@ public class WeaponWorldPickup : MonoBehaviour, IInteractable
         if (c == null)
             return;
 
-        bool isBat = weaponDefinition != null &&
-            string.Equals(weaponDefinition.itemName, BatWeapon.ItemName, System.StringComparison.OrdinalIgnoreCase);
-        float scale = isBat ? BatColliderScale : GenericWeaponColliderScale;
-
         if (c is BoxCollider2D box)
         {
-            box.size *= scale;
+            box.size *= BatColliderScale;
             return;
         }
 
         if (c is CircleCollider2D circle)
         {
-            circle.radius *= scale;
+            circle.radius *= BatColliderScale;
             return;
         }
 
         CapsuleCollider2D capsule = c as CapsuleCollider2D;
         if (capsule != null)
-            capsule.size *= scale;
+            capsule.size *= BatColliderScale;
     }
 
     private void EnsureWeaponCollider2D()
@@ -142,22 +130,14 @@ public class WeaponWorldPickup : MonoBehaviour, IInteractable
         box.isTrigger = true;
     }
 
-    private ItemDefinition ResolveWeaponDefinition()
+    private void ConfigureBatPickup()
     {
-        if (weaponDefinition != null)
-            return weaponDefinition;
+        if (weaponDefinition == null)
+            weaponDefinition = Resources.Load<ItemDefinition>(BatWeapon.ItemName);
 
-        RoomSpawnPrefabDefinition roomDef = GetComponent<RoomSpawnPrefabDefinition>();
-        string candidateName = null;
-        if (roomDef != null && !string.IsNullOrWhiteSpace(roomDef.pickupDisplayName))
-            candidateName = roomDef.pickupDisplayName;
-        else if (gameObject.name.IndexOf("bat", System.StringComparison.OrdinalIgnoreCase) >= 0)
-            candidateName = BatWeapon.ItemName;
-
-        if (!string.IsNullOrWhiteSpace(candidateName))
-            weaponDefinition = Resources.Load<ItemDefinition>(candidateName.Trim());
-
-        return weaponDefinition;
+        EnsureWeaponCollider2D();
+        ShrinkBlockingColliderFootprint();
+        EnsureBatGlow();
     }
 
     private bool CanPickup()
@@ -165,16 +145,15 @@ public class WeaponWorldPickup : MonoBehaviour, IInteractable
         if (!roomVisible)
             return false;
 
-        ItemDefinition resolvedDefinition = ResolveWeaponDefinition();
-        if (resolvedDefinition == null)
+        if (weaponDefinition == null)
             return false;
 
-        return IsBatPickup();
+        return string.Equals(weaponDefinition.itemName, BatWeapon.ItemName, System.StringComparison.OrdinalIgnoreCase);
     }
 
     private void EnsureBatGlow()
     {
-        if (!IsBatPickup())
+        if (weaponDefinition == null)
             return;
 
         SpriteRenderer source = GetComponentInChildren<SpriteRenderer>(true);
@@ -202,24 +181,4 @@ public class WeaponWorldPickup : MonoBehaviour, IInteractable
         glow.enabled = roomVisible;
     }
 
-    private bool IsBatPickup()
-    {
-        if (weaponDefinition != null)
-        {
-            string n = weaponDefinition.itemName;
-            if (!string.IsNullOrWhiteSpace(n))
-            {
-                if (string.Equals(n, BatWeapon.ItemName, System.StringComparison.OrdinalIgnoreCase))
-                    return true;
-                if (n.IndexOf("bat", System.StringComparison.OrdinalIgnoreCase) >= 0)
-                    return true;
-            }
-        }
-
-        RoomSpawnPrefabDefinition roomDef = GetComponent<RoomSpawnPrefabDefinition>();
-        if (roomDef != null && roomDef.spawnCategory == RoomSpawnCategory.Weapon)
-            return true;
-
-        return gameObject.name.IndexOf("bat", System.StringComparison.OrdinalIgnoreCase) >= 0;
-    }
 }

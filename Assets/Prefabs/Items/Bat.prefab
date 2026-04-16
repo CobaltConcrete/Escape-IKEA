@@ -45,11 +45,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 9201813141723428332}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f8c2e91b4d6af42e8b0c3d5e7f9a1b2c34, type: 3}
+  m_Script: {fileID: 11500000, guid: 895c7b0b55164e3428f6e1776c3cde1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weaponDefinition: {fileID: 11400000, guid: 476398be52343184ab30426607c171b8, type: 2}
+  itemDefinition: {fileID: 11400000, guid: 476398be52343184ab30426607c171b8, type: 2}
   amount: 1
+  spawnedObjectName: SportsBatPickup
 --- !u!212 &9202117452878698467
 SpriteRenderer:
   m_ObjectHideFlags: 0

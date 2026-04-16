@@ -15,6 +15,7 @@ MonoBehaviour:
   pools:
   - roomType: 1
     prefabs:
+    - {fileID: 2955381025110779136, guid: f8c4c8234fcaa7c4b9368a08cb62d8a6, type: 3}
     - {fileID: 400000, guid: 868c44842febc40088e0086156f41b2d, type: 3}
     - {fileID: 2955381025110779136, guid: cc0e227d46a40ac408146a082a0c87b3, type: 3}
     - {fileID: 410000, guid: b66048a86e68a4c35babf8ea2ef8ba8d, type: 3}
@@ -52,7 +53,6 @@ MonoBehaviour:
     - {fileID: 2955381025110779136, guid: 55e55fe63456edc4da52b6dfc66addd7, type: 3}
     - {fileID: 2955381025110779136, guid: b34e5ca1a118ed545be41d22018b689b, type: 3}
     - {fileID: 2955381025110779136, guid: f0cb29e4de86c4e42be41e918381d12d, type: 3}
-    - {fileID: 2955381025110779136, guid: f8c4c8234fcaa7c4b9368a08cb62d8a6, type: 3}
     - {fileID: 930000, guid: 7d8e9f102132435465768798a9bacbdc, type: 3}
     - {fileID: 920000, guid: 2cb48d5e6f708192a3b4c5d6e7f80910, type: 3}
     - {fileID: 910000, guid: 6ab19c31f3e247d4a1b2d3c4e5f60718, type: 3}
@@ -64,7 +64,6 @@ MonoBehaviour:
     - {fileID: 2955381025110779136, guid: 43e9ad9b4320a41768f21ffa9b817f80, type: 3}
     - {fileID: 2955381025110779136, guid: f1b70240356ac4d4fb49fcd864374529, type: 3}
     - {fileID: 2955381025110779136, guid: 30a7e8b5b89b55e42ba1909f6fe24ac9, type: 3}
-    - {fileID: 9201813141723428332, guid: 7702180b19fef4b459c5fa1a807b8bf6, type: 3}
   autoRouteFromLootFolders: 1
   lootRootFolder: Assets/Prefabs/Loots
   weaponRootFolder: Assets/Prefabs/Weapons

@@ -81,6 +81,8 @@ public class RoomGeneratedPickup : MonoBehaviour, IInteractable
         if (metadata == null || string.IsNullOrWhiteSpace(metadata.shoppingListKey))
             return;
 
+        bool useTriggerCollider = ShouldUseTriggerCollider();
+
         // Prefab auth can be messy during migration; remove any 3D colliders and
         // ensure there is always one reliable 2D collider for interaction + blocking.
         Collider[] legacy3d = GetComponentsInChildren<Collider>(true);
@@ -115,7 +117,7 @@ public class RoomGeneratedPickup : MonoBehaviour, IInteractable
         {
             rootBox.size = new Vector2(0.9f, 0.9f) * colliderRadiusScale;
         }
-        rootBox.isTrigger = false;
+        rootBox.isTrigger = useTriggerCollider;
 
         colliders = GetComponentsInChildren<Collider2D>(true);
         for (int i = 0; i < colliders.Length; i++)
@@ -124,7 +126,16 @@ public class RoomGeneratedPickup : MonoBehaviour, IInteractable
             if (c == null)
                 continue;
 
-            c.isTrigger = false;
+            c.isTrigger = useTriggerCollider;
         }
+    }
+
+    private bool ShouldUseTriggerCollider()
+    {
+        if (metadata == null)
+            return false;
+
+        return string.Equals(metadata.shoppingListKey, "Table", System.StringComparison.OrdinalIgnoreCase) ||
+               string.Equals(metadata.pickupDisplayName, "Table", System.StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -82,6 +82,8 @@ public class MapManager : MonoBehaviour
             RunObjectiveManager.Instance.SpawnLootForCurrentObjective();
         }
 
+        SpawnSportsRoomBatPickups();
+
         RoomContentActivation.RefreshPlayerRoomsAfterMapSetup();
         StartCoroutine(CoRoomContentActivationAfterFirstFrame());
     }
@@ -346,8 +348,24 @@ public class MapManager : MonoBehaviour
             presentation = roomInstance.AddComponent<RoomPresentation>();
 
         presentation.Initialize(roomFloorTileSprite, roomDecorationCatalog, roomPrefabSpawnCatalog);
+    }
 
-        // Bat now follows prefab-only objective spawn path (RoomPrefabObjectiveSpawner).
+    private void SpawnSportsRoomBatPickups()
+    {
+        if (sportsBatPickupPrefab == null || roomGrid == null)
+            return;
+
+        HashSet<GameObject> visitedRooms = new HashSet<GameObject>();
+        for (int x = 0; x < maxCellCols; x++)
+        {
+            for (int y = 0; y < maxCellRows; y++)
+            {
+                GameObject roomObj = roomGrid[x, y];
+                if (roomObj == null || !visitedRooms.Add(roomObj))
+                    continue;
+                SportsRoomBatPlacer.TrySpawnBat(roomObj, sportsBatPickupPrefab);
+            }
+        }
     }
 
     // ==================== Door Spawning stuff ====================
