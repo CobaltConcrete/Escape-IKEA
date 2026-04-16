@@ -77,7 +77,7 @@ MonoBehaviour:
   roomFloorTileSprite: {fileID: 8558019900175936754, guid: 175af030f562b4c8b844686d96bbe844, type: 3}
   roomDecorationCatalog: {fileID: 11400000, guid: 3a6f95315aeddcec0b24f9d7f769c473, type: 2}
   roomPrefabSpawnCatalog: {fileID: 11400000, guid: 7f2ac54d301d4fe4b39db0786caf4e11, type: 2}
-  sportsBatPickupPrefab: {fileID: 9201813141723428332, guid: 95bf413d79ab0106b27133027d355bfd, type: 3}
+  sportsBatPickupPrefab: {fileID: 9201813141723428332, guid: 26acdecb1f0c493023f6df040ce7493d, type: 3}
 --- !u!114 &8689048688299628491
 MonoBehaviour:
   m_ObjectHideFlags: 0

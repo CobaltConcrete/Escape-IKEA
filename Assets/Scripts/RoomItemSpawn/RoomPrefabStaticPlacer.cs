@@ -34,6 +34,12 @@ public static class RoomPrefabStaticPlacer
             spawnedAny = PlaceBedroomLayout(roomRoot, decorRoot.transform, catalog, prefabs, used);
         else if (roomType == RoomType.Kitchen)
             spawnedAny = PlaceKitchenLayout(roomRoot, decorRoot.transform, prefabs, used);
+        else if (roomType == RoomType.Bathroom)
+            spawnedAny = PlaceBathroomLayout(roomRoot, decorRoot.transform, prefabs, used);
+        else if (roomType == RoomType.LivingRoom)
+            spawnedAny = PlaceLivingRoomLayout(roomRoot, decorRoot.transform, prefabs, used);
+        else if (roomType == RoomType.Cafeteria)
+            spawnedAny = PlaceCafeteriaLayout(roomRoot, decorRoot.transform, prefabs, used);
 
         for (int i = 0; i < prefabs.Count; i++)
         {
@@ -45,6 +51,12 @@ public static class RoomPrefabStaticPlacer
             if (roomType == RoomType.Bedroom && IsBedroomLayoutPiece(prefab))
                 continue;
             if (roomType == RoomType.Kitchen && IsKitchenLayoutPiece(prefab))
+                continue;
+            if (roomType == RoomType.Bathroom && IsBathroomLayoutPiece(prefab))
+                continue;
+            if (roomType == RoomType.LivingRoom && IsLivingRoomLayoutPiece(prefab))
+                continue;
+            if (roomType == RoomType.Cafeteria && IsCafeteriaLayoutPiece(prefab))
                 continue;
             RoomSpawnPrefabDefinition def = prefab.GetComponent<RoomSpawnPrefabDefinition>();
             if (def == null)
@@ -83,6 +95,7 @@ public static class RoomPrefabStaticPlacer
         GameObject microwavePrefab = FindByToken(kitchenPrefabs, "microwave");
         GameObject sinkPrefab = FindByToken(kitchenPrefabs, "sink");
         GameObject dishwasherPrefab = FindByToken(kitchenPrefabs, "dishwasher");
+        GameObject tablePrefab = FindByToken(kitchenPrefabs, "table");
 
         List<GameObject> cabinetPrefabs = new List<GameObject>();
         for (int i = 0; i < kitchenPrefabs.Count; i++)
@@ -100,10 +113,8 @@ public static class RoomPrefabStaticPlacer
         {
             Vector3[] cabinetSlots = new[]
             {
-                RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopLeft, new Vector3(0.95f, -0.55f, 0f)),
-                RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopCenter, new Vector3(-1.75f, -0.55f, 0f)),
-                RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopCenter, new Vector3(1.75f, -0.55f, 0f)),
-                RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopRight, new Vector3(-0.95f, -0.55f, 0f)),
+                RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopCenter, new Vector3(-2.05f, -0.82f, 0f)),
+                RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopCenter, new Vector3(2.05f, -0.82f, 0f)),
             };
 
             for (int i = 0; i < cabinetSlots.Length; i++)
@@ -122,7 +133,7 @@ public static class RoomPrefabStaticPlacer
             Vector3 microwavePos = RoomDecorationPlacer.GetAnchoredWorldPosition(
                 roomRoot,
                 RoomDecorInteriorAnchor.InteriorTopCenter,
-                new Vector3(0f, -0.45f, 0f));
+                new Vector3(0f, -0.58f, 0f));
             GameObject microwave = SpawnConfiguredPrefab(microwavePrefab, microwavePos, parent, roomRoot);
             if (microwave != null)
             {
@@ -149,12 +160,176 @@ public static class RoomPrefabStaticPlacer
         {
             Vector3 dishwasherPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
                 roomRoot,
-                RoomDecorInteriorAnchor.InteriorMiddleCenter,
-                new Vector3(-0.55f, 0.15f, 0f));
+                RoomDecorInteriorAnchor.InteriorBottomRight,
+                new Vector3(-0.7f, 0.72f, 0f));
             GameObject dishwasher = SpawnConfiguredPrefab(dishwasherPrefab, dishwasherPos, parent, roomRoot);
             if (dishwasher != null)
             {
                 used.Add(dishwasher.transform.position);
+                spawnedAny = true;
+            }
+        }
+
+        if (tablePrefab != null)
+        {
+            Vector3 tablePos = RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorBottomCenter,
+                new Vector3(0f, 0.72f, 0f));
+            GameObject table = SpawnConfiguredPrefab(tablePrefab, tablePos, parent, roomRoot);
+            if (table != null)
+            {
+                used.Add(table.transform.position);
+                spawnedAny = true;
+            }
+        }
+
+        return spawnedAny;
+    }
+
+    private static bool PlaceBathroomLayout(
+        Transform roomRoot,
+        Transform parent,
+        List<GameObject> bathroomPrefabs,
+        List<Vector2> used)
+    {
+        GameObject sinkPrefab = FindByToken(bathroomPrefabs, "sink");
+        GameObject towelBasketPrefab = FindByToken(bathroomPrefabs, "towel_basket") ?? FindByToken(bathroomPrefabs, "towel basket");
+        bool spawnedAny = false;
+
+        if (sinkPrefab != null)
+        {
+            Vector3 sinkPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorTopCenter,
+                new Vector3(-1.15f, -0.74f, 0f));
+            GameObject sink = SpawnConfiguredPrefab(sinkPrefab, sinkPos, parent, roomRoot);
+            if (sink != null)
+            {
+                used.Add(sink.transform.position);
+                spawnedAny = true;
+            }
+        }
+
+        if (towelBasketPrefab != null)
+        {
+            Vector3 basketPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorTopCenter,
+                new Vector3(1.1f, -0.74f, 0f));
+            GameObject basket = SpawnConfiguredPrefab(towelBasketPrefab, basketPos, parent, roomRoot);
+            if (basket != null)
+            {
+                used.Add(basket.transform.position);
+                spawnedAny = true;
+            }
+        }
+
+        return spawnedAny;
+    }
+
+    private static bool PlaceCafeteriaLayout(
+        Transform roomRoot,
+        Transform parent,
+        List<GameObject> cafeteriaPrefabs,
+        List<Vector2> used)
+    {
+        List<GameObject> tablePrefabs = new List<GameObject>();
+        List<GameObject> chairPrefabs = new List<GameObject>();
+        for (int i = 0; i < cafeteriaPrefabs.Count; i++)
+        {
+            GameObject prefab = cafeteriaPrefabs[i];
+            if (prefab == null)
+                continue;
+
+            string name = prefab.name;
+            if (HasToken(name, "table"))
+                tablePrefabs.Add(prefab);
+            else if (HasToken(name, "chair"))
+                chairPrefabs.Add(prefab);
+        }
+
+        bool spawnedAny = false;
+        Vector3[] tableSlots =
+        {
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopLeft, new Vector3(1.25f, -1.05f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopRight, new Vector3(-1.25f, -1.05f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorBottomLeft, new Vector3(1.25f, 1.05f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorBottomRight, new Vector3(-1.25f, 1.05f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorMiddleCenter, Vector3.zero),
+        };
+
+        for (int i = 0; i < Mathf.Min(tableSlots.Length, tablePrefabs.Count > 0 ? tableSlots.Length : 0); i++)
+        {
+            GameObject tablePrefab = tablePrefabs[i % tablePrefabs.Count];
+            GameObject table = SpawnConfiguredPrefab(tablePrefab, tableSlots[i], parent, roomRoot, makePushableProp: true, skipShoppingListPickup: true);
+            if (table == null)
+                continue;
+            used.Add(table.transform.position);
+            spawnedAny = true;
+        }
+
+        Vector3[] chairSlots =
+        {
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopLeft, new Vector3(2.55f, -0.95f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopLeft, new Vector3(0.25f, -0.95f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopRight, new Vector3(-2.55f, -0.95f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopRight, new Vector3(-0.25f, -0.95f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorBottomLeft, new Vector3(2.55f, 0.95f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorBottomLeft, new Vector3(0.25f, 0.95f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorBottomRight, new Vector3(-2.55f, 0.95f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorBottomRight, new Vector3(-0.25f, 0.95f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorMiddleLeft, new Vector3(0.9f, 0f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorMiddleRight, new Vector3(-0.9f, 0f, 0f)),
+        };
+
+        for (int i = 0; i < Mathf.Min(chairSlots.Length, chairPrefabs.Count > 0 ? chairSlots.Length : 0); i++)
+        {
+            GameObject chairPrefab = chairPrefabs[i % chairPrefabs.Count];
+            GameObject chair = SpawnConfiguredPrefab(chairPrefab, chairSlots[i], parent, roomRoot, makePushableProp: true, skipShoppingListPickup: true);
+            if (chair == null)
+                continue;
+            used.Add(chair.transform.position);
+            spawnedAny = true;
+        }
+
+        return spawnedAny;
+    }
+
+    private static bool PlaceLivingRoomLayout(
+        Transform roomRoot,
+        Transform parent,
+        List<GameObject> livingRoomPrefabs,
+        List<Vector2> used)
+    {
+        GameObject couchPrefab = FindByToken(livingRoomPrefabs, "couch") ?? FindByToken(livingRoomPrefabs, "sofa");
+        GameObject coffeeTablePrefab = FindByToken(livingRoomPrefabs, "coffee") ?? FindByToken(livingRoomPrefabs, "coffeetable");
+        bool spawnedAny = false;
+
+        if (coffeeTablePrefab != null)
+        {
+            Vector3 tablePos = RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorMiddleCenter,
+                new Vector3(0f, -1.25f, 0f));
+            GameObject table = SpawnConfiguredPrefab(coffeeTablePrefab, tablePos, parent, roomRoot);
+            if (table != null)
+            {
+                used.Add(table.transform.position);
+                spawnedAny = true;
+            }
+        }
+
+        if (couchPrefab != null)
+        {
+            Vector3 topCouchPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorMiddleCenter,
+                new Vector3(0f, 1.8f, 0f));
+            GameObject topCouch = SpawnConfiguredPrefab(couchPrefab, topCouchPos, Quaternion.identity, parent, roomRoot);
+            if (topCouch != null)
+            {
+                used.Add(topCouch.transform.position);
                 spawnedAny = true;
             }
         }
@@ -220,17 +395,17 @@ public static class RoomPrefabStaticPlacer
         float[] bedScaleVariants = new[] { 1f, 0.95f, 1.08f, 1.02f };
         Vector3[] lampOffsets = new[]
         {
-            new Vector3(1.45f, 0.2f, 0f),
-            new Vector3(-1.45f, 0.2f, 0f),
-            new Vector3(1.45f, -0.2f, 0f),
-            new Vector3(-1.45f, -0.2f, 0f)
+            new Vector3(-1.9f, 0.12f, 0f),
+            new Vector3(1.9f, 0.12f, 0f),
+            new Vector3(-1.9f, -0.12f, 0f),
+            new Vector3(1.9f, -0.12f, 0f)
         };
         Vector3[] drawerOffsets = new[]
         {
-            new Vector3(-1.35f, 0.15f, 0f),
-            new Vector3(1.35f, 0.15f, 0f),
-            new Vector3(-1.35f, -0.15f, 0f),
-            new Vector3(1.35f, -0.15f, 0f)
+            new Vector3(2.3f, -0.28f, 0f),
+            new Vector3(-2.3f, -0.28f, 0f),
+            new Vector3(2.3f, 0.28f, 0f),
+            new Vector3(-2.3f, 0.28f, 0f)
         };
         bool spawnedAny = false;
 
@@ -298,6 +473,12 @@ public static class RoomPrefabStaticPlacer
             Vector3 sports = GetSportsPinnedPosition(roomRoot, prefab);
             if (sports != Vector3.zero)
                 return sports;
+        }
+        else if (roomType == RoomType.Kitchen)
+        {
+            Vector3 kitchen = GetKitchenPinnedPosition(roomRoot, prefab);
+            if (kitchen != Vector3.zero)
+                return kitchen;
         }
         else if (roomType == RoomType.LivingRoom)
         {
@@ -371,12 +552,77 @@ public static class RoomPrefabStaticPlacer
             return Vector3.zero;
 
         string name = prefab.name.ToLowerInvariant();
+        if (name.Contains("couch") || name.Contains("sofa"))
+        {
+            return RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorMiddleCenter,
+                new Vector3(0f, 1.45f, 0f));
+        }
+
         if (name.Contains("coffee") && name.Contains("table"))
         {
             return RoomDecorationPlacer.GetAnchoredWorldPosition(
                 roomRoot,
                 RoomDecorInteriorAnchor.InteriorMiddleCenter,
-                Vector3.zero);
+                new Vector3(0f, -1.25f, 0f));
+        }
+
+        if (name.Contains("remote"))
+        {
+            return RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorBottomRight,
+                new Vector3(-1.15f, 0.9f, 0f));
+        }
+
+        if (name.Contains("picture"))
+        {
+            return RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorTopCenter,
+                new Vector3(0f, -0.45f, 0f));
+        }
+
+        if (name.Contains("houseplant"))
+        {
+            return RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorMiddleLeft,
+                new Vector3(1.15f, -0.15f, 0f));
+        }
+
+        return Vector3.zero;
+    }
+
+    private static Vector3 GetKitchenPinnedPosition(Transform roomRoot, GameObject prefab)
+    {
+        if (roomRoot == null || prefab == null)
+            return Vector3.zero;
+
+        string name = prefab.name.ToLowerInvariant();
+        if (name.Contains("frying") && name.Contains("pan"))
+        {
+            return RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorBottomLeft,
+                new Vector3(1.05f, 0.95f, 0f));
+        }
+
+        if (name.Contains("apron"))
+        {
+            return RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorMiddleLeft,
+                new Vector3(0.6f, 0.15f, 0f));
+        }
+
+        if (name.Contains("whisk"))
+        {
+            return RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorMiddleLeft,
+                new Vector3(0.9f, 0.25f, 0f));
         }
 
         return Vector3.zero;
@@ -433,8 +679,35 @@ public static class RoomPrefabStaticPlacer
         return HasToken(prefab.name, "microwave") ||
                HasToken(prefab.name, "sink") ||
                HasToken(prefab.name, "dishwasher") ||
+               HasToken(prefab.name, "table") ||
                HasToken(prefab.name, "cupboard") ||
                HasToken(prefab.name, "cabinet");
+    }
+
+    private static bool IsBathroomLayoutPiece(GameObject prefab)
+    {
+        if (prefab == null)
+            return false;
+        return HasToken(prefab.name, "sink") ||
+               HasToken(prefab.name, "towel_basket") ||
+               HasToken(prefab.name, "towel basket");
+    }
+
+    private static bool IsCafeteriaLayoutPiece(GameObject prefab)
+    {
+        if (prefab == null)
+            return false;
+        return HasToken(prefab.name, "table") || HasToken(prefab.name, "chair");
+    }
+
+    private static bool IsLivingRoomLayoutPiece(GameObject prefab)
+    {
+        if (prefab == null)
+            return false;
+        return HasToken(prefab.name, "couch") ||
+               HasToken(prefab.name, "sofa") ||
+               HasToken(prefab.name, "coffee") ||
+               HasToken(prefab.name, "coffeetable");
     }
 
     private static bool IsPreferredBedroomBed(GameObject prefab)
@@ -578,6 +851,8 @@ public static class RoomPrefabStaticPlacer
     {
         if (instance == null || def == null)
             return;
+        if (!def.canAppearInShoppingList)
+            return;
         string key = def.shoppingListKey;
         if (string.IsNullOrWhiteSpace(key))
             return;
@@ -616,18 +891,97 @@ public static class RoomPrefabStaticPlacer
         }
     }
 
-    private static GameObject SpawnConfiguredPrefab(GameObject prefab, Vector3 position, Transform parent, Transform roomRoot)
+    private static GameObject SpawnConfiguredPrefab(
+        GameObject prefab,
+        Vector3 position,
+        Quaternion rotation,
+        Transform parent,
+        Transform roomRoot,
+        bool makePushableProp = false,
+        bool skipShoppingListPickup = false)
     {
         if (prefab == null)
             return null;
 
-        GameObject instance = Object.Instantiate(prefab, position, Quaternion.identity, parent);
+        GameObject instance = Object.Instantiate(prefab, position, rotation, parent);
         instance.SetActive(false);
         StripLegacySpawnerPath(instance);
         NormalizeSpawnedVisuals(instance);
         ClampInstanceInsideRoom(instance, roomRoot);
-        EnsureShoppingListPickupComponent(instance, prefab.GetComponent<RoomSpawnPrefabDefinition>());
+        if (makePushableProp)
+            ConfigurePushablePropPhysics(instance);
+        if (!skipShoppingListPickup)
+            EnsureShoppingListPickupComponent(instance, prefab.GetComponent<RoomSpawnPrefabDefinition>());
         instance.SetActive(true);
         return instance;
+    }
+
+    private static GameObject SpawnConfiguredPrefab(
+        GameObject prefab,
+        Vector3 position,
+        Transform parent,
+        Transform roomRoot,
+        bool makePushableProp = false,
+        bool skipShoppingListPickup = false)
+    {
+        return SpawnConfiguredPrefab(
+            prefab,
+            position,
+            Quaternion.identity,
+            parent,
+            roomRoot,
+            makePushableProp,
+            skipShoppingListPickup);
+    }
+
+    private static void ConfigurePushablePropPhysics(GameObject instance)
+    {
+        if (instance == null)
+            return;
+
+        // Use the same solid-collision layer as room walls so the player cannot ghost through cafeteria props.
+        instance.layer = 6;
+        Transform[] children = instance.GetComponentsInChildren<Transform>(true);
+        for (int i = 0; i < children.Length; i++)
+        {
+            if (children[i] != null)
+                children[i].gameObject.layer = 6;
+        }
+
+        Collider[] legacy3d = instance.GetComponentsInChildren<Collider>(true);
+        for (int i = 0; i < legacy3d.Length; i++)
+        {
+            if (legacy3d[i] != null)
+                Object.DestroyImmediate(legacy3d[i]);
+        }
+
+        BoxCollider2D box = instance.GetComponent<BoxCollider2D>();
+        if (box == null)
+            box = instance.AddComponent<BoxCollider2D>();
+
+        SpriteRenderer sr = instance.GetComponentInChildren<SpriteRenderer>(true);
+        if (sr != null && sr.sprite != null)
+        {
+            Vector2 size = sr.sprite.bounds.size;
+            box.size = new Vector2(Mathf.Max(0.45f, size.x * 0.8f), Mathf.Max(0.45f, size.y * 0.8f));
+            box.offset = sr.transform.localPosition;
+        }
+        box.isTrigger = false;
+
+        Rigidbody2D body = instance.GetComponent<Rigidbody2D>();
+        if (body == null)
+            body = instance.AddComponent<Rigidbody2D>();
+        body.bodyType = RigidbodyType2D.Dynamic;
+        body.gravityScale = 0f;
+        body.linearDamping = 6f;
+        body.angularDamping = 12f;
+        body.interpolation = RigidbodyInterpolation2D.Interpolate;
+        body.freezeRotation = true;
+        body.constraints = RigidbodyConstraints2D.FreezeRotation;
+        body.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+
+        RoomGeneratedPickup pickup = instance.GetComponent<RoomGeneratedPickup>();
+        if (pickup != null)
+            Object.DestroyImmediate(pickup);
     }
 }

@@ -20,7 +20,7 @@ MonoBehaviour:
   itemCategory: 0
   equipTag: 3
   useEffect: 2
-  effectValue: 8
+  effectValue: 10
   effectDuration: 10
   lootValue: 0
   canAppearInShoppingList: 1

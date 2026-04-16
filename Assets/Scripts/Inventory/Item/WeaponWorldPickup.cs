@@ -7,7 +7,8 @@ using UnityEngine;
 public class WeaponWorldPickup : MonoBehaviour, IInteractable
 {
     private const float GenericWeaponColliderScale = 0.55f;
-    private const float BatColliderScale = 0.8f;
+    private const float BatColliderScale = 1.15f;
+    private const string GlowChildName = "_BatGlow";
 
     [SerializeField] private ItemDefinition weaponDefinition;
     [SerializeField] private int amount = 1;
@@ -24,34 +25,45 @@ public class WeaponWorldPickup : MonoBehaviour, IInteractable
 
     private void Awake()
     {
+        ResolveWeaponDefinition();
         EnsureWeaponCollider2D();
-
         ShrinkBlockingColliderFootprint();
+        EnsureBatGlow();
+    }
+
+    private void OnEnable()
+    {
+        ResolveWeaponDefinition();
+        EnsureWeaponCollider2D();
+        ShrinkBlockingColliderFootprint();
+        EnsureBatGlow();
     }
 
     public void Interact(PlayerInventoryInteraction player)
     {
-        if (player == null || weaponDefinition == null)
+        ItemDefinition resolvedDefinition = ResolveWeaponDefinition();
+        if (player == null || resolvedDefinition == null)
             return;
-        if (!IsBatPickup())
+        if (!CanPickup())
             return;
 
-        player.PickupWeaponFromWorld(weaponDefinition, amount, gameObject);
+        player.PickupWeaponFromWorld(resolvedDefinition, amount, gameObject);
     }
 
     public string GetInteractionText()
     {
-        if (weaponDefinition == null)
+        if (!CanPickup())
             return "";
 
-        if (IsBatPickup())
-            return "[F] Pick up the bat to defend yourself";
-
-        return "";
+        return "[F] Pick up the bat to defend yourself";
     }
 
     public Vector3 GetInteractionPosition()
     {
+        Collider2D c = GetComponent<Collider2D>();
+        if (c != null)
+            return c.bounds.center;
+
         return transform.position;
     }
 
@@ -128,6 +140,66 @@ public class WeaponWorldPickup : MonoBehaviour, IInteractable
 
         // Trigger so scaled bat never walls off the room; interaction uses overlap checks.
         box.isTrigger = true;
+    }
+
+    private ItemDefinition ResolveWeaponDefinition()
+    {
+        if (weaponDefinition != null)
+            return weaponDefinition;
+
+        RoomSpawnPrefabDefinition roomDef = GetComponent<RoomSpawnPrefabDefinition>();
+        string candidateName = null;
+        if (roomDef != null && !string.IsNullOrWhiteSpace(roomDef.pickupDisplayName))
+            candidateName = roomDef.pickupDisplayName;
+        else if (gameObject.name.IndexOf("bat", System.StringComparison.OrdinalIgnoreCase) >= 0)
+            candidateName = BatWeapon.ItemName;
+
+        if (!string.IsNullOrWhiteSpace(candidateName))
+            weaponDefinition = Resources.Load<ItemDefinition>(candidateName.Trim());
+
+        return weaponDefinition;
+    }
+
+    private bool CanPickup()
+    {
+        if (!roomVisible)
+            return false;
+
+        ItemDefinition resolvedDefinition = ResolveWeaponDefinition();
+        if (resolvedDefinition == null)
+            return false;
+
+        return IsBatPickup();
+    }
+
+    private void EnsureBatGlow()
+    {
+        if (!IsBatPickup())
+            return;
+
+        SpriteRenderer source = GetComponentInChildren<SpriteRenderer>(true);
+        if (source == null || source.sprite == null)
+            return;
+
+        Transform glowTransform = transform.Find(GlowChildName);
+        SpriteRenderer glow = glowTransform != null ? glowTransform.GetComponent<SpriteRenderer>() : null;
+        if (glow == null)
+        {
+            GameObject glowObject = new GameObject(GlowChildName);
+            glowObject.transform.SetParent(transform, false);
+            glowObject.transform.localPosition = new Vector3(0f, 0f, 0.02f);
+            glowObject.transform.localRotation = Quaternion.identity;
+            glowObject.transform.localScale = new Vector3(1.2f, 1.2f, 1f);
+            glow = glowObject.AddComponent<SpriteRenderer>();
+        }
+
+        glow.sprite = source.sprite;
+        glow.sortingLayerID = source.sortingLayerID;
+        glow.sortingOrder = source.sortingOrder - 1;
+        glow.drawMode = source.drawMode;
+        glow.maskInteraction = SpriteMaskInteraction.None;
+        glow.color = new Color(1f, 0.92f, 0.35f, 0.42f);
+        glow.enabled = roomVisible;
     }
 
     private bool IsBatPickup()

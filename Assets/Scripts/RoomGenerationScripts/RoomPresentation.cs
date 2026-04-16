@@ -32,8 +32,8 @@ public class RoomPresentation : MonoBehaviour
     [Tooltip("Uniform scale per tile. Spacing matches tile.bounds.size * this so tiles stay edge-to-edge with no gaps.")]
     [SerializeField] [Min(0.01f)] private float floorTileScaleFactor = 1f;
     [Tooltip("Use the same layer as floor tiles so world-space TMP sorts with the room; Player layer sorts after Floor, so the player draws on top.")]
-    [SerializeField] private string labelSortingLayerName = "Floor";
-    [SerializeField] private int labelSortingOrder = 20;
+    [SerializeField] private string labelSortingLayerName = "Item";
+    [SerializeField] private int labelSortingOrder = 200;
     [Tooltip("Extra offset in world units after placing the label at the floor coverage center.")]
     [SerializeField] private Vector2 labelOffsetFromRoomCenter = Vector2.zero;
     [SerializeField] private float labelMaxFontSize = 5.5f;
@@ -307,17 +307,18 @@ public class RoomPresentation : MonoBehaviour
         {
             rt.localScale = Vector3.one;
             rt.pivot = new Vector2(0.5f, 0.5f);
-            float maxWidth = Mathf.Max(0.25f, floorBounds.size.x * 0.9f);
+            float maxWidth = Mathf.Max(0.25f, floorBounds.size.x * 0.98f);
             rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Horizontal, maxWidth);
-            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 3.2f);
+            rt.SetSizeWithCurrentAnchors(RectTransform.Axis.Vertical, 4.2f);
         }
 
-        float maxTextWidth = Mathf.Max(0.25f, floorBounds.size.x * 0.9f);
+        float maxTextWidth = Mathf.Max(0.25f, floorBounds.size.x * 0.98f);
         FitLabelFontToRoomWidth(tmp, maxTextWidth);
 
+        Vector2 roomSpecificOffset = GetRoomSpecificLabelOffset();
         Vector3 labelPos = new Vector3(
-            floorBounds.center.x + labelOffsetFromRoomCenter.x,
-            floorBounds.center.y + labelOffsetFromRoomCenter.y,
+            floorBounds.center.x + labelOffsetFromRoomCenter.x + roomSpecificOffset.x,
+            floorBounds.center.y + labelOffsetFromRoomCenter.y + roomSpecificOffset.y,
             labelTr.position.z);
         labelTr.position = SnapWorldPositionToPpuGrid(labelPos, pixelsPerUnit > 0.01f ? pixelsPerUnit : 100f);
 
@@ -347,6 +348,20 @@ public class RoomPresentation : MonoBehaviour
         }
 
         tmp.ForceMeshUpdate(true);
+    }
+
+    private Vector2 GetRoomSpecificLabelOffset()
+    {
+        if (!RoomLootSpawnTypeHelper.TryGetRoomType(transform, out RoomType roomType))
+            return Vector2.zero;
+
+        switch (roomType)
+        {
+            case RoomType.Kitchen:
+                return new Vector2(0f, -1.35f);
+            default:
+                return Vector2.zero;
+        }
     }
 
     private void FitLabelFontToRoomWidth(TMP_Text tmp, float maxWidthWorld)

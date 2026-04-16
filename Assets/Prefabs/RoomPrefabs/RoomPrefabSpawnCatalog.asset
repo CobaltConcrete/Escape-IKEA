@@ -53,6 +53,9 @@ MonoBehaviour:
     - {fileID: 2955381025110779136, guid: b34e5ca1a118ed545be41d22018b689b, type: 3}
     - {fileID: 2955381025110779136, guid: f0cb29e4de86c4e42be41e918381d12d, type: 3}
     - {fileID: 2955381025110779136, guid: f8c4c8234fcaa7c4b9368a08cb62d8a6, type: 3}
+    - {fileID: 930000, guid: 7d8e9f102132435465768798a9bacbdc, type: 3}
+    - {fileID: 920000, guid: 2cb48d5e6f708192a3b4c5d6e7f80910, type: 3}
+    - {fileID: 910000, guid: 6ab19c31f3e247d4a1b2d3c4e5f60718, type: 3}
     - {fileID: 2955381025110779136, guid: 6085a6ef8b2a0e448a69b8f631904d62, type: 3}
     - {fileID: 2955381025110779136, guid: e0e20c828d6f2e64caccfa4f0db95bfd, type: 3}
   - roomType: 6

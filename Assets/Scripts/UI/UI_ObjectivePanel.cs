@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -21,9 +21,9 @@ public class UI_ObjectivePanel : MonoBehaviour
     [SerializeField] private float listFontMax = 26f;
     [SerializeField] private float listFontMin = 11f;
     [SerializeField] private float rowLineHeightMultiplier = 1.2f;
-    [SerializeField] private float footerTopGap = 14f;
+    [SerializeField] private float footerTopGap = 20f;
     [SerializeField] private float bossBelowValueGap = 8f;
-    [SerializeField] private float footerVerticalNudge = 30f;
+    [SerializeField] private float footerVerticalNudge = 38f;
 
     [Header("Backdrop sizing")]
     [SerializeField] private float titleAreaReserve = 78f;

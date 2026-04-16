@@ -82,6 +82,11 @@ public class PlayerInventoryInteraction : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.F))
         {
+            if (TryPickupNearbyBatDirectly())
+            {
+                return;
+            }
+
             if (currentInteractable != null)
             {
                 currentInteractable.Interact(this);
@@ -169,6 +174,7 @@ public class PlayerInventoryInteraction : MonoBehaviour
         }
 
         inventory.AddItem(pickedUpItem);
+        AutoEquipWeaponImmediately(pickedUpItem);
         TryAutoEquipPickedUpItem(pickedUpItem);
 
         if (SoundManager.Instance != null)
@@ -205,6 +211,7 @@ public class PlayerInventoryInteraction : MonoBehaviour
         }
 
         inventory.AddItem(pickedUpItem);
+        AutoEquipWeaponImmediately(pickedUpItem);
         TryAutoEquipPickedUpItem(pickedUpItem);
 
         if (SoundManager.Instance != null)
@@ -213,6 +220,20 @@ public class PlayerInventoryInteraction : MonoBehaviour
         }
 
         Destroy(pickupObject);
+    }
+
+    private void AutoEquipWeaponImmediately(Item pickedUpItem)
+    {
+        if (pickedUpItem == null || pickedUpItem.definition == null)
+            return;
+        if (!ItemEquipClassifier.IsEquipable(pickedUpItem))
+            return;
+        if (ItemEquipClassifier.GetEquipTag(pickedUpItem) != EquipTag.Weapon)
+            return;
+        if (equipmentUI == null || equipmentData == null)
+            return;
+
+        AutoEquipItem(pickedUpItem);
     }
 
     private void FindBestInteractable()
@@ -288,7 +309,222 @@ public class PlayerInventoryInteraction : MonoBehaviour
             }
         }
 
+        if (currentInteractable == null)
+        {
+            currentInteractable = FindNearbyBatInteractable();
+        }
+
         UpdateInteractionPrompt();
+    }
+
+    private bool TryPickupNearbyBatDirectly()
+    {
+        IInteractable batInteractable = FindNearbyBatInteractable();
+        if (batInteractable != null)
+        {
+            batInteractable.Interact(this);
+            return true;
+        }
+
+        GameObject directBat = FindNearbyBatPickupObject();
+        if (directBat == null)
+            return false;
+
+        ItemDefinition batDefinition = ResolveNearbyBatDefinition(directBat);
+        if (batDefinition == null)
+            return false;
+
+        PickupWeaponFromWorld(batDefinition, 1, directBat);
+        return true;
+    }
+
+    private IInteractable FindNearbyBatInteractable()
+    {
+        MonoBehaviour[] behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        float bestDistance = float.MaxValue;
+        IInteractable bestInteractable = null;
+
+        for (int i = 0; i < behaviours.Length; i++)
+        {
+            MonoBehaviour behaviour = behaviours[i];
+            if (behaviour == null)
+                continue;
+            if (behaviour is not IInteractable interactable)
+                continue;
+            if (!string.Equals(behaviour.GetType().Name, "WeaponWorldPickup", System.StringComparison.Ordinal))
+                continue;
+
+            string prompt = interactable.GetInteractionText();
+            if (string.IsNullOrEmpty(prompt) || prompt.IndexOf("bat", System.StringComparison.OrdinalIgnoreCase) < 0)
+                continue;
+
+            float distance = Vector2.Distance(transform.position, interactable.GetInteractionPosition());
+            if (distance > interactRadius * 2.5f)
+                continue;
+
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                bestInteractable = interactable;
+            }
+        }
+
+        return bestInteractable;
+    }
+
+    private GameObject FindNearbyBatPickupObject()
+    {
+        float bestDistance = float.MaxValue;
+        GameObject bestObject = null;
+
+        Collider2D[] nearby = Physics2D.OverlapCircleAll(transform.position, interactRadius * 2.5f);
+        for (int i = 0; i < nearby.Length; i++)
+        {
+            Collider2D hit = nearby[i];
+            if (hit == null)
+                continue;
+
+            GameObject candidate = hit.attachedRigidbody != null
+                ? hit.attachedRigidbody.gameObject
+                : hit.gameObject;
+
+            candidate = NormalizeBatCandidate(candidate);
+            if (candidate == null)
+                continue;
+
+            float distance = Vector2.Distance(transform.position, candidate.transform.position);
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                bestObject = candidate;
+            }
+        }
+
+        if (bestObject != null)
+            return bestObject;
+
+        Transform[] allTransforms = FindObjectsByType<Transform>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+        for (int i = 0; i < allTransforms.Length; i++)
+        {
+            Transform tf = allTransforms[i];
+            if (tf == null)
+                continue;
+
+            GameObject candidate = NormalizeBatCandidate(tf.gameObject);
+            if (candidate == null)
+                continue;
+
+            float distance = Vector2.Distance(transform.position, candidate.transform.position);
+            if (distance > interactRadius * 2.5f)
+                continue;
+
+            if (distance < bestDistance)
+            {
+                bestDistance = distance;
+                bestObject = candidate;
+            }
+        }
+
+        return bestObject;
+    }
+
+    private GameObject NormalizeBatCandidate(GameObject candidate)
+    {
+        if (candidate == null)
+            return null;
+
+        if (IsBatPickupObject(candidate))
+            return candidate;
+
+        Transform parent = candidate.transform.parent;
+        while (parent != null)
+        {
+            if (IsBatPickupObject(parent.gameObject))
+                return parent.gameObject;
+            parent = parent.parent;
+        }
+
+        return null;
+    }
+
+    private bool IsBatPickupObject(GameObject candidate)
+    {
+        if (candidate == null)
+            return false;
+
+        RoomSpawnPrefabDefinition roomDef = candidate.GetComponent<RoomSpawnPrefabDefinition>();
+        if (roomDef != null &&
+            roomDef.spawnCategory == RoomSpawnCategory.Weapon &&
+            !string.IsNullOrWhiteSpace(roomDef.pickupDisplayName) &&
+            roomDef.pickupDisplayName.IndexOf(BatWeapon.ItemName, System.StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            return true;
+        }
+
+        ItemDefinition weaponDefinition = TryGetWeaponDefinition(candidate);
+        if (weaponDefinition != null)
+        {
+            string itemName = weaponDefinition.itemName;
+            return !string.IsNullOrWhiteSpace(itemName) &&
+                   itemName.IndexOf(BatWeapon.ItemName, System.StringComparison.OrdinalIgnoreCase) >= 0;
+        }
+
+        return candidate.name.IndexOf(BatWeapon.ItemName, System.StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
+    private ItemDefinition ResolveNearbyBatDefinition(GameObject candidate)
+    {
+        if (candidate == null)
+            return null;
+
+        ItemDefinition weaponDefinition = TryGetWeaponDefinition(candidate);
+        if (weaponDefinition != null)
+            return weaponDefinition;
+
+        ItemWorld itemWorld = candidate.GetComponent<ItemWorld>();
+        if (itemWorld != null)
+        {
+            Item item = itemWorld.GetItem();
+            if (item != null && item.definition != null)
+                return item.definition;
+        }
+
+        RoomSpawnPrefabDefinition roomDef = candidate.GetComponent<RoomSpawnPrefabDefinition>();
+        if (roomDef != null &&
+            !string.IsNullOrWhiteSpace(roomDef.pickupDisplayName) &&
+            roomDef.pickupDisplayName.IndexOf(BatWeapon.ItemName, System.StringComparison.OrdinalIgnoreCase) >= 0)
+        {
+            return Resources.Load<ItemDefinition>(BatWeapon.ItemName);
+        }
+
+        if (candidate.name.IndexOf(BatWeapon.ItemName, System.StringComparison.OrdinalIgnoreCase) >= 0)
+            return Resources.Load<ItemDefinition>(BatWeapon.ItemName);
+
+        return null;
+    }
+
+    private ItemDefinition TryGetWeaponDefinition(GameObject candidate)
+    {
+        if (candidate == null)
+            return null;
+
+        MonoBehaviour[] behaviours = candidate.GetComponents<MonoBehaviour>();
+        for (int i = 0; i < behaviours.Length; i++)
+        {
+            MonoBehaviour behaviour = behaviours[i];
+            if (behaviour == null)
+                continue;
+            if (!string.Equals(behaviour.GetType().Name, "WeaponWorldPickup", System.StringComparison.Ordinal))
+                continue;
+
+            System.Reflection.PropertyInfo property = behaviour.GetType().GetProperty("WeaponDefinition");
+            if (property == null)
+                continue;
+
+            return property.GetValue(behaviour) as ItemDefinition;
+        }
+
+        return null;
     }
 
     private void UpdateInteractionPrompt()
@@ -817,7 +1053,12 @@ public class PlayerInventoryInteraction : MonoBehaviour
                 break;
 
             case ItemUseEffect.SpeedBoost:
-                playerMovement.BoostSpeedFor10Seconds();
+                if (playerMovement != null)
+                {
+                    float boostedSpeed = def.effectValue > 0f ? def.effectValue : 10f;
+                    float duration = def.effectDuration > 0f ? def.effectDuration : 10f;
+                    playerMovement.BoostSpeedForDuration(boostedSpeed, duration);
+                }
                 FlashBlue();
                 break;
 

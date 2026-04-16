@@ -22,7 +22,7 @@ public static class SportsRoomBatPlacer
         }
 
         GameObject prefab = batSpawnerPrefab;
-        if (prefab == null)
+        if (prefab == null || !HasWeaponPickupComponent(prefab))
             prefab = Resources.Load<GameObject>(ResourcesBatPath);
 
         if (prefab == null)
@@ -78,5 +78,23 @@ public static class SportsRoomBatPlacer
         }
 
         return preferredWorld;
+    }
+
+    private static bool HasWeaponPickupComponent(GameObject prefab)
+    {
+        if (prefab == null)
+            return false;
+
+        MonoBehaviour[] behaviours = prefab.GetComponents<MonoBehaviour>();
+        for (int i = 0; i < behaviours.Length; i++)
+        {
+            MonoBehaviour behaviour = behaviours[i];
+            if (behaviour == null)
+                continue;
+            if (string.Equals(behaviour.GetType().Name, "WeaponWorldPickup", System.StringComparison.Ordinal))
+                return true;
+        }
+
+        return false;
     }
 }

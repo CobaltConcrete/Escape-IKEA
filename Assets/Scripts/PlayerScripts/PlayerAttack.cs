@@ -12,6 +12,7 @@ public class PlayerAttack : MonoBehaviour
 
     private float cooldownRemaining;
     private PlayerInventoryInteraction inventoryInteraction;
+    private BossRoomNoticeUI noWeaponNoticeUI;
 
     private void Awake()
     {
@@ -29,7 +30,7 @@ public class PlayerAttack : MonoBehaviour
 
         if (!HasEquippedWeapon())
         {
-            BossRoomNoticeUI.Instance?.ShowMessage("I have no weapon");
+            ShowNoWeaponMessage();
             return;
         }
 
@@ -74,11 +75,31 @@ public class PlayerAttack : MonoBehaviour
         EquipmentData equipmentData = inventoryInteraction != null ? inventoryInteraction.EquipmentData : null;
         Item equippedWeapon =
             equipmentData != null ? equipmentData.GetEquippedItem(EquipTag.Weapon) : null;
-        return equippedWeapon != null;
+        if (equippedWeapon == null || equippedWeapon.definition == null)
+            return false;
+
+        string itemName = equippedWeapon.definition.itemName;
+        return !string.IsNullOrWhiteSpace(itemName) &&
+               itemName.IndexOf(BatWeapon.ItemName, System.StringComparison.OrdinalIgnoreCase) >= 0;
     }
 
     private bool WasAttackPressed()
     {
         return Input.GetKeyDown(attackKey);
+    }
+
+    private void ShowNoWeaponMessage()
+    {
+        if (noWeaponNoticeUI == null)
+        {
+            BossRoomNoticeUI[] notices = FindObjectsByType<BossRoomNoticeUI>(
+                FindObjectsInactive.Include,
+                FindObjectsSortMode.None);
+            if (notices != null && notices.Length > 0)
+                noWeaponNoticeUI = notices[0];
+        }
+
+        if (noWeaponNoticeUI != null)
+            noWeaponNoticeUI.ShowMessage("I have no weapon");
     }
 }
