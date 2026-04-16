@@ -116,7 +116,7 @@ public class ItemWorld : MonoBehaviour, IInteractable
             return;
         }
 
-        player.PickupNormalItem(this);
+        player.PickupNormalItemWorld(this);
     }
 
     public void SetRoom(Room room)
