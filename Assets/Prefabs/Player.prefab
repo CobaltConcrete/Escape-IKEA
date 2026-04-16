@@ -263,6 +263,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   maxHealth: 150
   startingHealth: 150
+  deathSceneDelay: 0.6
 --- !u!114 &8600148856383864679
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -279,6 +280,7 @@ MonoBehaviour:
   attackRadius: 1.25
   attackKey: 106
   bulletClearRadius: 1.6
+  attackCooldown: 0.4
 --- !u!114 &107977642095276863
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -295,7 +297,6 @@ MonoBehaviour:
   uiLootInventory: {fileID: 0}
   equipmentUI: {fileID: 0}
   equipmentData: {fileID: 0}
-  playerDialogue: {fileID: 0}
   interactRadius: 0.45
   interactableLayerMask:
     serializedVersion: 2

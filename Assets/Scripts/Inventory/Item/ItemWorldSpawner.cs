@@ -27,6 +27,8 @@ public class ItemWorldSpawner : MonoBehaviour
             worldScale = transform.lossyScale
         };
 
+        item.InitializeRuntimeDataIfNeeded();
+
         ItemWorld spawned = ItemWorld.SpawnItemWorld(
             transform.position,
             transform.rotation,

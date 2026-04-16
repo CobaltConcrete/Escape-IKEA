@@ -23,6 +23,10 @@ MonoBehaviour:
   useEffect: 0
   effectValue: 0
   effectDuration: 0
+  armorMaxDurability: 100
+  armorDamageReduction: 8
+  armorSpecialAbility: 0
+  armorDurabilityLossMultiplier: 1
   lootValue: 0
   canAppearInShoppingList: 1
   minRequiredAmount: 1

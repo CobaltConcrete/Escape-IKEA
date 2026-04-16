@@ -1,5 +1,6 @@
 using UnityEditor;
 using UnityEngine;
+using static EquipmentEnum;
 
 [CustomEditor(typeof(ItemDefinition))]
 public class ItemDefinitionEditor : Editor
@@ -34,6 +35,16 @@ public class ItemDefinitionEditor : Editor
             EditorGUILayout.PropertyField(serializedObject.FindProperty("useEffect"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("effectValue"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("effectDuration"));
+
+            if (itemDefinition.equipTag == EquipTag.Armor)
+            {
+                EditorGUILayout.Space();
+                EditorGUILayout.LabelField("Armor Settings", EditorStyles.boldLabel);
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("armorMaxDurability"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("armorDamageReduction"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("armorSpecialAbility"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("armorDurabilityLossMultiplier"));
+            }
         }
         else if (itemDefinition.itemCategory == ItemCategory.Loot)
         {

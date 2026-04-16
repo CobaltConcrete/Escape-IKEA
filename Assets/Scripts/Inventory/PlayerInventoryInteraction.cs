@@ -106,6 +106,68 @@ public class PlayerInventoryInteraction : MonoBehaviour
 
         itemWorld.DestroySelf();
     }
+    public void PickupNormalItem(ItemWorld itemWorld)
+    {
+        if (itemWorld == null || !itemWorld.CanBePickedUp())
+        {
+            return;
+        }
+
+        Item pickedUpItem = itemWorld.GetItem();
+
+        if (pickedUpItem == null || pickedUpItem.definition == null)
+        {
+            return;
+        }
+
+        if (pickedUpItem.IsLoot())
+        {
+            return;
+        }
+
+        if (!firstItemFound)
+        {
+            firstItemFound = true;
+        }
+
+        inventory.AddItem(pickedUpItem);
+        TryAutoEquipPickedUpItem(pickedUpItem);
+
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.PlayItemPickup();
+        }
+
+        itemWorld.DestroySelf();
+    }
+    public Item GetEquippedArmorItem()
+    {
+        if (equipmentData == null)
+        {
+            return null;
+        }
+
+        return equipmentData.GetEquippedArmor();
+    }
+
+    public void BreakEquippedArmor()
+    {
+        if (equipmentData == null)
+        {
+            return;
+        }
+
+        Item brokenArmor = equipmentData.UnequipArmor();
+        if (brokenArmor == null)
+        {
+            return;
+        }
+
+        if (equipmentUI != null)
+        {
+            equipmentUI.RefreshAllSlots();
+        }
+    }
     private void FindBestInteractable()
     {
         currentInteractable = null;
@@ -233,6 +295,8 @@ public class PlayerInventoryInteraction : MonoBehaviour
 
         // Weapon / Armor replacement
         Item itemClone = pickedItem.Clone();
+        itemClone.InitializeRuntimeDataIfNeeded();
+
         Item oldEquippedItem = equipmentUI.EquipItem(itemClone);
 
         if (pickedItem.IsStackable())
@@ -527,23 +591,27 @@ public class PlayerInventoryInteraction : MonoBehaviour
 
             inventory.RemoveAllByDefinition(definition);
 
-            return new Item
+            Item newItem = new Item
             {
                 definition = definition,
                 amount = totalAmount,
                 worldScale = sampleItem.worldScale
             };
+            newItem.InitializeRuntimeDataIfNeeded();
+            return newItem;
         }
         else
         {
             inventory.RemoveOneItem(sampleItem);
 
-            return new Item
+            Item newItem = new Item
             {
                 definition = definition,
                 amount = 1,
                 worldScale = sampleItem.worldScale
             };
+            newItem.InitializeRuntimeDataIfNeeded();
+            return newItem;
         }
     }
 
@@ -624,6 +692,8 @@ public class PlayerInventoryInteraction : MonoBehaviour
     private void AutoEquipItem(Item item)
     {
         Item itemToEquip = item.Clone();
+        itemToEquip.InitializeRuntimeDataIfNeeded();
+
         Item oldItem = equipmentUI.EquipItem(itemToEquip);
 
         if (ItemEquipClassifier.GetEquipTag(itemToEquip) == EquipTag.Utility)
@@ -705,6 +775,8 @@ public class PlayerInventoryInteraction : MonoBehaviour
             int originalIndex = inventory.GetItemIndex(item);
 
             Item itemToEquip = item.Clone();
+            itemToEquip.InitializeRuntimeDataIfNeeded();
+
             Item oldItem = equipmentUI.EquipItem(itemToEquip);
 
             if (ItemEquipClassifier.GetEquipTag(itemToEquip) == EquipTag.Utility)
@@ -830,43 +902,34 @@ public class PlayerInventoryInteraction : MonoBehaviour
                 return null;
         }
     }
+    public void RefreshEquipmentAndInventoryUI()
+    {
+        if (equipmentUI != null)
+        {
+            equipmentUI.RefreshAllSlots();
+        }
+    }
     private void OnTriggerEnter2D(Collider2D collider)
     {
         ItemWorld itemWorld = collider.GetComponent<ItemWorld>();
-
-        if (itemWorld == null || !itemWorld.CanBePickedUp())
+        if (itemWorld == null)
         {
             return;
         }
 
         Item pickedUpItem = itemWorld.GetItem();
-
         if (pickedUpItem == null || pickedUpItem.definition == null)
         {
             return;
         }
 
-        // Loot don't auto pick up, leave it to F interact
+        // Loot still uses F interact only
         if (pickedUpItem.IsLoot())
         {
             return;
         }
 
-        // normal item pick up immediately
-        if (!firstItemFound)
-        {
-            firstItemFound = true;
-        }
-
-        inventory.AddItem(pickedUpItem);
-        TryAutoEquipPickedUpItem(pickedUpItem);
-
-        if (SoundManager.Instance != null)
-        {
-            SoundManager.Instance.PlayItemPickup();
-        }
-
-        itemWorld.DestroySelf();
+        PickupNormalItem(itemWorld);
     }
     private void OnTriggerExit2D(Collider2D collider)
     {

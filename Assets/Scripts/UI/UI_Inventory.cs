@@ -86,6 +86,11 @@ public class UI_Inventory : MonoBehaviour
         RefreshInventoryItems();
     }
 
+    public void RefreshNow()
+    {
+        RefreshInventoryItems();
+    }
+
     private void Inventory_OnItemListChaned(object sender, EventArgs e)
     {
         RefreshInventoryItems();
@@ -97,10 +102,11 @@ public class UI_Inventory : MonoBehaviour
         {
             return;
         }
+        Item tooltipItemToRestore = null;
 
-        if (UI_ItemTooltip.Instance != null)
+        if (UI_ItemTooltip.Instance != null && UI_ItemTooltip.Instance.IsShowing)
         {
-            UI_ItemTooltip.Instance.Hide();
+            tooltipItemToRestore = UI_ItemTooltip.Instance.CurrentItem;
         }
 
         foreach (Transform child in itemSlotContainer)
@@ -198,6 +204,8 @@ public class UI_Inventory : MonoBehaviour
                 }
             }
 
+            RefreshDurabilityBar(itemSlotRectTransform, item);
+
             x++;
             if (x >= columnCount)
             {
@@ -220,5 +228,70 @@ public class UI_Inventory : MonoBehaviour
             containerRectTransform.sizeDelta.x,
             contentHeight
         );
+        if (tooltipItemToRestore != null && tooltipItemToRestore.definition != null)
+        {
+            bool stillExists = false;
+
+            foreach (Item item in inventory.GetItemList())
+            {
+                if (item == tooltipItemToRestore)
+                {
+                    stillExists = true;
+                    break;
+                }
+            }
+
+            if (stillExists && UI_ItemTooltip.Instance != null)
+            {
+                UI_ItemTooltip.Instance.Show(tooltipItemToRestore);
+            }
+        }
+    }
+
+    private void RefreshDurabilityBar(RectTransform slotRectTransform, Item item)
+    {
+        Transform durabilityTransform = slotRectTransform.Find("durability");
+        if (durabilityTransform == null)
+        {
+            return;
+        }
+
+        if (item == null || !item.IsArmor())
+        {
+            durabilityTransform.gameObject.SetActive(false);
+            return;
+        }
+
+        item.InitializeRuntimeDataIfNeeded();
+
+        durabilityTransform.gameObject.SetActive(true);
+
+        Transform fillTransform = durabilityTransform.Find("Fill");
+        if (fillTransform == null)
+        {
+            return;
+        }
+
+        RectTransform fillRect = fillTransform.GetComponent<RectTransform>();
+        Image fillImage = fillTransform.GetComponent<Image>();
+
+        float maxDurability = item.GetArmorMaxDurability();
+        float currentDurability = Mathf.Max(0f, item.GetArmorCurrentDurability());
+        float t = maxDurability > 0f ? Mathf.Clamp01(currentDurability / maxDurability) : 0f;
+
+        if (fillRect != null)
+        {
+            fillRect.anchorMin = new Vector2(0f, 0f);
+            fillRect.anchorMax = new Vector2(Mathf.Max(0.001f, t), 1f);
+            fillRect.offsetMin = Vector2.zero;
+            fillRect.offsetMax = Vector2.zero;
+            fillRect.anchoredPosition = Vector2.zero;
+            fillRect.sizeDelta = Vector2.zero;
+        }
+
+        if (fillImage != null)
+        {
+            fillImage.color = new Color(0.2f, 0.55f, 1f, 1f);
+        }
     }
 }

@@ -14,10 +14,12 @@ public class PlayerHealth : MonoBehaviour
     public event Action OnHealthChanged;
 
     private bool isDead = false;
+    private PlayerInventoryInteraction playerInventoryInteraction;
 
     private void Awake()
     {
         CurrentHealth = Mathf.Clamp(startingHealth, 0f, maxHealth);
+        playerInventoryInteraction = GetComponent<PlayerInventoryInteraction>();
     }
 
     private void Start()
@@ -30,9 +32,13 @@ public class PlayerHealth : MonoBehaviour
         if (amount <= 0f || isDead)
             return;
 
+        float finalDamage = amount;
+
+        HandleArmorBeforeHealthDamage(amount, ref finalDamage);
+
         float previousHealth = CurrentHealth;
 
-        CurrentHealth = Mathf.Max(0f, CurrentHealth - amount);
+        CurrentHealth = Mathf.Max(0f, CurrentHealth - finalDamage);
         OnHealthChanged?.Invoke();
 
         if (CurrentHealth < previousHealth)
@@ -47,6 +53,38 @@ public class PlayerHealth : MonoBehaviour
         {
             isDead = true;
             StartCoroutine(HandleDeath());
+        }
+    }
+
+    private void HandleArmorBeforeHealthDamage(float incomingDamage, ref float finalDamage)
+    {
+        if (playerInventoryInteraction == null)
+            return;
+
+        Item equippedArmor = playerInventoryInteraction.GetEquippedArmorItem();
+        if (equippedArmor == null || !equippedArmor.IsArmor())
+            return;
+
+        equippedArmor.InitializeRuntimeDataIfNeeded();
+
+        // ¼õÉË
+        float damageReduction = equippedArmor.GetArmorDamageReduction();
+        finalDamage = Mathf.Max(0f, incomingDamage - damageReduction);
+
+        // µôÄÍ¾Ã
+        float durabilityLoss = incomingDamage;
+
+        if (equippedArmor.definition != null)
+        {
+            durabilityLoss *= Mathf.Max(0f, equippedArmor.definition.armorDurabilityLossMultiplier);
+        }
+
+        bool broken = equippedArmor.DamageArmor(durabilityLoss);
+        playerInventoryInteraction.RefreshEquipmentAndInventoryUI();
+
+        if (broken)
+        {
+            playerInventoryInteraction.BreakEquippedArmor();
         }
     }
 

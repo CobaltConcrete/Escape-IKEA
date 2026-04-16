@@ -77,6 +77,31 @@ public class ItemWorld : MonoBehaviour, IInteractable
             canBePickedUpTimer -= Time.deltaTime;
         }
     }
+    private void OnTriggerStay2D(Collider2D collider)
+    {
+        if (!CanBePickedUp())
+        {
+            return;
+        }
+
+        if (item == null || item.definition == null)
+        {
+            return;
+        }
+
+        if (item.IsLoot())
+        {
+            return;
+        }
+
+        PlayerInventoryInteraction player = collider.GetComponent<PlayerInventoryInteraction>();
+        if (player == null)
+        {
+            return;
+        }
+
+        player.PickupNormalItem(this);
+    }
 
     public void SetRoom(Room room)
     {
@@ -93,7 +118,6 @@ public class ItemWorld : MonoBehaviour, IInteractable
 
     public void SetRoomVisible(bool visible)
     {
-        // LukeScene 永远显示，方便测试
         string sceneName = SceneManager.GetActiveScene().name;
         if (sceneName == "LukeScene")
         {
@@ -110,7 +134,6 @@ public class ItemWorld : MonoBehaviour, IInteractable
             textMeshPro.enabled = visible;
         }
 
-        // Loot 本来就不发光；普通 item 才跟着显示状态走
         if (light2D != null && item != null && !item.IsLoot())
         {
             light2D.enabled = visible;
@@ -256,7 +279,7 @@ public class ItemWorld : MonoBehaviour, IInteractable
             itemWorld
         );
 
-        itemWorld.SetCanBePickedUpTimer(0.25f);
+        itemWorld.SetCanBePickedUpTimer(0.8f);
 
         Rigidbody2D rb = itemWorld.GetComponent<Rigidbody2D>();
         if (rb != null)

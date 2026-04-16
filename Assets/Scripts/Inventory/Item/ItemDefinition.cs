@@ -15,6 +15,12 @@ public enum WorldColliderType
     Circle
 }
 
+public enum ArmorSpecialAbility
+{
+    None,
+    Dash
+}
+
 [CreateAssetMenu(menuName = "Inventory/Item Definition")]
 public class ItemDefinition : ScriptableObject
 {
@@ -36,6 +42,12 @@ public class ItemDefinition : ScriptableObject
     public ItemUseEffect useEffect = ItemUseEffect.None;
     public float effectValue = 0f;
     public float effectDuration = 0f;
+
+    [Header("Armor Settings")]
+    public float armorMaxDurability = 100f;
+    public float armorDamageReduction = 0f;
+    public ArmorSpecialAbility armorSpecialAbility = ArmorSpecialAbility.None;
+    public float armorDurabilityLossMultiplier = 1f;
 
     [Header("Loot Settings")]
     public int lootValue = 0;
@@ -78,6 +90,11 @@ public class ItemDefinition : ScriptableObject
     public bool IsNormalItem()
     {
         return itemCategory == ItemCategory.Normal;
+    }
+
+    public bool IsArmor()
+    {
+        return itemCategory == ItemCategory.Normal && equipTag == EquipTag.Armor;
     }
 
     public string GetShoppingListKey()
