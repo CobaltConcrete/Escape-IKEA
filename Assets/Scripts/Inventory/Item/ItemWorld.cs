@@ -7,7 +7,7 @@ using static EquipmentEnum;
 
 public class ItemWorld : MonoBehaviour, IInteractable
 {
-    private const float WorldPickupColliderScale = 0.58f;
+    private const float WorldPickupColliderScale = 0.24f;
     private Room currentRoom;
 
     [SerializeField] private bool lockRoomOnSpawn = true;

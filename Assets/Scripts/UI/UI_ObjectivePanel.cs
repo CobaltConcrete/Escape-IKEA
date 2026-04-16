@@ -13,6 +13,10 @@ public class UI_ObjectivePanel : MonoBehaviour
     [SerializeField] private TextMeshProUGUI valueText;
     [SerializeField] private TextMeshProUGUI bossText;
 
+    [Header("Dynamic List Text")]
+    [SerializeField] private float listFontMax = 52f;
+    [SerializeField] private float listFontMin = 24f;
+
     private void Start()
     {
         RefreshUI();
@@ -80,6 +84,7 @@ public class UI_ObjectivePanel : MonoBehaviour
                 if (text != null)
                 {
                     text.text = $"{entry.GetDisplayName()} {entry.collectedAmount}/{entry.requiredAmount}";
+                    ApplyDynamicListTextStyle(text, RunObjectiveManager.Instance.CurrentShoppingList.Count);
                 }
             }
 
@@ -89,6 +94,21 @@ public class UI_ObjectivePanel : MonoBehaviour
                 checkTransform.gameObject.SetActive(entry.IsComplete());
             }
         }
+    }
+
+    private void ApplyDynamicListTextStyle(TextMeshProUGUI text, int rowCount)
+    {
+        if (text == null)
+            return;
+
+        float t = Mathf.InverseLerp(6f, 18f, rowCount);
+        float targetSize = Mathf.Lerp(listFontMax, listFontMin, t);
+
+        text.enableAutoSizing = true;
+        text.fontSizeMax = targetSize;
+        text.fontSizeMin = Mathf.Max(14f, targetSize * 0.55f);
+        text.overflowMode = TextOverflowModes.Ellipsis;
+        text.textWrappingMode = TextWrappingModes.NoWrap;
     }
 
     private void ClearLootRows()

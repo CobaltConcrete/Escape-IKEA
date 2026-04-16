@@ -11,7 +11,7 @@ public static class RoomDecorationPlacer
     private const float PlacementGrid = 0.25f;
     private const float DoorClearanceHalfWidth = 0.9f;
     private const float DoorClearanceDepth = 0.95f;
-    private const float DecorationColliderScale = 0.78f;
+    private const float DecorationColliderScale = 0.3f;
     private const float MinPropScale = 0.8f;
     private const float MaxPropScale = 1.2f;
 
@@ -460,8 +460,8 @@ public static class RoomDecorationPlacer
         box.isTrigger = false;
         Vector2 spriteSize = sprite.bounds.size;
         box.size = new Vector2(
-            Mathf.Max(0.18f, spriteSize.x * DecorationColliderScale),
-            Mathf.Max(0.18f, spriteSize.y * DecorationColliderScale));
+            Mathf.Max(0.08f, spriteSize.x * DecorationColliderScale),
+            Mathf.Max(0.08f, spriteSize.y * DecorationColliderScale));
         box.offset = Vector2.zero;
     }
 

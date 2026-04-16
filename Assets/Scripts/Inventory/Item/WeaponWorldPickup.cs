@@ -6,6 +6,9 @@ using UnityEngine;
 [RequireComponent(typeof(Collider2D))]
 public class WeaponWorldPickup : MonoBehaviour, IInteractable
 {
+    private const float GenericWeaponColliderScale = 0.45f;
+    private const float BatColliderScale = 0.24f;
+
     [SerializeField] private ItemDefinition weaponDefinition;
     [SerializeField] private int amount = 1;
     [SerializeField] private bool roomVisible = true;
@@ -23,6 +26,8 @@ public class WeaponWorldPickup : MonoBehaviour, IInteractable
         Collider2D c = GetComponent<Collider2D>();
         if (c != null && c.isTrigger)
             c.isTrigger = false;
+
+        ShrinkBlockingColliderFootprint();
     }
 
     public void Interact(PlayerInventoryInteraction player)
@@ -66,5 +71,32 @@ public class WeaponWorldPickup : MonoBehaviour, IInteractable
             if (cols[i] != null)
                 cols[i].enabled = visible;
         }
+    }
+
+    private void ShrinkBlockingColliderFootprint()
+    {
+        Collider2D c = GetComponent<Collider2D>();
+        if (c == null)
+            return;
+
+        bool isBat = weaponDefinition != null &&
+            string.Equals(weaponDefinition.itemName, BatWeapon.ItemName, System.StringComparison.OrdinalIgnoreCase);
+        float scale = isBat ? BatColliderScale : GenericWeaponColliderScale;
+
+        if (c is BoxCollider2D box)
+        {
+            box.size *= scale;
+            return;
+        }
+
+        if (c is CircleCollider2D circle)
+        {
+            circle.radius *= scale;
+            return;
+        }
+
+        CapsuleCollider2D capsule = c as CapsuleCollider2D;
+        if (capsule != null)
+            capsule.size *= scale;
     }
 }
