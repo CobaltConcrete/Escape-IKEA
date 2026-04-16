@@ -56,6 +56,7 @@ public class ItemWorld : MonoBehaviour, IInteractable
     private float canBePickedUpTimer;
     private Vector3 defaultScale;
     private BoxCollider2D boxCollider2D;
+    private Rigidbody2D rigidbody2D;
     private Transform contrastPlateTransform;
 
     private static Sprite s_unitWhiteSprite;
@@ -65,6 +66,16 @@ public class ItemWorld : MonoBehaviour, IInteractable
         spriteRenderer = GetComponent<SpriteRenderer>();
         light2D = GetComponent<Light2D>();
         boxCollider2D = GetComponent<BoxCollider2D>();
+        rigidbody2D = GetComponent<Rigidbody2D>();
+        if (rigidbody2D != null)
+        {
+            // World pickups should block movement but never be pushed by player/enemies.
+            rigidbody2D.bodyType = RigidbodyType2D.Kinematic;
+            rigidbody2D.simulated = true;
+            rigidbody2D.freezeRotation = true;
+            rigidbody2D.linearVelocity = Vector2.zero;
+            rigidbody2D.angularVelocity = 0f;
+        }
 
         Transform amountTransform = transform.Find("Amount");
         if (amountTransform != null)
@@ -193,7 +204,9 @@ public class ItemWorld : MonoBehaviour, IInteractable
         if (spriteRenderer != null)
         {
             spriteRenderer.sortingLayerName = "Item";
-            spriteRenderer.sortingOrder = 2;
+            // Weapons draw above generic pickups (same layer) so large sprites never read as "under" floor props.
+            spriteRenderer.sortingOrder =
+                item.definition.equipTag == EquipTag.Weapon ? 18 : 2;
         }
 
         ConfigureContrastBackdrop();
@@ -387,17 +400,18 @@ public class ItemWorld : MonoBehaviour, IInteractable
     }
 
     /// <summary>
-    /// World pickups: normal items (inventory) and shopping-list loot. List loot off-objective is not picked up or prompted.
+    /// World pickups: normal items are always interactable; loot is interactable only when needed by the shopping list.
     /// </summary>
     private bool IsEligibleForWorldPickup()
     {
         if (item == null || item.definition == null)
             return false;
 
-        if (item.IsLoot())
-            return IsLootOnCurrentShoppingList();
+        // Non-loot items (equipment/consumables like speed potion) should be pickable in-world.
+        if (!item.IsLoot())
+            return true;
 
-        return item.definition.IsNormalItem();
+        return IsLootOnCurrentShoppingList();
     }
 
     /// <summary>
@@ -406,12 +420,12 @@ public class ItemWorld : MonoBehaviour, IInteractable
     private bool IsLootOnCurrentShoppingList()
     {
         if (item == null || item.definition == null || !item.IsLoot())
-            return true;
+            return false;
 
         RunObjectiveManager rom = RunObjectiveManager.Instance;
         if (rom == null)
-            return true;
+            return false;
 
-        return rom.ContainsShoppingListKey(item.definition.GetShoppingListKey());
+        return rom.NeedsMoreOfShoppingListKey(item.definition.GetShoppingListKey());
     }
 }

@@ -273,6 +273,14 @@ public class RoomContentActivation : MonoBehaviour
                 method.Invoke(behaviour, new object[] { active });
         }
 
+        RoomGeneratedPickup[] generated = itemContainer.GetComponentsInChildren<RoomGeneratedPickup>(true);
+        for (int i = 0; i < generated.Length; i++)
+        {
+            if (generated[i] == null)
+                continue;
+            generated[i].SetRoomVisible(active);
+        }
+
         itemContainer.gameObject.SetActive(active);
     }
 }

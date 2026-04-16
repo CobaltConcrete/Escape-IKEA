@@ -63,6 +63,31 @@ public static class RoomItemWorldQuery
         return false;
     }
 
+    public static bool RoomHasShoppingListKeyInPickupScopes(GameObject roomRoot, string shoppingListKey)
+    {
+        if (roomRoot == null || string.IsNullOrEmpty(shoppingListKey))
+            return false;
+
+        Transform spawnedItems = roomRoot.transform.Find(SpawnedItemsName);
+        if (spawnedItems != null)
+        {
+            if (ContainsShoppingListKeyUnder(spawnedItems, shoppingListKey))
+                return true;
+        }
+
+        LootSpawnArea[] areas = roomRoot.GetComponentsInChildren<LootSpawnArea>(true);
+        for (int i = 0; i < areas.Length; i++)
+        {
+            Transform spawnParent = areas[i] != null ? areas[i].SpawnParent : null;
+            if (spawnParent == null)
+                continue;
+            if (ContainsShoppingListKeyUnder(spawnParent, shoppingListKey))
+                return true;
+        }
+
+        return false;
+    }
+
     private static void AddItemWorldDefinitionsUnder(Transform root, HashSet<ItemDefinition> set)
     {
         ItemWorld[] worlds = root.GetComponentsInChildren<ItemWorld>(true);
@@ -109,6 +134,34 @@ public static class RoomItemWorldQuery
         {
             ItemWorldSpawner sp = spawners[i];
             if (sp != null && sp.ItemDefinition == itemDefinition)
+                return true;
+        }
+
+        return false;
+    }
+
+    private static bool ContainsShoppingListKeyUnder(Transform root, string shoppingListKey)
+    {
+        ItemWorld[] worlds = root.GetComponentsInChildren<ItemWorld>(true);
+        for (int i = 0; i < worlds.Length; i++)
+        {
+            ItemWorld iw = worlds[i];
+            if (iw == null)
+                continue;
+            Item it = iw.GetItem();
+            if (it == null || it.definition == null)
+                continue;
+            if (string.Equals(it.definition.GetShoppingListKey(), shoppingListKey, System.StringComparison.Ordinal))
+                return true;
+        }
+
+        ItemWorldSpawner[] spawners = root.GetComponentsInChildren<ItemWorldSpawner>(true);
+        for (int i = 0; i < spawners.Length; i++)
+        {
+            ItemWorldSpawner sp = spawners[i];
+            if (sp == null || sp.ItemDefinition == null)
+                continue;
+            if (string.Equals(sp.ItemDefinition.GetShoppingListKey(), shoppingListKey, System.StringComparison.Ordinal))
                 return true;
         }
 

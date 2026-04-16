@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class ItemWorldSpawner : MonoBehaviour
 {
-    /// <summary>Applied to room pickup prefabs so world items read clearly at room scale.</summary>
+    /// <summary>Legacy multiplier retained for compatibility constants only.</summary>
     public const float RoomPickupWorldScale = 4f;
 
     [SerializeField] private ItemDefinition itemDefinition;
@@ -25,10 +25,9 @@ public class ItemWorldSpawner : MonoBehaviour
             return;
         }
 
-        Vector3 spawnScale = itemDefinition.worldDropScale.sqrMagnitude > 1e-8f
-            ? itemDefinition.worldDropScale
-            : transform.lossyScale;
-        spawnScale *= RoomPickupWorldScale;
+        // Prefab transform scale is the authoritative world size for this spawner path.
+        // This allows designers to tune pickup size directly in prefab Transform.
+        Vector3 spawnScale = GetWorldSpawnScale(itemDefinition, transform);
 
         Item item = new Item
         {
@@ -71,6 +70,18 @@ public class ItemWorldSpawner : MonoBehaviour
     private void ApplyDefinitionWorldSettings(GameObject target, ItemDefinition definition)
     {
         ApplyWorldSpawnSettings(target, definition);
+    }
+
+    /// <summary>
+    /// Unified world pickup scale resolver:
+    /// - Hard source of truth is prefab/source transform scale.
+    /// - ItemDefinition worldDropScale fallback is intentionally disabled.
+    /// </summary>
+    public static Vector3 GetWorldSpawnScale(ItemDefinition definition, Transform sourceTransform = null)
+    {
+        if (sourceTransform != null && sourceTransform.lossyScale.sqrMagnitude > 1e-8f)
+            return sourceTransform.lossyScale;
+        return Vector3.one;
     }
 
     /// <summary>Tag/layer setup for spawned <see cref="ItemWorld"/> (also used by room decoration pickups).</summary>

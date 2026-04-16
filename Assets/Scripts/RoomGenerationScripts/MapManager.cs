@@ -35,6 +35,7 @@ public class MapManager : MonoBehaviour
     [Tooltip("Sprites/Generic/Floor_Connecting (32px @ 100 PPU). Tiled in a grid; wood tiles use Sprite Mask to room interior.")]
     [SerializeField] private Sprite roomFloorTileSprite;
     [SerializeField] private RoomDecorationCatalog roomDecorationCatalog;
+    [SerializeField] private RoomPrefabSpawnCatalog roomPrefabSpawnCatalog;
     [Tooltip("Spawned only in SportsRoom (not from ItemSpawnManager weighted list).")]
     [SerializeField] private GameObject sportsBatPickupPrefab;
 
@@ -344,9 +345,9 @@ public class MapManager : MonoBehaviour
         if (presentation == null)
             presentation = roomInstance.AddComponent<RoomPresentation>();
 
-        presentation.Initialize(roomFloorTileSprite, roomDecorationCatalog);
+        presentation.Initialize(roomFloorTileSprite, roomDecorationCatalog, roomPrefabSpawnCatalog);
 
-        SportsRoomBatPlacer.TrySpawnBat(roomInstance, sportsBatPickupPrefab);
+        // Bat now follows prefab-only objective spawn path (RoomPrefabObjectiveSpawner).
     }
 
     // ==================== Door Spawning stuff ====================

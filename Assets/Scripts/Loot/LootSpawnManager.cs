@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class LootSpawnManager : MonoBehaviour
 {
+    private const float DoorClearanceHalfWidth = 0.9f;
+    private const float DoorClearanceDepth = 0.95f;
     public static LootSpawnManager Instance { get; private set; }
 
     private readonly List<LootSpawnArea> allSpawnAreas = new List<LootSpawnArea>();
@@ -62,6 +64,8 @@ public class LootSpawnManager : MonoBehaviour
             return extraRequiredSpawnBuffer;
 
         string key = def.GetShoppingListKey();
+        if (IsBedPlushBedDelegatedLoot(def, key))
+            return 0;
         return IsSingleRoomCatalogDelegatedLoot(def, key) ? 0 : extraRequiredSpawnBuffer;
     }
 
@@ -117,6 +121,12 @@ public class LootSpawnManager : MonoBehaviour
 
     public void GenerateLootForObjective(IReadOnlyList<ShoppingListEntry> shoppingList, int requiredGoalValue, List<ItemDefinition> allLootDefinitions)
     {
+        if (RoomPrefabObjectiveSpawner.Instance != null &&
+            RoomPrefabObjectiveSpawner.Instance.TrySpawnFromObjective(shoppingList))
+        {
+            return;
+        }
+
         RefreshSpawnAreas();
         ClearSpawnCounts();
 
@@ -134,6 +144,7 @@ public class LootSpawnManager : MonoBehaviour
         Dictionary<string, int> lootValueByKey = new Dictionary<string, int>();
 
         SeedSpawnedCountsFromPickupsAlreadyInScene(shoppingList, spawnedCountByKey);
+        SeedBedPlushCapacityFromBeds(shoppingList, spawnedCountByKey);
 
         int guaranteedValue = 0;
         foreach (ShoppingListEntry e in shoppingList)
@@ -159,6 +170,18 @@ public class LootSpawnManager : MonoBehaviour
             if (entry == null || entry.itemDefinition == null) continue;
 
             string key = entry.itemDefinition.GetShoppingListKey();
+
+            if (IsBedPlushBedDelegatedLoot(entry.itemDefinition, key))
+            {
+                int seeded = GetSpawnedCountForKey(spawnedCountByKey, key);
+                if (seeded < entry.requiredAmount)
+                {
+                    Debug.LogError(
+                        $"LootSpawnManager: Not enough bedroom beds carrying {key}. Capacity={seeded}, required={entry.requiredAmount}.");
+                }
+
+                continue;
+            }
 
             if (IsSingleRoomCatalogDelegatedLoot(entry.itemDefinition, key))
             {
@@ -249,6 +272,8 @@ public class LootSpawnManager : MonoBehaviour
             int minimumRequired = entry.requiredAmount + extraRequiredSpawnBuffer;
             if (IsSingleRoomCatalogDelegatedLoot(entry.itemDefinition, key))
                 minimumRequired = entry.requiredAmount;
+            if (IsBedPlushBedDelegatedLoot(entry.itemDefinition, key))
+                minimumRequired = entry.requiredAmount;
 
             int spawned = GetSpawnedCountForKey(spawnedCountByKey, key);
 
@@ -270,6 +295,59 @@ public class LootSpawnManager : MonoBehaviour
             return false;
 
         return decorationCatalog.HasListGatedCatalogPickupForRoom(shoppingListKey, def.allowedRoomTypes[0]);
+    }
+
+    private static bool IsBedPlushShoppingListKey(string shoppingListKey)
+    {
+        if (string.IsNullOrEmpty(shoppingListKey))
+            return false;
+
+        return string.Equals(shoppingListKey, "Bee_Plush", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(shoppingListKey, "Owl_Plush", StringComparison.OrdinalIgnoreCase);
+    }
+
+    private static bool IsBedPlushBedDelegatedLoot(ItemDefinition def, string shoppingListKey)
+    {
+        return def != null && IsBedPlushShoppingListKey(shoppingListKey);
+    }
+
+    private static void SeedBedPlushCapacityFromBeds(
+        IReadOnlyList<ShoppingListEntry> shoppingList,
+        Dictionary<string, int> spawnedCountByKey)
+    {
+        if (shoppingList == null || spawnedCountByKey == null)
+            return;
+
+        BedroomBedContainerPickup[] beds = UnityEngine.Object.FindObjectsByType<BedroomBedContainerPickup>(
+            FindObjectsInactive.Include, FindObjectsSortMode.None);
+        Dictionary<string, int> cap = new Dictionary<string, int>(StringComparer.Ordinal);
+        for (int i = 0; i < beds.Length; i++)
+        {
+            if (beds[i] == null)
+                continue;
+            string k = beds[i].GetPlushShoppingListKey();
+            if (string.IsNullOrEmpty(k))
+                continue;
+            if (!cap.ContainsKey(k))
+                cap[k] = 0;
+            cap[k]++;
+        }
+
+        for (int i = 0; i < shoppingList.Count; i++)
+        {
+            ShoppingListEntry e = shoppingList[i];
+            if (e?.itemDefinition == null)
+                continue;
+            string k = e.itemDefinition.GetShoppingListKey();
+            if (!IsBedPlushShoppingListKey(k))
+                continue;
+            if (!cap.TryGetValue(k, out int n))
+                n = 0;
+            int existing = 0;
+            if (spawnedCountByKey.TryGetValue(k, out int s))
+                existing = s;
+            spawnedCountByKey[k] = Mathf.Max(existing, n);
+        }
     }
 
     public void SpawnAdditionalBonusLoot(int extraSpawnCount, List<ItemDefinition> allLootDefinitions)
@@ -336,6 +414,8 @@ public class LootSpawnManager : MonoBehaviour
             if (!itemDef.IsLoot()) continue;
             if (itemDef.lootValue <= 0) continue;
             if (itemDef.allowedRoomTypes == null || itemDef.allowedRoomTypes.Count == 0) continue;
+            if (IsBedPlushShoppingListKey(itemDef.GetShoppingListKey()))
+                continue;
 
             if (shoppingListKeys != null && shoppingListKeys.Count > 0 &&
                 !shoppingListKeys.Contains(itemDef.GetShoppingListKey()))
@@ -472,6 +552,8 @@ public class LootSpawnManager : MonoBehaviour
     {
         if (itemDefinition == null) return false;
         if (itemDefinition.allowedRoomTypes == null || itemDefinition.allowedRoomTypes.Count == 0) return false;
+        if (IsBedPlushBedDelegatedLoot(itemDefinition, itemDefinition.GetShoppingListKey()))
+            return false;
 
         List<LootSpawnArea> validAreas = GetValidAreasForLoot(itemDefinition, purpose);
 
@@ -506,7 +588,7 @@ public class LootSpawnManager : MonoBehaviour
             if (!area.CanSpawn()) continue;
             if (area.RoomType == RoomType.Cafeteria)
                 continue;
-            if (purpose == LootSpawnPurpose.Bonus && area.RoomType == RoomType.SportsRoom)
+            if (area.RoomType == RoomType.SportsRoom)
                 continue;
 
             if (itemDefinition.allowedRoomTypes.Contains(area.RoomType))
@@ -521,9 +603,16 @@ public class LootSpawnManager : MonoBehaviour
     private bool TrySpawnInArea(ItemDefinition itemDefinition, LootSpawnArea area)
     {
         Room room = area != null ? area.GetComponentInParent<Room>() : null;
+        string shoppingListKey = itemDefinition != null ? itemDefinition.GetShoppingListKey() : null;
         if (room != null &&
             RoomItemWorldQuery.RoomHasDefinitionInPickupScopes(room.gameObject, itemDefinition))
             return false;
+        if (room != null &&
+            !string.IsNullOrEmpty(shoppingListKey) &&
+            RoomItemWorldQuery.RoomHasShoppingListKeyInPickupScopes(room.gameObject, shoppingListKey))
+        {
+            return false;
+        }
 
         Vector2 footprint = itemDefinition.spawnFootprint;
 
@@ -535,7 +624,7 @@ public class LootSpawnManager : MonoBehaviour
             else
                 point = area.GetRandomPoint(footprint);
 
-            if (!IsSpawnPointValid(point, footprint))
+            if (!IsSpawnPointValid(point, footprint, room != null ? room.transform : null))
             {
                 continue;
             }
@@ -552,18 +641,61 @@ public class LootSpawnManager : MonoBehaviour
     /// </summary>
     private static Vector2 GetSportsAnchoredLootPoint(Transform roomRoot, int attemptIndex, int maxAttempts)
     {
-        // Fixed center-right spot to keep sports layout deterministic and clean.
+        // Interior from bottom-right anchor: positive X walks toward room center (away from SportsBatPickup).
         Vector3 world = RoomDecorationPlacer.GetAnchoredWorldPosition(
             roomRoot,
             RoomDecorInteriorAnchor.InteriorBottomRight,
-            new Vector3(-0.2f, 0.2f, 0f));
+            new Vector3(0.52f, 0.24f, 0f));
         return new Vector2(world.x, world.y);
     }
 
-    private bool IsSpawnPointValid(Vector2 point, Vector2 footprint)
+    private bool IsSpawnPointValid(Vector2 point, Vector2 footprint, Transform roomRoot)
     {
         Collider2D hit = Physics2D.OverlapBox(point, footprint, 0f, blockedLayerMask);
-        return hit == null;
+        if (hit != null)
+            return false;
+
+        if (roomRoot != null && IsInsideDoorClearanceZone(point, roomRoot))
+            return false;
+
+        return true;
+    }
+
+    private static bool IsInsideDoorClearanceZone(Vector2 worldPoint, Transform roomRoot)
+    {
+        if (roomRoot == null)
+            return false;
+
+        Collider2D best = null;
+        float bestArea = 0f;
+        Collider2D[] colliders = roomRoot.GetComponentsInChildren<Collider2D>(true);
+        for (int i = 0; i < colliders.Length; i++)
+        {
+            Collider2D c = colliders[i];
+            if (c == null || !c.isTrigger)
+                continue;
+            float a = c.bounds.size.x * c.bounds.size.y;
+            if (a > bestArea)
+            {
+                bestArea = a;
+                best = c;
+            }
+        }
+
+        if (best == null)
+            return false;
+
+        Vector3 minL = roomRoot.InverseTransformPoint(best.bounds.min);
+        Vector3 maxL = roomRoot.InverseTransformPoint(best.bounds.max);
+        Vector3 pL = roomRoot.InverseTransformPoint(worldPoint);
+        Vector3 cL = (minL + maxL) * 0.5f;
+
+        bool inTopDoor = Mathf.Abs(pL.x - cL.x) <= DoorClearanceHalfWidth && Mathf.Abs(pL.y - maxL.y) <= DoorClearanceDepth;
+        bool inBottomDoor = Mathf.Abs(pL.x - cL.x) <= DoorClearanceHalfWidth && Mathf.Abs(pL.y - minL.y) <= DoorClearanceDepth;
+        bool inLeftDoor = Mathf.Abs(pL.y - cL.y) <= DoorClearanceHalfWidth && Mathf.Abs(pL.x - minL.x) <= DoorClearanceDepth;
+        bool inRightDoor = Mathf.Abs(pL.y - cL.y) <= DoorClearanceHalfWidth && Mathf.Abs(pL.x - maxL.x) <= DoorClearanceDepth;
+
+        return inTopDoor || inBottomDoor || inLeftDoor || inRightDoor;
     }
 
     private void SpawnLootObject(ItemDefinition itemDefinition, Vector2 position, LootSpawnArea area)
@@ -575,7 +707,7 @@ public class LootSpawnManager : MonoBehaviour
             parent = area.SpawnParent;
         }
 
-        Vector3 lootScale = itemDefinition.worldDropScale * ItemWorldSpawner.RoomPickupWorldScale;
+        Vector3 lootScale = ItemWorldSpawner.GetWorldSpawnScale(itemDefinition, parent);
 
         Item item = new Item
         {

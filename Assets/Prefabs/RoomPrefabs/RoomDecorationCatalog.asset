@@ -16,7 +16,7 @@ MonoBehaviour:
   - roomType: 1
     sprite: {fileID: 834619308395806614, guid: 019dcb5a96a394c329894a7a3f7cb2b2, type: 3}
     localPosition: {x: 0, y: -0.12, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
+    localScale: {x: 1.18, y: 1.18, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     interiorAnchor: 6
@@ -34,7 +34,7 @@ MonoBehaviour:
   - roomType: 1
     sprite: {fileID: 6289138071654779636, guid: 6b5b41e1033a240e0939bfee9dae0464, type: 3}
     localPosition: {x: -0.42, y: -0.06, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
+    localScale: {x: 1.18, y: 1.18, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     interiorAnchor: 2
@@ -42,7 +42,7 @@ MonoBehaviour:
   - roomType: 1
     sprite: {fileID: 3336099508720387894, guid: 3361bfe26007d48dbb0e4ee8b55c4f76, type: 3}
     localPosition: {x: 0, y: 0.1, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
+    localScale: {x: 1.18, y: 1.18, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     interiorAnchor: 9
@@ -50,7 +50,7 @@ MonoBehaviour:
   - roomType: 1
     sprite: {fileID: 47444012576403307, guid: e4a30ea720edf4890903f849dfb1ca3e, type: 3}
     localPosition: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
+    localScale: {x: 1.2, y: 1.2, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     interiorAnchor: 7
@@ -58,7 +58,7 @@ MonoBehaviour:
   - roomType: 1
     sprite: {fileID: 47444012576403307, guid: e4a30ea720edf4890903f849dfb1ca3e, type: 3}
     localPosition: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
+    localScale: {x: 1.2, y: 1.2, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     interiorAnchor: 3
@@ -66,7 +66,7 @@ MonoBehaviour:
   - roomType: 1
     sprite: {fileID: 5166054062301881049, guid: a5af8420f4e2a42ac8ad7f928eade835, type: 3}
     localPosition: {x: 0, y: 0, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
+    localScale: {x: 1.18, y: 1.18, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     interiorAnchor: 8
@@ -102,8 +102,14 @@ MonoBehaviour:
     localScale: {x: 0.28, y: 0.28, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
+  - roomType: 2
+    sprite: {fileID: 3334673588272203963, guid: 94ffb916b32c94ac58197236e8e65d0b, type: 3}
+    localPosition: {x: 0, y: 0, z: 0}
+    localScale: {x: 1, y: 1, z: 1}
+    sortingLayerName: Floor
+    sortingOrder: 0
     catalogPickup: {fileID: 11400000, guid: 2a1a42b089e13ad4fbc1c32c941833db, type: 2}
-    pickupOnlyWhenOnShoppingList: 1
+    pickupOnlyWhenOnShoppingList: 0
   - roomType: 2
     sprite: {fileID: -2763794566718083992, guid: aea84b86b959a454ebf9006fb385a961, type: 3}
     localPosition: {x: -0.8, y: 0.5, z: 0}
@@ -128,16 +134,12 @@ MonoBehaviour:
     localScale: {x: 0.28, y: 0.28, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
-    catalogPickup: {fileID: 11400000, guid: 1e89265057e8023419e1d5784083dbbd, type: 2}
-    pickupOnlyWhenOnShoppingList: 1
   - roomType: 3
     sprite: {fileID: -1296523228350353732, guid: d431f389c69724d30874caa6e908fa74, type: 3}
     localPosition: {x: 1.4, y: -1.5, z: 0}
     localScale: {x: 0.28, y: 0.28, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
-    catalogPickup: {fileID: 11400000, guid: 230f612b83bfa76499e82053f3288d0f, type: 2}
-    pickupOnlyWhenOnShoppingList: 1
   - roomType: 3
     sprite: {fileID: 92361898666043238, guid: 119eb6c2341c94473bd41305f5839726, type: 3}
     localPosition: {x: 3.6, y: -1.5, z: 0}
@@ -150,24 +152,18 @@ MonoBehaviour:
     localScale: {x: 0.28, y: 0.28, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
-    catalogPickup: {fileID: 11400000, guid: 19070407d5b12f84fb19ceaa00bcf179, type: 2}
-    pickupOnlyWhenOnShoppingList: 1
   - roomType: 3
     sprite: {fileID: -6833735102609310062, guid: aabefb4e958bb4272ab30e987b19ceca, type: 3}
     localPosition: {x: -0.8, y: 0.5, z: 0}
     localScale: {x: 0.28, y: 0.28, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
-    catalogPickup: {fileID: 11400000, guid: 6da3d6411d0270c4db136dd71f9267f2, type: 2}
-    pickupOnlyWhenOnShoppingList: 1
   - roomType: 3
     sprite: {fileID: 7947502558246424140, guid: f620c21d0f7c0429cab138407d7a7235, type: 3}
     localPosition: {x: 1.4, y: 0.5, z: 0}
     localScale: {x: 0.28, y: 0.28, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
-    catalogPickup: {fileID: 11400000, guid: ca9f1e8dfe1913143b1d032fd6d978dc, type: 2}
-    pickupOnlyWhenOnShoppingList: 1
   - roomType: 3
     sprite: {fileID: -1922979618149193216, guid: 5eff9d0e664f4485e907ee231164642c, type: 3}
     localPosition: {x: 3.6, y: 0.5, z: 0}
@@ -189,7 +185,7 @@ MonoBehaviour:
   - roomType: 4
     sprite: {fileID: -5134162304728761883, guid: 5d8bd8f71ecd94a31a117474fdbd253d, type: 3}
     localPosition: {x: -3.0, y: -1.5, z: 0}
-    localScale: {x: 0.28, y: 0.28, z: 1}
+    localScale: {x: 0.22, y: 0.22, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     catalogPickup: {fileID: 11400000, guid: b7ec58a5b48d03944a00b49bf82848f9, type: 2}
@@ -197,19 +193,19 @@ MonoBehaviour:
   - roomType: 4
     sprite: {fileID: -9062558433506644301, guid: c3a89ce84c5ec496983eccfa7ed55b5d, type: 3}
     localPosition: {x: -0.8, y: -1.5, z: 0}
-    localScale: {x: 0.28, y: 0.28, z: 1}
+    localScale: {x: 0.22, y: 0.22, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
   - roomType: 4
     sprite: {fileID: -6989816364347550636, guid: 24c2db5e80cf04c7e9bed73b7c80025f, type: 3}
     localPosition: {x: 1.4, y: -1.5, z: 0}
-    localScale: {x: 0.28, y: 0.28, z: 1}
+    localScale: {x: 0.22, y: 0.22, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
   - roomType: 4
     sprite: {fileID: 995186738447775445, guid: 4f24abd5d8b814945a31cf33b95a6a2a, type: 3}
     localPosition: {x: 3.6, y: -1.5, z: 0}
-    localScale: {x: 0.28, y: 0.28, z: 1}
+    localScale: {x: 0.22, y: 0.22, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     catalogPickup: {fileID: 11400000, guid: 25aa11298459fa648af40bd26245ca0a, type: 2}
@@ -217,13 +213,13 @@ MonoBehaviour:
   - roomType: 4
     sprite: {fileID: 6764707825347140516, guid: 5418b94ddcf3e4f5ea668fa09b76aaff, type: 3}
     localPosition: {x: -3.0, y: 0.5, z: 0}
-    localScale: {x: 0.28, y: 0.28, z: 1}
+    localScale: {x: 0.22, y: 0.22, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
   - roomType: 4
     sprite: {fileID: -4641098184274028752, guid: 34c645612c12341349fbcb76603a470a, type: 3}
     localPosition: {x: -0.8, y: 0.5, z: 0}
-    localScale: {x: 0.28, y: 0.28, z: 1}
+    localScale: {x: 0.22, y: 0.22, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     catalogPickup: {fileID: 11400000, guid: 22fce4f95d5b69447a1589f448b39fe2, type: 2}
@@ -231,7 +227,7 @@ MonoBehaviour:
   - roomType: 4
     sprite: {fileID: -5996101261890546387, guid: 3a76f4f7abb1e48cda7c022e25a01325, type: 3}
     localPosition: {x: 1.4, y: 0.5, z: 0}
-    localScale: {x: 0.28, y: 0.28, z: 1}
+    localScale: {x: 0.22, y: 0.22, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     catalogPickup: {fileID: 11400000, guid: 70cb8c1dbd1475241a94ae30f0152943, type: 2}
@@ -239,7 +235,7 @@ MonoBehaviour:
   - roomType: 4
     sprite: {fileID: 3574613206785399529, guid: ab640fd9736094763b4371bb143988f5, type: 3}
     localPosition: {x: 3.6, y: 0.5, z: 0}
-    localScale: {x: 0.28, y: 0.28, z: 1}
+    localScale: {x: 0.22, y: 0.22, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     catalogPickup: {fileID: 11400000, guid: 15a1ee3c97f929e4786ba86610635c6c, type: 2}
@@ -247,7 +243,7 @@ MonoBehaviour:
   - roomType: 4
     sprite: {fileID: 7613071095470564417, guid: bebe5ed273dae46c8b50bfbfd7d594f0, type: 3}
     localPosition: {x: -3.0, y: 2.5, z: 0}
-    localScale: {x: 0.28, y: 0.28, z: 1}
+    localScale: {x: 0.22, y: 0.22, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     catalogPickup: {fileID: 11400000, guid: 19454d86210960d4091fe59b6384180f, type: 2}
@@ -255,7 +251,7 @@ MonoBehaviour:
   - roomType: 4
     sprite: {fileID: 8366970848145841662, guid: 6fd418b1f60674d0a829af5b32bc0fa3, type: 3}
     localPosition: {x: -0.8, y: 2.5, z: 0}
-    localScale: {x: 0.28, y: 0.28, z: 1}
+    localScale: {x: 0.22, y: 0.22, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     catalogPickup: {fileID: 11400000, guid: a40e23bc5b1203a49b91ce722d5eab78, type: 2}
@@ -263,7 +259,7 @@ MonoBehaviour:
   - roomType: 4
     sprite: {fileID: -7066622788456987460, guid: e19be428a8dde43a0aecfeb4bf45b3b3, type: 3}
     localPosition: {x: 1.4, y: 2.5, z: 0}
-    localScale: {x: 0.28, y: 0.28, z: 1}
+    localScale: {x: 0.22, y: 0.22, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
   - roomType: 5
@@ -376,61 +372,49 @@ MonoBehaviour:
     pickupOnlyWhenOnShoppingList: 1
   - roomType: 6
     sprite: {fileID: 8071599066485508972, guid: ec71d6e466d7343e28ac82d6037f2975, type: 3}
-    localPosition: {x: 0.1, y: -0.05, z: 0}
+    localPosition: {x: 0.18, y: -0.42, z: 0}
     localScale: {x: 1, y: 1, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     interiorAnchor: 1
-    interiorAnchorInset: 0
+    interiorAnchorInset: 1.12
+    catalogPickup: {fileID: 11400000, guid: b8f6877baf33410c87e5166b78aeab4f, type: 2}
+    pickupOnlyWhenOnShoppingList: 1
   - roomType: 6
     sprite: {fileID: -5831146638174434607, guid: 27ec10ba5c05742adbf5b4e26fd2433c, type: 3}
-    localPosition: {x: -1.05, y: -0.05, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
+    localPosition: {x: -0.82, y: -0.4, z: 0}
+    localScale: {x: 1.78, y: 1.78, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     interiorAnchor: 2
-    interiorAnchorInset: 0
+    interiorAnchorInset: 1.18
   - roomType: 6
     sprite: {fileID: -7640417796101528469, guid: 9961f11610d8f491ea320504317b927f, type: 3}
-    localPosition: {x: -0.18, y: 1.12, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
+    localPosition: {x: 0.02, y: 0.98, z: 0}
+    localScale: {x: 1.78, y: 1.78, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     interiorAnchor: 3
-    interiorAnchorInset: 0
-  - roomType: 6
-    sprite: {fileID: -1341090406375734871, guid: 9961f11610d8f491ea320504317b927f, type: 3}
-    localPosition: {x: 0.08, y: 1.12, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-    sortingLayerName: Floor
-    sortingOrder: 8
-    interiorAnchor: 3
-    interiorAnchorInset: 0
-  - roomType: 6
-    sprite: {fileID: 2662384165034553781, guid: 9961f11610d8f491ea320504317b927f, type: 3}
-    localPosition: {x: 0.34, y: 1.12, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
-    sortingLayerName: Floor
-    sortingOrder: 8
-    interiorAnchor: 3
-    interiorAnchorInset: 0
+    interiorAnchorInset: 1.34
+    catalogPickup: {fileID: 11400000, guid: c7dc95f9c77f4e10bcf4474439131548, type: 2}
+    pickupOnlyWhenOnShoppingList: 1
   - roomType: 6
     sprite: {fileID: -5515266580534268866, guid: 7c676b81110b648cb822a13bb35f88dc, type: 3}
-    localPosition: {x: 0.15, y: 0.2, z: 0}
+    localPosition: {x: 0.56, y: 0.92, z: 0}
     localScale: {x: 1, y: 1, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     interiorAnchor: 4
-    interiorAnchorInset: 0
+    interiorAnchorInset: 1.42
     catalogPickup: {fileID: 11400000, guid: 26373e26ee5179744aa065b4d05620cc, type: 2}
     pickupOnlyWhenOnShoppingList: 1
   - roomType: 6
     sprite: {fileID: -8836283830214730600, guid: b4789617423824eeb938fca1d4c2c58a, type: 3}
-    localPosition: {x: -0.2, y: 0.2, z: 0}
-    localScale: {x: 1, y: 1, z: 1}
+    localPosition: {x: -0.36, y: 0.54, z: 0}
+    localScale: {x: 1.05, y: 1.05, z: 1}
     sortingLayerName: Floor
     sortingOrder: 8
     interiorAnchor: 5
-    interiorAnchorInset: 0
+    interiorAnchorInset: 1.22
     catalogPickup: {fileID: 11400000, guid: 2441ad719a3e21f4186058d60accec95, type: 2}
     pickupOnlyWhenOnShoppingList: 1

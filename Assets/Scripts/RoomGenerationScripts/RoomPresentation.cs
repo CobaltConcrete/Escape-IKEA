@@ -42,7 +42,10 @@ public class RoomPresentation : MonoBehaviour
     private bool initialized;
     private float referencePixelsPerUnit = 100f;
 
-    public void Initialize(Sprite floorTileSprite, RoomDecorationCatalog roomDecorationCatalog = null)
+    public void Initialize(
+        Sprite floorTileSprite,
+        RoomDecorationCatalog roomDecorationCatalog = null,
+        RoomPrefabSpawnCatalog prefabSpawnCatalog = null)
     {
         if (initialized)
             return;
@@ -62,8 +65,14 @@ public class RoomPresentation : MonoBehaviour
         Room room = GetComponent<Room>();
         room?.RefreshRendererRegistry();
 
-        if (roomDecorationCatalog != null)
-            RoomDecorationPlacer.Place(transform, roomDecorationCatalog);
+        if (prefabSpawnCatalog != null)
+        {
+            RoomPrefabStaticPlacer.PlaceRoomPrefabs(transform, prefabSpawnCatalog);
+        }
+        else
+        {
+            Debug.LogWarning($"RoomPresentation: Missing prefab spawn catalog for room '{name}'. Prefab-only mode skips legacy decoration path.", this);
+        }
     }
 
     private static Transform FindLegacyFloor(Transform roomRoot)

@@ -27,18 +27,14 @@ public class PlayerAttack : MonoBehaviour
         if (!WasAttackPressed())
             return;
 
-        if (cooldownRemaining > 0f)
-            return;
-
-        EquipmentData equipmentData = inventoryInteraction != null ? inventoryInteraction.EquipmentData : null;
-        Item equippedWeapon =
-            equipmentData != null ? equipmentData.GetEquippedItem(EquipTag.Weapon) : null;
-
-        if (equippedWeapon == null)
+        if (!HasEquippedWeapon())
         {
             BossRoomNoticeUI.Instance?.ShowMessage("I have no weapon");
             return;
         }
+
+        if (cooldownRemaining > 0f)
+            return;
 
         cooldownRemaining = attackCooldown;
 
@@ -71,6 +67,14 @@ public class PlayerAttack : MonoBehaviour
             if (bullet == null) continue;
             Destroy(bullet.gameObject);
         }
+    }
+
+    private bool HasEquippedWeapon()
+    {
+        EquipmentData equipmentData = inventoryInteraction != null ? inventoryInteraction.EquipmentData : null;
+        Item equippedWeapon =
+            equipmentData != null ? equipmentData.GetEquippedItem(EquipTag.Weapon) : null;
+        return equippedWeapon != null;
     }
 
     private bool WasAttackPressed()

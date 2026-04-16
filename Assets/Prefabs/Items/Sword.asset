@@ -32,6 +32,6 @@ MonoBehaviour:
   - 4
   - 5
   bonusSpawnWeight: 1
-  worldDropScale: {x: 0.11000001, y: 0.11000001, z: 0.11000001}
+  worldDropScale: {x: 0.2, y: 0.2, z: 0.2}
   worldTag: Item
   worldLayer: 9

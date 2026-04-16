@@ -1,9 +1,8 @@
 using UnityEngine;
 
 /// <summary>
-/// Two-step bed interaction:
-/// 1) reveal hidden plush
-/// 2) pick plush if it is on shopping list.
+/// Two-step bed interaction: first F takes the plush off the bed (reveals it for pickup), second F collects if on shopping list.
+/// After collection the bed sprite switches to the no-plush variant.
 /// </summary>
 [RequireComponent(typeof(Collider2D))]
 public class BedroomBedContainerPickup : MonoBehaviour, IInteractable
@@ -11,19 +10,34 @@ public class BedroomBedContainerPickup : MonoBehaviour, IInteractable
     [SerializeField] private ItemDefinition plushDefinition;
     [SerializeField] private SpriteRenderer plushRenderer;
     [SerializeField] private Collider2D plushCollider;
+    [SerializeField] private SpriteRenderer bedRenderer;
+    [SerializeField] private Sprite bedSpriteNoPlush;
     [SerializeField] private bool plushRevealed;
 
-    public void Configure(ItemDefinition plushDef, SpriteRenderer plushSr, Collider2D plushCol)
+    public void Configure(
+        ItemDefinition plushDef,
+        SpriteRenderer plushSr,
+        Collider2D plushCol,
+        SpriteRenderer bedSr,
+        Sprite noPlushBedSprite)
     {
         plushDefinition = plushDef;
         plushRenderer = plushSr;
         plushCollider = plushCol;
+        bedRenderer = bedSr;
+        bedSpriteNoPlush = noPlushBedSprite;
         plushRevealed = false;
 
         if (plushRenderer != null)
             plushRenderer.enabled = false;
         if (plushCollider != null)
             plushCollider.enabled = false;
+    }
+
+    /// <summary>Used by loot seeding: how many of this plush can exist on this bed.</summary>
+    public string GetPlushShoppingListKey()
+    {
+        return plushDefinition != null ? plushDefinition.GetShoppingListKey() : null;
     }
 
     private bool CanCollectPlush()
@@ -35,7 +49,7 @@ public class BedroomBedContainerPickup : MonoBehaviour, IInteractable
         if (rom == null)
             return true;
 
-        return rom.ContainsShoppingListKey(plushDefinition.GetShoppingListKey());
+        return rom.NeedsMoreOfShoppingListKey(plushDefinition.GetShoppingListKey());
     }
 
     public void Interact(PlayerInventoryInteraction player)
@@ -60,6 +74,10 @@ public class BedroomBedContainerPickup : MonoBehaviour, IInteractable
             return;
 
         player.PickupLootDefinitionFromWorld(plushDefinition, 1, plushRenderer.gameObject);
+
+        if (bedRenderer != null && bedSpriteNoPlush != null)
+            bedRenderer.sprite = bedSpriteNoPlush;
+
         plushRenderer = null;
         plushCollider = null;
     }
@@ -71,7 +89,7 @@ public class BedroomBedContainerPickup : MonoBehaviour, IInteractable
             return "";
 
         if (!plushRevealed)
-            return "[F] Search bed";
+            return "[F] Take plush from bed";
 
         if (!CanCollectPlush())
             return "";
@@ -87,4 +105,3 @@ public class BedroomBedContainerPickup : MonoBehaviour, IInteractable
         return transform.position;
     }
 }
-

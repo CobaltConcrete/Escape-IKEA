@@ -29,7 +29,7 @@ MonoBehaviour:
   lootWorldPrefab: {fileID: 0}
   allowedRoomTypes: 
   bonusSpawnWeight: 1
-  worldDropScale: {x: 0.11000001, y: 0.11000001, z: 0.11000001}
+  worldDropScale: {x: 0.0275, y: 0.0275, z: 0.0275}
   spawnFootprint: {x: 0.5, y: 0.5}
   worldTag: Item
   worldLayer: 9

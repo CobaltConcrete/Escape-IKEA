@@ -35,7 +35,7 @@ public class LivingRoomContainerPickup : MonoBehaviour, IInteractable
         if (rom == null)
             return true;
 
-        return rom.ContainsShoppingListKey(lootDefinition.GetShoppingListKey());
+        return rom.NeedsMoreOfShoppingListKey(lootDefinition.GetShoppingListKey());
     }
 
     public void Interact(PlayerInventoryInteraction player)

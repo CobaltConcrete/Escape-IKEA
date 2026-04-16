@@ -28,6 +28,9 @@ public class RoomDecorationCatalog : ScriptableObject
         [Tooltip("Only rooms of this type receive this row (must match the room's LootSpawnArea room type).")]
         public RoomType roomType;
 
+        [Tooltip("Optional prefab override. When set, the placer instantiates this prefab instead of spawning a plain sprite object.")]
+        public GameObject prefab;
+
         [Tooltip("Static art when this row is decor only, or when Catalog Pickup is set to Pickup only when on shopping list and this run does not list that item.")]
         public Sprite sprite;
 

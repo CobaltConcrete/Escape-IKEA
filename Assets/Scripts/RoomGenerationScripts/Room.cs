@@ -69,19 +69,19 @@ public class Room : MonoBehaviour
 
     private void SetRenderersVisible(bool visible)
     {
-        if (roomVisuals == null)
-            return;
-
-        // Loot / pickups spawn after Awake; re-scan so hidden rooms do not leave new renderers enabled
-        // (fixes seeing adjacent rooms through doors and "invisible" items).
-        renderers = roomVisuals.GetComponentsInChildren<Renderer>(true);
-        if (renderers == null)
-            return;
-
-        foreach (Renderer rend in renderers)
+        if (roomVisuals != null)
         {
-            if (rend != null)
-                rend.enabled = visible;
+            // Loot / pickups spawn after Awake; re-scan so hidden rooms do not leave new renderers enabled
+            // (fixes seeing adjacent rooms through doors and "invisible" items).
+            renderers = roomVisuals.GetComponentsInChildren<Renderer>(true);
+            if (renderers != null)
+            {
+                foreach (Renderer rend in renderers)
+                {
+                    if (rend != null)
+                        rend.enabled = visible;
+                }
+            }
         }
 
         // Spawned room pickups (including bat weapon pickup) may live outside roomVisuals hierarchy.
@@ -100,6 +100,25 @@ public class Room : MonoBehaviour
             {
                 if (spawnedColliders[i] != null)
                     spawnedColliders[i].enabled = visible;
+            }
+        }
+
+        // Prefab-only room content lives under Decorations root; keep it room-gated too.
+        Transform decorations = transform.Find("Decorations");
+        if (decorations != null)
+        {
+            Renderer[] decorRenderers = decorations.GetComponentsInChildren<Renderer>(true);
+            for (int i = 0; i < decorRenderers.Length; i++)
+            {
+                if (decorRenderers[i] != null)
+                    decorRenderers[i].enabled = visible;
+            }
+
+            Collider2D[] decorColliders = decorations.GetComponentsInChildren<Collider2D>(true);
+            for (int i = 0; i < decorColliders.Length; i++)
+            {
+                if (decorColliders[i] != null)
+                    decorColliders[i].enabled = visible;
             }
         }
     }

@@ -16,7 +16,7 @@ public class PlayerInventoryInteraction : MonoBehaviour
     //[SerializeField] private Dialogue playerDialogue;
 
     private ItemWorld nearbyLoot;
-    [SerializeField] private float interactRadius = 0.45f;
+    [SerializeField] private float interactRadius = 0.9f;
     [SerializeField] private LayerMask interactableLayerMask;
     [SerializeField] private UI_InteractionPrompt interactionPromptUI;
 
@@ -99,6 +99,10 @@ public class PlayerInventoryInteraction : MonoBehaviour
         if (pickedUpItem == null || pickedUpItem.definition == null) return;
         if (!pickedUpItem.IsLoot()) return;
 
+        RunObjectiveManager rom = RunObjectiveManager.Instance;
+        if (rom != null && !rom.NeedsMoreOfShoppingListKey(pickedUpItem.definition.GetShoppingListKey()))
+            return;
+
         inventory.AddLoot(pickedUpItem);
 
         if (SoundManager.Instance != null)
@@ -116,12 +120,12 @@ public class PlayerInventoryInteraction : MonoBehaviour
             return;
 
         RunObjectiveManager rom = RunObjectiveManager.Instance;
-        if (rom != null && !rom.ContainsShoppingListKey(definition.GetShoppingListKey()))
+        if (rom != null && !rom.NeedsMoreOfShoppingListKey(definition.GetShoppingListKey()))
             return;
 
-        Vector3 ws = definition.worldDropScale.sqrMagnitude > 1e-8f
-            ? definition.worldDropScale * ItemWorldSpawner.RoomPickupWorldScale
-            : Vector3.one * ItemWorldSpawner.RoomPickupWorldScale;
+        Vector3 ws = pickupObject.transform.lossyScale.sqrMagnitude > 1e-8f
+            ? pickupObject.transform.lossyScale
+            : Vector3.one;
 
         Item pickedUpItem = new Item
         {
@@ -173,11 +177,6 @@ public class PlayerInventoryInteraction : MonoBehaviour
         }
 
         itemWorld.DestroySelf();
-
-        if (ItemEquipClassifier.GetEquipTag(pickedUpItem) == EquipTag.Weapon)
-        {
-            BossRoomNoticeUI.Instance?.ShowMessage("I'm ready for this.", 2.8f);
-        }
     }
 
     /// <summary>Weapon world pickup that does not use <see cref="ItemWorld"/> (e.g. bat prefab).</summary>
@@ -189,9 +188,9 @@ public class PlayerInventoryInteraction : MonoBehaviour
         if (definition.IsLoot())
             return;
 
-        Vector3 ws = definition.worldDropScale.sqrMagnitude > 1e-8f
-            ? definition.worldDropScale * ItemWorldSpawner.RoomPickupWorldScale
-            : Vector3.one * ItemWorldSpawner.RoomPickupWorldScale;
+        Vector3 ws = pickupObject.transform.lossyScale.sqrMagnitude > 1e-8f
+            ? pickupObject.transform.lossyScale
+            : Vector3.one;
 
         Item pickedUpItem = new Item
         {
@@ -214,11 +213,6 @@ public class PlayerInventoryInteraction : MonoBehaviour
         }
 
         Destroy(pickupObject);
-
-        if (ItemEquipClassifier.GetEquipTag(pickedUpItem) == EquipTag.Weapon)
-        {
-            BossRoomNoticeUI.Instance?.ShowMessage("I'm ready for this.", 2.8f);
-        }
     }
 
     private void FindBestInteractable()
@@ -231,11 +225,23 @@ public class PlayerInventoryInteraction : MonoBehaviour
             interactableLayerMask
         );
 
+        // Fallback for mis-layered interactables (e.g. weapon prefab layer drift during authoring).
+        // Keeps prompt/pickup functional even if layer mask config is stale.
+        if (hits == null || hits.Length == 0)
+        {
+            hits = Physics2D.OverlapCircleAll(
+                transform.position,
+                interactRadius
+            );
+        }
+
         float bestDistance = float.MaxValue;
 
         foreach (Collider2D hit in hits)
         {
             IInteractable interactable = hit.GetComponent<IInteractable>();
+            if (interactable == null)
+                interactable = hit.GetComponentInParent<IInteractable>();
             if (interactable == null) continue;
 
             string prompt = interactable.GetInteractionText();
@@ -248,6 +254,37 @@ public class PlayerInventoryInteraction : MonoBehaviour
             {
                 bestDistance = distance;
                 currentInteractable = interactable;
+            }
+        }
+
+        // Final fallback: discover nearby interactables by component distance, not collider overlap.
+        // This makes pickup robust even if a prefab collider is offset, too small, or misconfigured.
+        if (currentInteractable == null)
+        {
+            MonoBehaviour[] behaviours = FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Exclude, FindObjectsSortMode.None);
+            for (int i = 0; i < behaviours.Length; i++)
+            {
+                MonoBehaviour behaviour = behaviours[i];
+                if (behaviour == null)
+                    continue;
+                if (behaviour == this)
+                    continue;
+                if (behaviour is not IInteractable interactable)
+                    continue;
+
+                string prompt = interactable.GetInteractionText();
+                if (string.IsNullOrEmpty(prompt))
+                    continue;
+
+                float distance = Vector2.Distance(transform.position, interactable.GetInteractionPosition());
+                if (distance > interactRadius * 2f)
+                    continue;
+
+                if (distance < bestDistance)
+                {
+                    bestDistance = distance;
+                    currentInteractable = interactable;
+                }
             }
         }
 
