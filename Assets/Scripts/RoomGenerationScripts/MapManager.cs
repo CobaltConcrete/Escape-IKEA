@@ -1,4 +1,5 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 [System.Serializable]
@@ -30,8 +31,17 @@ public class MapManager : MonoBehaviour
     [SerializeField] private GameObject horizontalBoundaryDoorPrefab;
     [SerializeField] private GameObject verticalBoundaryDoorPrefab;
 
+    [Header("Room presentation")]
+    [Tooltip("Sprites/Generic/Floor_Connecting (32px @ 100 PPU). Tiled in a grid; wood tiles use Sprite Mask to room interior.")]
+    [SerializeField] private Sprite roomFloorTileSprite;
+    [SerializeField] private RoomDecorationCatalog roomDecorationCatalog;
+    [SerializeField] private RoomPrefabSpawnCatalog roomPrefabSpawnCatalog;
+    [Tooltip("Spawned only in SportsRoom (not from ItemSpawnManager weighted list).")]
+    [SerializeField] private GameObject sportsBatPickupPrefab;
+
     private bool[,] occupied;
     private GameObject[,] roomGrid;
+    private GameObject _startingRoomInstance;
 
     private int bossX;
     private int bossY;
@@ -45,6 +55,12 @@ public class MapManager : MonoBehaviour
         centerY = maxCellRows / 2;
 
         ChooseBossLocation();
+
+        if (RunObjectiveManager.Instance != null)
+        {
+            RunObjectiveManager.Instance.GenerateShoppingListAndGoals();
+        }
+
         GenerateMap();
         GenerateDoors();
 
@@ -53,7 +69,9 @@ public class MapManager : MonoBehaviour
             player.position = MapToWorld(centerX, centerY);
         }
 
-        // ===== LOOT SYSTEM INIT =====
+        if (_startingRoomInstance != null)
+            StartCoroutine(ShowOnlyStartingRoomAfterFirstFrame());
+
         if (LootSpawnManager.Instance != null)
         {
             LootSpawnManager.Instance.RefreshSpawnAreas();
@@ -61,8 +79,19 @@ public class MapManager : MonoBehaviour
 
         if (RunObjectiveManager.Instance != null)
         {
-            RunObjectiveManager.Instance.GenerateNewRunObjective();
+            RunObjectiveManager.Instance.SpawnLootForCurrentObjective();
         }
+
+        SpawnSportsRoomBatPickups();
+
+        RoomContentActivation.RefreshPlayerRoomsAfterMapSetup();
+        StartCoroutine(CoRoomContentActivationAfterFirstFrame());
+    }
+
+    private IEnumerator CoRoomContentActivationAfterFirstFrame()
+    {
+        yield return null;
+        RoomContentActivation.RefreshPlayerRoomsAfterMapSetup();
     }
 
     // ==================== Room Spawning stuff ====================
@@ -104,6 +133,7 @@ public class MapManager : MonoBehaviour
 
     void GenerateMap()
     {
+        Room.ResetOneShotHintsForNewMap();
         occupied = new bool[maxCellCols, maxCellRows];
         roomGrid = new GameObject[maxCellCols, maxCellRows];
 
@@ -117,9 +147,14 @@ public class MapManager : MonoBehaviour
         
         occupied[centerX, centerY] = true;
         roomGrid[centerX, centerY] = startRoomObj;
+        _startingRoomInstance = startRoomObj;
+        ApplyRoomPresentation(startRoomObj);
 
         // Spawn boss room
         PlaceRoom(bossRoom, bossX, bossY);
+
+        // Ensure we have at least one of each room type when possible.
+        EnsureAtLeastOneRoomPerType();
 
         // Spawn other rooms
         List<Vector2Int> positions = new List<Vector2Int>();
@@ -141,6 +176,96 @@ public class MapManager : MonoBehaviour
         {
             TryPlaceRandomRoom(pos.x, pos.y);
         }
+    }
+
+    private void EnsureAtLeastOneRoomPerType()
+    {
+        if (roomPrefabs == null || roomPrefabs.Length == 0)
+            return;
+
+        HashSet<RoomType> present = CollectPresentRoomTypes();
+
+        List<Vector2Int> openPositions = new List<Vector2Int>();
+        for (int y = 0; y < maxCellRows; y++)
+        {
+            for (int x = 0; x < maxCellCols; x++)
+            {
+                if (!occupied[x, y])
+                    openPositions.Add(new Vector2Int(x, y));
+            }
+        }
+        Shuffle(openPositions);
+
+        foreach (RoomType rt in System.Enum.GetValues(typeof(RoomType)))
+        {
+            if (rt == RoomType.None || present.Contains(rt))
+                continue;
+
+            RoomPrefab forcedPrefab = PickRoomPrefabForType(rt);
+            if (forcedPrefab == null)
+                continue;
+
+            bool placed = false;
+            for (int i = 0; i < openPositions.Count; i++)
+            {
+                Vector2Int p = openPositions[i];
+                if (!CanPlace(forcedPrefab, p.x, p.y))
+                    continue;
+
+                PlaceRoom(forcedPrefab, p.x, p.y);
+                present.Add(rt);
+                openPositions.RemoveAt(i);
+                placed = true;
+                break;
+            }
+
+            if (!placed)
+            {
+                Debug.LogWarning($"MapManager: Could not force-place room type {rt}; map bounds are full.");
+            }
+        }
+    }
+
+    private HashSet<RoomType> CollectPresentRoomTypes()
+    {
+        HashSet<RoomType> present = new HashSet<RoomType>();
+        HashSet<GameObject> visited = new HashSet<GameObject>();
+
+        for (int y = 0; y < maxCellRows; y++)
+        {
+            for (int x = 0; x < maxCellCols; x++)
+            {
+                GameObject go = roomGrid[x, y];
+                if (go == null || !visited.Add(go))
+                    continue;
+
+                if (RoomLootSpawnTypeHelper.TryGetRoomType(go.transform, out RoomType rt))
+                    present.Add(rt);
+            }
+        }
+
+        return present;
+    }
+
+    private RoomPrefab PickRoomPrefabForType(RoomType targetType)
+    {
+        List<RoomPrefab> candidates = new List<RoomPrefab>();
+        for (int i = 0; i < roomPrefabs.Length; i++)
+        {
+            RoomPrefab rp = roomPrefabs[i];
+            if (rp == null || rp.prefab == null)
+                continue;
+
+            if (!RoomLootSpawnTypeHelper.TryGetRoomType(rp.prefab.transform, out RoomType prefabType))
+                continue;
+            if (prefabType != targetType)
+                continue;
+            candidates.Add(rp);
+        }
+
+        if (candidates.Count == 0)
+            return null;
+        return candidates[Random.Range(0, candidates.Count)];
     }
 
     void Shuffle(List<Vector2Int> list)
@@ -196,6 +321,49 @@ public class MapManager : MonoBehaviour
             {
                 occupied[x + dx, y + dy] = true;
                 roomGrid[x + dx, y + dy] = roomObj;
+            }
+        }
+
+        ApplyRoomPresentation(roomObj);
+    }
+
+    private IEnumerator ShowOnlyStartingRoomAfterFirstFrame()
+    {
+        yield return null;
+        if (_startingRoomInstance == null)
+            yield break;
+
+        Room room = _startingRoomInstance.GetComponent<Room>();
+        if (room != null)
+            room.ApplyAsCurrentVisibleRoom();
+    }
+
+    private void ApplyRoomPresentation(GameObject roomInstance)
+    {
+        if (roomInstance == null)
+            return;
+
+        RoomPresentation presentation = roomInstance.GetComponent<RoomPresentation>();
+        if (presentation == null)
+            presentation = roomInstance.AddComponent<RoomPresentation>();
+
+        presentation.Initialize(roomFloorTileSprite, roomDecorationCatalog, roomPrefabSpawnCatalog);
+    }
+
+    private void SpawnSportsRoomBatPickups()
+    {
+        if (sportsBatPickupPrefab == null || roomGrid == null)
+            return;
+
+        HashSet<GameObject> visitedRooms = new HashSet<GameObject>();
+        for (int x = 0; x < maxCellCols; x++)
+        {
+            for (int y = 0; y < maxCellRows; y++)
+            {
+                GameObject roomObj = roomGrid[x, y];
+                if (roomObj == null || !visitedRooms.Add(roomObj))
+                    continue;
+                SportsRoomBatPlacer.TrySpawnBat(roomObj, sportsBatPickupPrefab);
             }
         }
     }

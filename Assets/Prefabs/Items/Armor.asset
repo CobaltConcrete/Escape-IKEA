@@ -32,9 +32,12 @@ MonoBehaviour:
   minRequiredAmount: 1
   maxRequiredAmount: 3
   shoppingListKey: 
-  allowedRoomTypes: 
+  allowedRoomTypes:
+  - 1
+  - 2
+  - 5
   bonusSpawnWeight: 1
-  worldDropScale: {x: 0.13, y: 0.13, z: 0.13}
+  worldDropScale: {x: 0.0325, y: 0.0325, z: 0.0325}
   spawnFootprint: {x: 1, y: 1}
   worldColliderType: 0
   boxOffset: {x: 0, y: 0}

@@ -100,7 +100,20 @@ public class ItemSpawnManager : MonoBehaviour
             return state;
         }
 
-        if (Random.value > roomSpawnChance)
+        if (IsCafeteriaRoom(roomInstance))
+        {
+            state.shouldSpawn = false;
+            return state;
+        }
+
+        if (RoomLootSpawnTypeHelper.TryGetRoomType(roomInstance.transform, out RoomType roomTypeForSpawn) &&
+            roomTypeForSpawn == RoomType.SportsRoom)
+        {
+            state.shouldSpawn = false;
+            return state;
+        }
+
+        if (UnityEngine.Random.value > roomSpawnChance)
         {
             state.shouldSpawn = false;
             return state;
@@ -113,7 +126,9 @@ public class ItemSpawnManager : MonoBehaviour
             return state;
         }
 
-        GameObject selectedPrefab = PickRandomSpawnablePrefab();
+        RoomLootSpawnTypeHelper.TryGetRoomType(roomInstance.transform, out RoomType resolvedRoomType);
+
+        GameObject selectedPrefab = PickRandomSpawnablePrefab(resolvedRoomType, roomInstance);
         if (selectedPrefab == null)
         {
             state.shouldSpawn = false;
@@ -135,19 +150,30 @@ public class ItemSpawnManager : MonoBehaviour
         return state;
     }
 
-    private GameObject PickRandomSpawnablePrefab()
+    private GameObject PickRandomSpawnablePrefab(RoomType resolvedRoomType, GameObject roomInstance)
     {
         if (spawnableItems == null || spawnableItems.Count == 0)
             return null;
+
+        HashSet<ItemDefinition> definitionsAlreadyInRoom =
+            RoomItemWorldQuery.CollectDefinitionsInPickupScopes(roomInstance);
 
         List<SpawnableRoomItem> validItems = new List<SpawnableRoomItem>();
 
         foreach (SpawnableRoomItem item in spawnableItems)
         {
-            if (item != null && item.itemPrefab != null && item.spawnWeight > 0f)
-            {
-                validItems.Add(item);
-            }
+            if (item == null || item.itemPrefab == null || item.spawnWeight <= 0f)
+                continue;
+
+            if (!IsSpawnPrefabAllowedInRoom(item.itemPrefab, resolvedRoomType))
+                continue;
+
+            ItemWorldSpawner spawner = item.itemPrefab.GetComponent<ItemWorldSpawner>();
+            ItemDefinition def = spawner != null ? spawner.ItemDefinition : null;
+            if (def != null && definitionsAlreadyInRoom.Contains(def))
+                continue;
+
+            validItems.Add(item);
         }
 
         if (validItems.Count == 0)
@@ -159,7 +185,7 @@ public class ItemSpawnManager : MonoBehaviour
             totalWeight += item.spawnWeight;
         }
 
-        float roll = Random.value * totalWeight;
+        float roll = UnityEngine.Random.value * totalWeight;
         float current = 0f;
 
         foreach (SpawnableRoomItem item in validItems)
@@ -172,6 +198,20 @@ public class ItemSpawnManager : MonoBehaviour
         }
 
         return validItems[validItems.Count - 1].itemPrefab;
+    }
+
+    private static bool IsSpawnPrefabAllowedInRoom(GameObject prefab, RoomType resolvedRoomType)
+    {
+        ItemWorldSpawner spawner = prefab != null ? prefab.GetComponent<ItemWorldSpawner>() : null;
+        ItemDefinition definition = spawner != null ? spawner.ItemDefinition : null;
+
+        if (definition == null)
+            return false;
+
+        if (definition.allowedRoomTypes == null || definition.allowedRoomTypes.Count == 0)
+            return false;
+
+        return definition.allowedRoomTypes.Contains(resolvedRoomType);
     }
 
     private void EnsureRoomItemExists(GameObject roomInstance, RoomItemState state)
@@ -236,6 +276,20 @@ public class ItemSpawnManager : MonoBehaviour
         if (roomInstance == null) return false;
 
         string roomName = roomInstance.name;
-        return roomName.Contains("SportsRoom") || roomName.Contains("Tutorial");
+        return roomName.Contains("Tutorial");
+    }
+
+    private static bool IsCafeteriaRoom(GameObject roomInstance)
+    {
+        if (roomInstance == null)
+            return false;
+
+        if (RoomLootSpawnTypeHelper.TryGetRoomType(roomInstance.transform, out RoomType roomType) &&
+            roomType == RoomType.Cafeteria)
+        {
+            return true;
+        }
+
+        return roomInstance.name.IndexOf("Cafeteria", System.StringComparison.OrdinalIgnoreCase) >= 0;
     }
 }

@@ -20,16 +20,21 @@ MonoBehaviour:
   itemCategory: 0
   equipTag: 3
   useEffect: 2
-  effectValue: 8
+  effectValue: 10
   effectDuration: 10
   lootValue: 0
   canAppearInShoppingList: 1
   minRequiredAmount: 1
   maxRequiredAmount: 3
   lootWorldPrefab: {fileID: 0}
-  allowedRoomTypes: 
+  allowedRoomTypes:
+  - 1
+  - 2
+  - 4
+  - 5
+  - 6
   bonusSpawnWeight: 1
-  worldDropScale: {x: 0.11000001, y: 0.11000001, z: 0.11000001}
+  worldDropScale: {x: 0.0275, y: 0.0275, z: 0.0275}
   spawnFootprint: {x: 0.5, y: 0.5}
   worldTag: Item
   worldLayer: 9

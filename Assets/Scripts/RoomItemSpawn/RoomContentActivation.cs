@@ -41,7 +41,7 @@ public class RoomContentActivation : MonoBehaviour
         }
 
         SetRoomContentActive(false);
-        TryRegisterIfPlayerAlreadyInside();
+        RegisterIfPlayerInsideVolume();
         ReevaluateActiveRoom();
     }
 
@@ -90,24 +90,75 @@ public class RoomContentActivation : MonoBehaviour
         ReevaluateActiveRoom();
     }
 
-    private void TryRegisterIfPlayerAlreadyInside()
+    /// <summary>
+    /// Adds this room to <see cref="playerRooms"/> when the player is already overlapping the room trigger
+    /// (e.g. starting room after teleport). Uses bounds + trigger point tests so <see cref="SpawnedItems"/>
+    /// is not left inactive (which would disable loot / bat colliders only in that room).
+    /// </summary>
+    public void RegisterIfPlayerInsideVolume()
     {
-        if (roomTrigger == null)
+        if (roomTrigger == null || ignoreRoomActivationInThisScene)
+        {
             return;
+        }
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
         if (player == null)
+        {
             return;
+        }
 
         Collider2D playerCol = player.GetComponent<Collider2D>();
         if (playerCol == null)
+        {
             return;
+        }
 
-        if (roomTrigger.bounds.Intersects(playerCol.bounds))
+        Bounds pb = playerCol.bounds;
+        Vector2 center = pb.center;
+        Vector2 feet = player.transform.position;
+
+        if (roomTrigger.bounds.Intersects(pb) ||
+            roomTrigger.OverlapPoint(center) ||
+            roomTrigger.OverlapPoint(feet))
         {
             playerTransform = player.transform;
             playerRooms.Add(this);
         }
+    }
+
+    /// <summary>
+    /// Rebuilds which room owns active pickups after map generation / loot spawn / player teleport.
+    /// Call from <see cref="MapManager"/> once the player is at their start cell so the starting room
+    /// (often Sports) does not keep <see cref="itemContainer"/> disabled.
+    /// </summary>
+    public static void RefreshPlayerRoomsAfterMapSetup()
+    {
+        playerRooms.Clear();
+
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+        if (player == null)
+        {
+            return;
+        }
+
+        playerTransform = player.transform;
+
+        RoomContentActivation[] rooms = Object.FindObjectsByType<RoomContentActivation>(
+            FindObjectsInactive.Exclude,
+            FindObjectsSortMode.None);
+
+        foreach (RoomContentActivation room in rooms)
+        {
+            if (room == null)
+            {
+                continue;
+            }
+
+            room.RegisterIfPlayerInsideVolume();
+        }
+
+        ReevaluateActiveRoom();
     }
 
     private static void ReevaluateActiveRoom()
@@ -206,6 +257,28 @@ public class RoomContentActivation : MonoBehaviour
             {
                 item.SetRoomVisible(active);
             }
+        }
+
+        // Avoid direct compile-time dependency on WeaponWorldPickup (can fail on some script compile orders).
+        MonoBehaviour[] behaviours = itemContainer.GetComponentsInChildren<MonoBehaviour>(true);
+        foreach (MonoBehaviour behaviour in behaviours)
+        {
+            if (behaviour == null)
+                continue;
+            if (!string.Equals(behaviour.GetType().Name, "WeaponWorldPickup", System.StringComparison.Ordinal))
+                continue;
+
+            var method = behaviour.GetType().GetMethod("SetRoomVisible", new[] { typeof(bool) });
+            if (method != null)
+                method.Invoke(behaviour, new object[] { active });
+        }
+
+        RoomGeneratedPickup[] generated = itemContainer.GetComponentsInChildren<RoomGeneratedPickup>(true);
+        for (int i = 0; i < generated.Length; i++)
+        {
+            if (generated[i] == null)
+                continue;
+            generated[i].SetRoomVisible(active);
         }
 
         itemContainer.gameObject.SetActive(active);
