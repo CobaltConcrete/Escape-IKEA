@@ -12,10 +12,10 @@ GameObject:
   - component: {fileID: 9205252766977592890}
   - component: {fileID: 9202117452878698467}
   - component: {fileID: 9207077252193120690}
-  - component: {fileID: 9206123456789012345}
   - component: {fileID: -1900770363445998628}
+  - component: {fileID: 5888453961114078487}
   m_Layer: 12
-  m_Name: BatPickup
+  m_Name: Bat
   m_TagString: Item
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -148,7 +148,34 @@ MonoBehaviour:
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 0
   m_PointLightOuterRadius: 1.8
---- !u!61 &9206123456789012345
+  m_ShapeLightParametricSides: 5
+  m_ShapeLightParametricAngleOffset: 0
+  m_ShapeLightParametricRadius: 1
+  m_ShapeLightFalloffSize: 0.5
+  m_ShapeLightFalloffOffset: {x: 0, y: 0}
+  m_ShapePath: []
+--- !u!114 &-1900770363445998628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9201813141723428332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  roomType: 6
+  spawnCategory: 2
+  shoppingListKey: 
+  pickupDisplayName: Bat
+  lootValue: 0
+  canAppearInShoppingList: 0
+  minRequiredAmount: 1
+  maxRequiredAmount: 1
+  spawnWeight: 1
+--- !u!61 &5888453961114078487
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -186,42 +213,11 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 8, y: 8}
+    oldSize: {x: 0.24, y: 0.24}
     newSize: {x: 8, y: 8}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1.2, y: 0.35}
+  m_Size: {x: 1, y: 0.35}
   m_EdgeRadius: 0
---- !u!114 &-1900770363445998628
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9201813141723428332}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomType: 6
-  spawnCategory: 2
-  shoppingListKey: 
-  pickupDisplayName: Bat
-  lootValue: 0
-  canAppearInShoppingList: 0
-  minRequiredAmount: 1
-  maxRequiredAmount: 1
-  spawnWeight: 1
-  m_ShapeLightParametricSides: 5
-  m_ShapeLightParametricAngleOffset: 0
-  m_ShapeLightParametricRadius: 1
-  m_ShapeLightFalloffSize: 0.5
-  m_ShapeLightFalloffOffset: {x: 0, y: 0}
-  m_ShapePath:
-  - {x: -0.5, y: -0.5, z: 0}
-  - {x: 0.5, y: -0.5, z: 0}
-  - {x: 0.5, y: 0.5, z: 0}
-  - {x: -0.5, y: 0.5, z: 0}

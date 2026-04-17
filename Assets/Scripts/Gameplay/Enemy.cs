@@ -23,6 +23,11 @@ public class Enemy : MonoBehaviour
     [SerializeField] private float recoilDuration = 0.12f;
     [SerializeField] private float stunDurationAfterHit = 2f;
 
+    [Header("Dash Through Reaction")]
+    [SerializeField] private float dashStaggerDistance = 0.8f;
+    [SerializeField] private float dashStaggerDuration = 0.14f;
+    [SerializeField] private float dashSideBias = 0.7f;
+
     [Header("Wall Bounce")]
     [SerializeField] private float wallBounceCooldown = 0.15f;
 
@@ -260,5 +265,28 @@ public class Enemy : MonoBehaviour
         BounceAwayFromWall(wallNormal);
         wallRecoverTimer = wallRecoverDuration;
         lastWallBounceTime = Time.time;
+    }
+    public void HitByDash(Vector2 dashDirection, float dashDamage, float dashStunDuration)
+    {
+        if (dashDirection.sqrMagnitude < 0.001f)
+            return;
+
+        Vector2 forward = dashDirection.normalized;
+        Vector2 side = new Vector2(-forward.y, forward.x);
+
+        float sideSign = Random.value < 0.5f ? -1f : 1f;
+        Vector2 staggerDirection = (forward + side * sideSign * dashSideBias).normalized;
+
+        recoilDirection = staggerDirection;
+        recoilDistance = dashStaggerDistance;
+        recoilDuration = dashStaggerDuration;
+        recoilTimer = recoilDuration;
+
+        isRecoiling = true;
+        isStunned = false;
+
+        stunDurationAfterHit = dashStunDuration;
+
+        SendMessage("TakeDamage", dashDamage, SendMessageOptions.DontRequireReceiver);
     }
 }

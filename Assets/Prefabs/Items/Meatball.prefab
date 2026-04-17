@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 5569127065122104655}
   - component: {fileID: 3297271436586200869}
-  - component: {fileID: 6924176029194304441}
   - component: {fileID: 1804827316909422306}
   - component: {fileID: 2680106428504148284}
+  - component: {fileID: -619979486133121894}
   m_Layer: 8
   m_Name: Meatball
   m_TagString: Untagged
@@ -90,8 +90,35 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!58 &6924176029194304441
-CircleCollider2D:
+--- !u!114 &1804827316909422306
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2870026492113798478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: be1e306fda06c48ee8d45acdda1ee1f7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  healAmount: 25
+  useMeatballBrownTint: 1
+  meatballTint: {r: 1, g: 1, b: 1, a: 1}
+--- !u!114 &2680106428504148284
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2870026492113798478}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c6392ff11c9b67f44890dc519402a091, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!61 &-619979486133121894
+BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -125,31 +152,14 @@ CircleCollider2D:
   m_CompositeOperation: 0
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_Radius: 0.5
---- !u!114 &1804827316909422306
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2870026492113798478}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: be1e306fda06c48ee8d45acdda1ee1f7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  healAmount: 25
-  useMeatballBrownTint: 1
-  meatballTint: {r: 1, g: 1, b: 1, a: 1}
---- !u!114 &2680106428504148284
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2870026492113798478}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c6392ff11c9b67f44890dc519402a091, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  m_SpriteTilingProperty:
+    border: {x: 0, y: 0, z: 0, w: 0}
+    pivot: {x: 0.5, y: 0.5}
+    oldSize: {x: 0.93, y: 0.48}
+    newSize: {x: 1, y: 1}
+    adaptiveTilingThreshold: 0.5
+    drawMode: 0
+    adaptiveTiling: 0
+  m_AutoTiling: 0
+  m_Size: {x: 1, y: 0.5}
+  m_EdgeRadius: 0

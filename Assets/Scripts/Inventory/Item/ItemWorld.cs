@@ -199,12 +199,10 @@ public class ItemWorld : MonoBehaviour, IInteractable
         {
             if (item.IsLoot())
             {
-                // Loot ??????
                 light2D.enabled = false;
             }
             else
             {
-                // ??? Item ????
                 light2D.enabled = true;
                 light2D.color = item.GetColor();
                 light2D.intensity = 1f;
@@ -224,12 +222,12 @@ public class ItemWorld : MonoBehaviour, IInteractable
             }
         }
 
-        ApplyColliderFromDefinition();
+        // collider，直接用 pfItemWorld prefab 上原本设置好的 collider
+        // ApplyColliderFromDefinition();
 
         if (spriteRenderer != null)
         {
             spriteRenderer.sortingLayerName = "Item";
-            // Weapons draw above generic pickups (same layer) so large sprites never read as "under" floor props.
             spriteRenderer.sortingOrder =
                 item.definition.equipTag == EquipTag.Weapon ? 18 : 2;
         }
@@ -296,46 +294,49 @@ public class ItemWorld : MonoBehaviour, IInteractable
         plateSr.sortingOrder = spriteRenderer != null ? spriteRenderer.sortingOrder - 1 : 1;
     }
 
-    private void ApplyColliderFromDefinition()
-    {
-        if (item == null || item.definition == null)
-            return;
+    //private void ApplyColliderFromDefinition()
+    //{
+    //    if (item == null || item.definition == null)
+    //        return;
 
-        var def = item.definition;
+    //    var def = item.definition;
 
-        if (def.worldColliderType == WorldColliderType.None)
-        {
-            return;
-        }
+    //    // 先全部删掉旧的 collider
+    //    Collider2D[] colliders = GetComponents<Collider2D>();
+    //    foreach (var c in colliders)
+    //    {
+    //        Destroy(c);
+    //    }
 
-        Collider2D[] colliders = GetComponents<Collider2D>();
-        foreach (var c in colliders)
-        {
-            Destroy(c);
-        }
+    //    // 如果是 None → 不创建新 collider（就是“无碰撞”）
+    //    if (def.worldColliderType == WorldColliderType.None)
+    //    {
+    //        return;
+    //    }
 
-        switch (def.worldColliderType)
-        {
-            case WorldColliderType.Box:
-                {
-                    BoxCollider2D box = gameObject.AddComponent<BoxCollider2D>();
-                    box.isTrigger = false;
-                    box.offset = def.boxOffset;
-                    box.size = def.boxSize * WorldPickupColliderScale;
-                    box.edgeRadius = def.boxEdgeRadius;
-                    break;
-                }
+    //    // 再创建新的 collider
+    //    switch (def.worldColliderType)
+    //    {
+    //        case WorldColliderType.Box:
+    //            {
+    //                BoxCollider2D box = gameObject.AddComponent<BoxCollider2D>();
+    //                box.isTrigger = true;
+    //                box.offset = def.boxOffset;
+    //                box.size = def.boxSize * WorldPickupColliderScale;
+    //                box.edgeRadius = def.boxEdgeRadius;
+    //                break;
+    //            }
 
-            case WorldColliderType.Circle:
-                {
-                    CircleCollider2D circle = gameObject.AddComponent<CircleCollider2D>();
-                    circle.isTrigger = false;
-                    circle.offset = def.circleOffset;
-                    circle.radius = def.circleRadius * WorldPickupColliderScale;
-                    break;
-                }
-        }
-    }
+    //        case WorldColliderType.Circle:
+    //            {
+    //                CircleCollider2D circle = gameObject.AddComponent<CircleCollider2D>();
+    //                circle.isTrigger = true;
+    //                circle.offset = def.circleOffset;
+    //                circle.radius = def.circleRadius * WorldPickupColliderScale;
+    //                break;
+    //            }
+    //    }
+    //}
 
     public Item GetItem()
     {
@@ -413,9 +414,11 @@ public class ItemWorld : MonoBehaviour, IInteractable
         if (!IsEligibleForWorldPickup())
             return "";
 
-        if (item.IsLoot())
-            return "[F] Pick up " + item.definition.itemName;
+        // 普通 item：不显示任何提示
+        if (!item.IsLoot())
+            return "";
 
+        // 只有 loot 显示 F 提示
         return "[F] Pick up " + item.definition.itemName;
     }
 

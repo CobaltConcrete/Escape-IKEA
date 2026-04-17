@@ -32,9 +32,13 @@ public class ItemDefinitionEditor : Editor
         {
             EditorGUILayout.LabelField("Normal Item Settings", EditorStyles.boldLabel);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("equipTag"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("useEffect"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("effectValue"));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty("effectDuration"));
+
+            if (itemDefinition.equipTag == EquipTag.Utility)
+            {
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("useEffect"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("effectValue"));
+                EditorGUILayout.PropertyField(serializedObject.FindProperty("effectDuration"));
+            }
 
             if (itemDefinition.equipTag == EquipTag.Armor)
             {

@@ -59,6 +59,7 @@ public class ItemWorldSpawner : MonoBehaviour
         if (spawned != null)
         {
             ApplyDefinitionWorldSettings(spawned.gameObject, itemDefinition);
+            CopyColliderToSpawned(spawned.gameObject);
 
             if (spawnParent != null)
             {
@@ -70,6 +71,35 @@ public class ItemWorldSpawner : MonoBehaviour
         }
 
         Destroy(gameObject);
+    }
+    private void CopyColliderToSpawned(GameObject target)
+    {
+        if (target == null) return;
+
+        Collider2D sourceCollider = GetComponent<Collider2D>();
+        if (sourceCollider == null) return;
+
+        Collider2D existing = target.GetComponent<Collider2D>();
+        if (existing != null)
+        {
+            Destroy(existing);
+        }
+
+        if (sourceCollider is BoxCollider2D sourceBox)
+        {
+            BoxCollider2D box = target.AddComponent<BoxCollider2D>();
+            box.isTrigger = sourceBox.isTrigger;
+            box.offset = sourceBox.offset;
+            box.size = sourceBox.size;
+            box.edgeRadius = sourceBox.edgeRadius;
+        }
+        else if (sourceCollider is CircleCollider2D sourceCircle)
+        {
+            CircleCollider2D circle = target.AddComponent<CircleCollider2D>();
+            circle.isTrigger = sourceCircle.isTrigger;
+            circle.offset = sourceCircle.offset;
+            circle.radius = sourceCircle.radius;
+        }
     }
 
     private void ApplyDefinitionWorldSettings(GameObject target, ItemDefinition definition)
@@ -86,6 +116,10 @@ public class ItemWorldSpawner : MonoBehaviour
     {
         if (sourceTransform != null && sourceTransform.lossyScale.sqrMagnitude > 1e-8f)
             return sourceTransform.lossyScale;
+
+        if (definition != null && definition.worldDropScale.sqrMagnitude > 1e-8f)
+            return definition.worldDropScale;
+
         return Vector3.one;
     }
 

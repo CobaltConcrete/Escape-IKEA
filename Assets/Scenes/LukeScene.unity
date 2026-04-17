@@ -610,7 +610,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1321239863346662718, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0.000015258789
+      value: 0.0000076293945
       objectReference: {fileID: 0}
     - target: {fileID: 2525558533577613229, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
       propertyPath: m_Pivot.x
@@ -708,6 +708,26 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0.000030517578
       objectReference: {fileID: 0}
+    - target: {fileID: 3694953047713900371, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3694953047713900371, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3694953047713900371, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3694953047713900371, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3694953047713900371, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3740954505476501487, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
       propertyPath: playerInventoryInteraction
       value: 
@@ -720,10 +740,54 @@ PrefabInstance:
       propertyPath: m_SizeDelta.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4548331804990669048, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4548331804990669048, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4548331804990669048, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_SizeDelta.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4548331804990669048, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4548331804990669048, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4548331804990669048, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4850528307255079063, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
       propertyPath: playerMovement
       value: 
       objectReference: {fileID: 5300817743267398497}
+    - target: {fileID: 6907275819199827848, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6907275819199827848, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchorMin.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6907275819199827848, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_SizeDelta.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6907275819199827848, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchoredPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6907275819199827848, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8291567420406807307, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
       propertyPath: m_Name
       value: List_Eq_Item_Loot

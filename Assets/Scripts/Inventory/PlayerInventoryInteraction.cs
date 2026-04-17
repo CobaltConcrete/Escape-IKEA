@@ -95,13 +95,10 @@ public class PlayerInventoryInteraction : MonoBehaviour
     public void PickupLoot(ItemWorld itemWorld)
     {
         if (itemWorld == null) return;
+
         Item pickedUpItem = itemWorld.GetItem();
         if (pickedUpItem == null || pickedUpItem.definition == null) return;
         if (!pickedUpItem.IsLoot()) return;
-
-        RunObjectiveManager rom = RunObjectiveManager.Instance;
-        if (rom != null && !rom.NeedsMoreOfShoppingListKey(pickedUpItem.definition.GetShoppingListKey()))
-            return;
 
         inventory.AddLoot(pickedUpItem);
 
@@ -117,10 +114,6 @@ public class PlayerInventoryInteraction : MonoBehaviour
     public void PickupLootDefinitionFromWorld(ItemDefinition definition, int pickupAmount, GameObject pickupObject)
     {
         if (definition == null || pickupObject == null || !definition.IsLoot())
-            return;
-
-        RunObjectiveManager rom = RunObjectiveManager.Instance;
-        if (rom != null && !rom.NeedsMoreOfShoppingListKey(definition.GetShoppingListKey()))
             return;
 
         Vector3 ws = pickupObject.transform.lossyScale.sqrMagnitude > 1e-8f

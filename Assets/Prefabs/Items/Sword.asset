@@ -17,21 +17,31 @@ MonoBehaviour:
   stackable: 0
   uiScale: 1
   glowColor: {r: 1, g: 1, b: 1, a: 1}
+  description: 
   itemCategory: 0
   equipTag: 1
   useEffect: 0
   effectValue: 0
   effectDuration: 0
+  armorMaxDurability: 100
+  armorDamageReduction: 0
+  armorSpecialAbility: 0
+  armorDurabilityLossMultiplier: 1
   lootValue: 0
   canAppearInShoppingList: 1
   minRequiredAmount: 1
   maxRequiredAmount: 3
-  lootWorldPrefab: {fileID: 0}
-  allowedRoomTypes:
-  - 2
-  - 4
-  - 5
+  shoppingListKey: 
+  allowedRoomTypes: 020000000400000005000000
   bonusSpawnWeight: 1
-  worldDropScale: {x: 0.2, y: 0.2, z: 0.2}
+  worldDropScale: {x: 1, y: 1, z: 1}
+  spawnFootprint: {x: 1, y: 1}
+  worldContrastBackdrop: 0
+  worldColliderType: 0
+  boxOffset: {x: 0, y: 0}
+  boxSize: {x: 1, y: 1}
+  boxEdgeRadius: 0
+  circleOffset: {x: 0, y: 0}
+  circleRadius: 0.5
   worldTag: Item
   worldLayer: 9
