@@ -1744,6 +1744,34 @@ PrefabInstance:
       propertyPath: interactionPromptUI
       value: 
       objectReference: {fileID: 6281745019174675742}
+    - target: {fileID: 107977642095276863, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: autoEquipWhenSlotEmpty
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 107977642095276863, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: autoRefillUtilityWhenConsumed
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 107977642095276863, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: weaponPriorityList.Array.size
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 107977642095276863, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: 'weaponPriorityList.Array.data[0]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 476398be52343184ab30426607c171b8, type: 2}
+    - target: {fileID: 107977642095276863, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: 'weaponPriorityList.Array.data[1]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 712ca49f61bfc7d48bc9eee9ef6045b4, type: 2}
+    - target: {fileID: 107977642095276863, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: 'weaponPriorityList.Array.data[2]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 56b77b7c4beb2404d858b0225d87ec60, type: 2}
+    - target: {fileID: 107977642095276863, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: 'weaponPriorityList.Array.data[3]'
+      value: 
+      objectReference: {fileID: 11400000, guid: a497e763e5473154fa5fcfed649410fd, type: 2}
     - target: {fileID: 2186692304189018441, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
       propertyPath: m_Name
       value: Player
@@ -2127,6 +2155,14 @@ PrefabInstance:
       propertyPath: spawnableItems.Array.data[6].itemPrefab
       value: 
       objectReference: {fileID: 2870026492113798478, guid: c5692d816becb45e5bd4aaee83b6f00d, type: 3}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[21]'
+      value: 
+      objectReference: {fileID: 11400000, guid: 7afae247691de824280fc5f25af5e36b, type: 2}
+    - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: 'allItemDefinitions.Array.data[22]'
+      value: 
+      objectReference: {fileID: 11400000, guid: c6142730141f3ec47823df46ceaf548e, type: 2}
     - target: {fileID: 4499290462588721395, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: m_Name
       value: GameManager

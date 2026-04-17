@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a735814c985e7c48bde2bdca9fc5a74, type: 3}
-  m_Name: Bed
+  m_Name: Bee Bed
   m_EditorClassIdentifier: 
-  itemName: Bed Night Owl
-  icon: {fileID: 3844635641330849691, guid: 361d5e27ef98b4f649d3676dd7c35c84, type: 3}
+  itemName: Bee Bed
+  icon: {fileID: 3334673588272203963, guid: 94ffb916b32c94ac58197236e8e65d0b, type: 3}
   stackable: 0
   uiScale: 0.7
   glowColor: {r: 0.33730364, g: 0, b: 1, a: 1}

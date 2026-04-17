@@ -23,6 +23,10 @@ public class RoomSpawnPrefabDefinition : MonoBehaviour
     [Min(1)] public int maxRequiredAmount = 1;
     [Min(1)] public int spawnWeight = 1;
 
+    [Header("Pickup Handoff")]
+    public bool isPickable = false;
+    public ItemDefinition linkedItemDefinition;
+
     public string GetResolvedDisplayName()
     {
         if (!string.IsNullOrWhiteSpace(pickupDisplayName))
