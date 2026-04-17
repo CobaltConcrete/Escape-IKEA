@@ -48,7 +48,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 895c7b0b55164e3428f6e1776c3cde1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemDefinition: {fileID: 11400000, guid: 2a1a42b089e13ad4fbc1c32c941833db, type: 2}
+  itemDefinition: {fileID: 11400000, guid: 7afae247691de824280fc5f25af5e36b, type: 2}
   amount: 1
   spawnedObjectName: Bee
 --- !u!212 &-8225381597860622731
@@ -179,6 +179,8 @@ MonoBehaviour:
   minRequiredAmount: 1
   maxRequiredAmount: 3
   spawnWeight: 1
+  isPickable: 1
+  linkedItemDefinition: {fileID: 11400000, guid: 7afae247691de824280fc5f25af5e36b, type: 2}
 --- !u!61 &6654801386280465556
 BoxCollider2D:
   m_ObjectHideFlags: 0
