@@ -18,8 +18,11 @@ public class PlayerDashAbility : MonoBehaviour
     [SerializeField] private LayerMask enemyLayerMask;
     [SerializeField] private float dashHitRadius = 0.6f;
     [SerializeField] private float dashDamage = 20f;
-    [SerializeField] private float dashKnockbackForce = 10f;
-    [SerializeField] private float dashStunDuration = 1.0f;
+    [SerializeField] private float dashStunDuration = 0.35f;
+
+    [Header("Dash Phase Settings")]
+    [SerializeField] private int playerLayer = 8;
+    [SerializeField] private int enemyLayer = 10;
 
     private bool isDashing = false;
     private float lastDashTime = -999f;
@@ -103,6 +106,8 @@ public class PlayerDashAbility : MonoBehaviour
 
         rb.linearVelocity = Vector2.zero;
 
+        Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, true);
+
         while (elapsed < dashDuration)
         {
             float step = dashSpeed * Time.fixedDeltaTime;
@@ -114,6 +119,8 @@ public class PlayerDashAbility : MonoBehaviour
             elapsed += Time.fixedDeltaTime;
             yield return new WaitForFixedUpdate();
         }
+
+        Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, false);
 
         rb.linearVelocity = Vector2.zero;
 
@@ -136,17 +143,16 @@ public class PlayerDashAbility : MonoBehaviour
 
             hitThisDash.Add(hit);
 
-            EnemyDashTarget dashTarget = hit.GetComponent<EnemyDashTarget>();
-            if (dashTarget == null)
+            Enemy enemy = hit.GetComponent<Enemy>();
+            if (enemy == null)
             {
-                dashTarget = hit.GetComponentInParent<EnemyDashTarget>();
+                enemy = hit.GetComponentInParent<Enemy>();
             }
 
-            if (dashTarget != null)
+            if (enemy != null)
             {
-                dashTarget.HitByDash(
+                enemy.HitByDash(
                     dashDirection,
-                    transform.position,
                     dashDamage,
                     dashStunDuration
                 );
@@ -154,7 +160,6 @@ public class PlayerDashAbility : MonoBehaviour
             else
             {
                 hit.gameObject.SendMessage("TakeDamage", dashDamage, SendMessageOptions.DontRequireReceiver);
-                hit.gameObject.SendMessage("ApplyStun", dashStunDuration, SendMessageOptions.DontRequireReceiver);
             }
         }
     }

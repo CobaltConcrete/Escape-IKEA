@@ -126,6 +126,7 @@ GameObject:
   - component: {fileID: 1822560432590618026}
   - component: {fileID: 8600148856383864679}
   - component: {fileID: 107977642095276863}
+  - component: {fileID: 8431549004850888555}
   m_Layer: 8
   m_Name: Player
   m_TagString: Player
@@ -316,3 +317,28 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 8b1ded8cb101ed6489ded3f5d0897afb, type: 2}
   - {fileID: 11400000, guid: 0b9f9db855c79b7439d128dc85067cf3, type: 2}
   - {fileID: 11400000, guid: 7db76ef5dc1369a4d93382e40f3c7caa, type: 2}
+--- !u!114 &8431549004850888555
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2186692304189018441}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c27916e02a6237b45a49630be5b57834, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 5004750727922367931}
+  playerMovementScript: {fileID: 4454752908340480334}
+  equipmentData: {fileID: 0}
+  dashDistance: 3.5
+  dashDuration: 0.12
+  dashCooldown: 1.2
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 1088
+  dashHitRadius: 0.6
+  dashDamage: 20
+  dashKnockbackForce: 10
+  dashStunDuration: 1
