@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: -8047790109118790915}
   - component: {fileID: -9025449423726534894}
   - component: {fileID: -5407095470068128593}
+  - component: {fileID: 1938281404488083802}
   m_Layer: 10
   m_Name: DistortedShopper
   m_TagString: Enemy
@@ -251,3 +252,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfcb5cbf73c143a4cbd1f87435004d6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1938281404488083802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3464154710725457275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce03509757122af4a9ed36a300c504c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 3072285298274155184}
+  enemyWander: {fileID: 8404082261452416212}
+  enemyAimerShooter: {fileID: 0}
+  enemyDashCharger: {fileID: 6259989672804943158}

@@ -136,7 +136,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 15, y: 15}
+  m_Size: {x: 10, y: 10}
   m_EdgeRadius: 0
 --- !u!114 &7163489287122536335
 MonoBehaviour:
@@ -150,6 +150,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0638dc5f663494440a17f1ba89c620a0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  lockRoomOnSpawn: 1
 --- !u!50 &3057304995095792669
 Rigidbody2D:
   serializedVersion: 5

@@ -18,6 +18,7 @@ GameObject:
   - component: {fileID: -7194297125487669818}
   - component: {fileID: 3081837168203019117}
   - component: {fileID: 2618402277444551181}
+  - component: {fileID: 2153638254944649856}
   m_Layer: 10
   m_Name: CafeteriaBoss
   m_TagString: Enemy
@@ -304,7 +305,6 @@ MonoBehaviour:
   burstShots: 3
   burstGap: 0.45
   burstPause: 2.4
-  randomizeInitialDelay: 1
   trackingRange: 6
   cancelThreshold: 0.4
   bulletPrefab: {fileID: 5573476143328688710, guid: 7180c99457c77e041a061f4ca7371c35, type: 3}
@@ -364,6 +364,26 @@ MonoBehaviour:
   pauseDuration: 2
   keepBulletsInBossRoom: 1
   bulletsBounceOnWalls: 1
+  fleeRadius: 4
+  fleePushPerSecond: 3.5
+  chaseDotThreshold: 0.2
+  minPlayerSpeed: 0.35
+--- !u!114 &2153638254944649856
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1626777669089237922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce03509757122af4a9ed36a300c504c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 3311330670656350568}
+  enemyWander: {fileID: 3189414846442038637}
+  enemyAimerShooter: {fileID: 1148303909692211348}
+  enemyDashCharger: {fileID: 6259989672804943158, guid: 73a96bd0a680f8949861c27cf368dbe9, type: 3}
 --- !u!1 &6020604292169883429
 GameObject:
   m_ObjectHideFlags: 0

@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 7776932078797165444}
   - component: {fileID: -5141088472471799213}
   - component: {fileID: 1695997259055853026}
+  - component: {fileID: 86945060787307803}
   m_Layer: 10
   m_Name: Employee
   m_TagString: Enemy
@@ -235,3 +236,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cfcb5cbf73c143a4cbd1f87435004d6f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &86945060787307803
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6291527677918437734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ce03509757122af4a9ed36a300c504c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 6033468489796418918}
+  enemyWander: {fileID: 0}
+  enemyAimerShooter: {fileID: 0}
+  enemyDashCharger: {fileID: 0}

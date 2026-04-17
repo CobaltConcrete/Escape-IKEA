@@ -36,7 +36,6 @@ public class EnemyCombat : MonoBehaviour
 
     private void TryDamagePlayerOnContact()
     {
-        // no damage when enemy is stunned
         if (enemy != null && !enemy.CanDealContactDamage())
             return;
 
@@ -57,9 +56,16 @@ public class EnemyCombat : MonoBehaviour
             PlayerHealth playerHealth = hit.GetComponent<PlayerHealth>() ?? hit.GetComponentInParent<PlayerHealth>();
             if (playerHealth == null) continue;
 
+            PlayerDashAbility dashAbility =
+                hit.GetComponent<PlayerDashAbility>() ?? hit.GetComponentInParent<PlayerDashAbility>();
+
+            if (dashAbility != null && dashAbility.IsDashing)
+            {
+                continue;
+            }
+
             ColliderDistance2D distanceInfo = hit.Distance(GetComponent<Collider2D>());
 
-            // too far, can't hit
             if (distanceInfo.distance > contactDamageDistance)
                 continue;
 

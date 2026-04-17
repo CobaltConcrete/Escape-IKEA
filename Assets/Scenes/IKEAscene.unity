@@ -1107,7 +1107,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4454752908340480334, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
   m_PrefabInstance: {fileID: 4826707941909227092}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 4826707941909227094}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 1ed1df4d132bbc341a2f1b24375bcddb, type: 3}
@@ -1118,7 +1118,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 107977642095276863, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
   m_PrefabInstance: {fileID: 4826707941909227092}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 4826707941909227094}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 53f1cc2d69cc34e4bb03447bb9a0dac4, type: 3}
@@ -1129,7 +1129,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1822560432590618026, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
   m_PrefabInstance: {fileID: 4826707941909227092}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 4826707941909227094}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6268c1f5cb88a4a6fa4912559636d0d1, type: 3}
@@ -1799,8 +1799,46 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2186692304189018441, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4826707941909227095}
   m_SourcePrefab: {fileID: 100100000, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+--- !u!50 &4826707941909227093 stripped
+Rigidbody2D:
+  m_CorrespondingSourceObject: {fileID: 5004750727922367931, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+  m_PrefabInstance: {fileID: 4826707941909227092}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &4826707941909227094 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2186692304189018441, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+  m_PrefabInstance: {fileID: 4826707941909227092}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &4826707941909227095
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4826707941909227094}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c27916e02a6237b45a49630be5b57834, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  rb: {fileID: 4826707941909227093}
+  playerMovementScript: {fileID: 2033428277}
+  equipmentData: {fileID: 9108433767328902556}
+  dashDistance: 3.5
+  dashDuration: 0.12
+  dashCooldown: 1.2
+  enemyLayerMask:
+    serializedVersion: 2
+    m_Bits: 1088
+  dashHitRadius: 0.6
+  dashDamage: 20
+  dashKnockbackForce: 10
+  dashStunDuration: 1
 --- !u!114 &4942712673117137775 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 2528238351845877907, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
@@ -2103,6 +2141,18 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 766821874428729140, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: spawnableItems.Array.data[1].itemPrefab
+      value: 
+      objectReference: {fileID: 9201813141723428332, guid: 95bf413d79ab0106b27133027d355bfd, type: 3}
+    - target: {fileID: 766821874428729140, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: spawnableItems.Array.data[4].itemPrefab
+      value: 
+      objectReference: {fileID: 5471021774987429058, guid: 23576884eba6ade40a40c00fc2630ac7, type: 3}
+    - target: {fileID: 766821874428729140, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
+      propertyPath: spawnableItems.Array.data[6].itemPrefab
+      value: 
+      objectReference: {fileID: 2870026492113798478, guid: c5692d816becb45e5bd4aaee83b6f00d, type: 3}
     - target: {fileID: 4499290462588721395, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: m_Name
       value: GameManager
