@@ -6,6 +6,7 @@ public class WorldLoop : MonoBehaviour
     [SerializeField] private Transform cameraTransform;
 
     private MapManager mapManager;
+    private static bool externalLoopLock = false;
 
     float minX, maxX, minY, maxY;
 
@@ -25,6 +26,8 @@ public class WorldLoop : MonoBehaviour
 
     void Update()
     {
+        if (externalLoopLock) return;
+
         Vector3 pos = transform.position;
         Vector3 delta = Vector3.zero;
 
@@ -57,5 +60,10 @@ public class WorldLoop : MonoBehaviour
             if (cameraTransform != null)
                 cameraTransform.position += delta;
         }
+    }
+
+    public static void SetExternalLoopLock(bool isLocked)
+    {
+        externalLoopLock = isLocked;
     }
 }

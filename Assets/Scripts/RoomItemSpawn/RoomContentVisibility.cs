@@ -9,6 +9,7 @@ public class RoomContentVisibility : MonoBehaviour
     private EnemyWander enemyWander;
     private EnemyDashCharger enemyDashCharger;
     private EnemyAimerShooter enemyAimerShooter;
+    private CafeteriaBossPattern cafeteriaBossPattern;
     private EnemyCombat enemyCombat;
     private EnemyBullet enemyBullet;
 
@@ -21,47 +22,65 @@ public class RoomContentVisibility : MonoBehaviour
         enemyWander = GetComponent<EnemyWander>();
         enemyDashCharger = GetComponent<EnemyDashCharger>();
         enemyAimerShooter = GetComponent<EnemyAimerShooter>();
+        cafeteriaBossPattern = GetComponent<CafeteriaBossPattern>();
         enemyCombat = GetComponent<EnemyCombat>();
         enemyBullet = GetComponent<EnemyBullet>();
     }
 
     public void SetActiveInRoom(bool active)
     {
-        // show & hide
+        // Visuals
         foreach (Renderer r in cachedRenderers)
         {
             if (r != null)
+            {
                 r.enabled = active;
+            }
         }
 
-        // collider
+        // Physics / interaction
         foreach (Collider2D c in cachedColliders)
         {
             if (c != null)
+            {
                 c.enabled = active;
+            }
         }
 
-        // basic movement
+        // Basic movement
         if (enemyWander != null)
         {
             enemyWander.CanMove = active;
         }
 
-        // actions
+        // Special behavior scripts
         if (enemyDashCharger != null)
+        {
             enemyDashCharger.enabled = active;
+        }
 
         if (enemyAimerShooter != null)
-            enemyAimerShooter.enabled = active;
+        {
+            enemyAimerShooter.enabled = active && cafeteriaBossPattern == null;
+        }
+
+        if (cafeteriaBossPattern != null)
+        {
+            cafeteriaBossPattern.enabled = active;
+        }
 
         if (enemyCombat != null)
+        {
             enemyCombat.enabled = active;
+        }
 
-        // normal enemy chase script
+        // Normal enemy chase script
         if (enemy != null)
+        {
             enemy.enabled = active;
+        }
 
-        // bullets
+        // Bullets should disappear when room deactivates
         if (!active && enemyBullet != null)
         {
             Destroy(gameObject);

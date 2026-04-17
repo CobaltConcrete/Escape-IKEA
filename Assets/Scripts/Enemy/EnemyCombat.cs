@@ -12,6 +12,9 @@ public class EnemyCombat : MonoBehaviour
 
     [Header("HitboxRange")]
     [SerializeField] private float contactDamageDistance = 0f;
+    [Header("Boss")]
+    [SerializeField] private bool onlyTakeDamageFromBehind = false;
+    [SerializeField] private float behindDotThreshold = 0f;
 
     private float currentHealth;
     private float lastDamageTime = -999f;
@@ -84,6 +87,19 @@ public class EnemyCombat : MonoBehaviour
         }
     }
 
+    public void TakeDamageFrom(Vector2 attackerPosition, float amount)
+    {
+        if (amount <= 0f) return;
+        if (onlyTakeDamageFromBehind)
+        {
+            Vector2 toAttacker = (attackerPosition - (Vector2)transform.position).normalized;
+            Vector2 forward = transform.right;
+            float dot = Vector2.Dot(forward, toAttacker);
+            if (dot > behindDotThreshold) return;
+        }
+        TakeDamage(amount);
+    }
+
     private void Die()
     {
         Destroy(gameObject);
@@ -104,6 +120,14 @@ public class EnemyCombat : MonoBehaviour
     public float GetMaxHealth()
     {
         return maxHealth;
+    }
+
+    public void ConfigureBossMode(float bossHealth, bool requireBehind, float dotThreshold)
+    {
+        maxHealth = Mathf.Max(1f, bossHealth);
+        currentHealth = maxHealth;
+        onlyTakeDamageFromBehind = requireBehind;
+        behindDotThreshold = dotThreshold;
     }
 
     private void OnDrawGizmosSelected()

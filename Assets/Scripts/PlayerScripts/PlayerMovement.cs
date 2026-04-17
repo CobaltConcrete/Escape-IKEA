@@ -19,6 +19,8 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        rb.interpolation = RigidbodyInterpolation2D.Interpolate;
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
     }
 
     void Update()
@@ -38,18 +40,27 @@ public class PlayerMovement : MonoBehaviour
 
     public void BoostSpeedFor10Seconds()
     {
-        speedCoroutine = StartCoroutine(SpeedBoostRoutine());
+        BoostSpeedForDuration(8f, 10f);
     }
 
-    private IEnumerator SpeedBoostRoutine()
+    public void BoostSpeedForDuration(float boostedSpeed, float durationSeconds)
+    {
+        if (speedCoroutine != null)
+            StopCoroutine(speedCoroutine);
+
+        speedCoroutine = StartCoroutine(SpeedBoostRoutine(boostedSpeed, durationSeconds));
+    }
+
+    private IEnumerator SpeedBoostRoutine(float boostedSpeed, float durationSeconds)
     {
         originalSpeed = speed;
 
-        speed = 8f;
+        speed = boostedSpeed;
 
-        yield return new WaitForSeconds(10f);
+        yield return new WaitForSeconds(durationSeconds);
 
         speed = originalSpeed;
+        speedCoroutine = null;
     }
 
     // Collide with walls

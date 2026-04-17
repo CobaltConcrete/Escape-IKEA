@@ -1,0 +1,41 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3a735814c985e7c48bde2bdca9fc5a74, type: 3}
+  m_Name: Lamp
+  m_EditorClassIdentifier: 
+  itemName: Lamp
+  icon: {fileID: -3535221090349844623, guid: 306c989c24f7041ebbcd35b3dfddc992, type: 3}
+  stackable: 0
+  uiScale: 0.7
+  glowColor: {r: 0.33730364, g: 0, b: 1, a: 1}
+  itemCategory: 1
+  equipTag: 0
+  useEffect: 0
+  effectValue: 0
+  effectDuration: 0
+  lootValue: 350
+  canAppearInShoppingList: 1
+  minRequiredAmount: 1
+  maxRequiredAmount: 3
+  shoppingListKey: Lamp
+  allowedRoomTypes: 0200000005000000
+  bonusSpawnWeight: 1
+  worldDropScale: {x: 0.8, y: 0.8, z: 0.8}
+  spawnFootprint: {x: 1.1, y: 1.1}
+  worldColliderType: 1
+  boxOffset: {x: 0, y: 0}
+  boxSize: {x: 1.5, y: 1.5}
+  boxEdgeRadius: 0
+  circleOffset: {x: 0, y: 0}
+  circleRadius: 0.5
+  worldTag: Loot
+  worldLayer: 12

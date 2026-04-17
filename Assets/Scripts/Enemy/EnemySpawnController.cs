@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemySpawnController : MonoBehaviour
@@ -33,6 +34,7 @@ public class EnemySpawnController : MonoBehaviour
     [SerializeField] private int maxPositionTriesPerSpawn = 20;
     [SerializeField] private float edgePadding = 0.5f;
     [SerializeField] private float overlapCheckRadius = 0.4f;
+    [SerializeField] private float doorAvoidRadius = 1.2f;
     [SerializeField] private LayerMask blockingLayers;
 
     private bool hasSpawned = false;
@@ -46,6 +48,11 @@ public class EnemySpawnController : MonoBehaviour
     public void SpawnRoomContents()
     {
         if (hasSpawned) return;
+        if (IsTutorialRoom())
+        {
+            hasSpawned = true;
+            return;
+        }
 
         if (enemySpawnAreaCollider == null)
         {
@@ -64,6 +71,8 @@ public class EnemySpawnController : MonoBehaviour
         foreach (SpawnGroup group in spawnGroups)
         {
             if (group.prefab == null) continue;
+            if (IsBossGroup(group) && !IsCafeteriaRoom())
+                continue;
 
             float roll = Random.value;
             if (roll > group.spawnChance) continue;
@@ -84,6 +93,81 @@ public class EnemySpawnController : MonoBehaviour
         }
 
         hasSpawned = true;
+    }
+
+    public void RefillEnemies(int missingCount, RoomEnemyRespawnAnchor roomAnchor, GameObject roomOwner)
+    {
+        if (missingCount <= 0) return;
+
+        if (enemySpawnAreaCollider == null)
+        {
+            Debug.LogWarning($"EnemySpawnController on {name}: enemySpawnAreaCollider is not assigned.");
+            return;
+        }
+
+        Collider2D boundsSource = enemyWanderAreaCollider != null ? enemyWanderAreaCollider : enemySpawnAreaCollider;
+
+        Bounds spawnBounds = enemySpawnAreaCollider.bounds;
+        Bounds wanderBounds = boundsSource.bounds;
+
+        Vector2 min = wanderBounds.min;
+        Vector2 max = wanderBounds.max;
+
+        int spawnedCount = 0;
+
+        while (spawnedCount < missingCount)
+        {
+            SpawnGroup group = GetRandomValidSpawnGroup();
+            if (group == null)
+            {
+                Debug.LogWarning($"EnemySpawnController on {name}: no valid spawn group found for refill.");
+                break;
+            }
+
+            if (!TryGetSpawnPosition(spawnBounds, out Vector3 spawnPos))
+            {
+                break;
+            }
+
+            Transform parentToUse = spawnParent != null ? spawnParent : transform;
+            GameObject spawned = Instantiate(group.prefab, spawnPos, Quaternion.identity, parentToUse);
+
+            ApplySortingOrder(spawned, group.sortingOrder);
+            AssignMovementBounds(spawned, min, max);
+
+            EnemyRoomMember member = spawned.GetComponent<EnemyRoomMember>();
+            if (member == null)
+            {
+                member = spawned.AddComponent<EnemyRoomMember>();
+            }
+
+            member.Initialize(roomAnchor);
+            EnemyRespawnManager.Instance?.RegisterSpawnedEnemy(roomOwner, spawned);
+
+            spawnedCount++;
+        }
+
+        Debug.Log($"[EnemySpawnController] Refilled {spawnedCount}/{missingCount} enemies in {name}");
+    }
+
+    private SpawnGroup GetRandomValidSpawnGroup()
+    {
+        List<SpawnGroup> validGroups = new List<SpawnGroup>();
+
+        foreach (SpawnGroup group in spawnGroups)
+        {
+            if (group == null) continue;
+            if (group.prefab == null) continue;
+            if (IsBossGroup(group) && !IsCafeteriaRoom()) continue;
+
+            validGroups.Add(group);
+        }
+
+        if (validGroups.Count == 0)
+            return null;
+
+        int index = Random.Range(0, validGroups.Count);
+        return validGroups[index];
     }
 
     private bool TryGetSpawnPosition(Bounds bounds, out Vector3 position)
@@ -109,11 +193,48 @@ public class EnemySpawnController : MonoBehaviour
             if (Physics2D.OverlapCircle(testPos, overlapCheckRadius, blockingLayers) != null)
                 continue;
 
+            if (IsNearDoor(testPos))
+                continue;
+
             position = testPos;
             return true;
         }
 
         position = Vector3.zero;
+        return false;
+    }
+
+    private bool IsNearDoor(Vector3 testPos)
+    {
+        Collider2D[] hits = Physics2D.OverlapCircleAll(testPos, doorAvoidRadius);
+        for (int i = 0; i < hits.Length; i++)
+        {
+            if (hits[i] != null && hits[i].CompareTag("Door"))
+                return true;
+        }
+        return false;
+    }
+
+    private bool IsTutorialRoom()
+    {
+        string n = gameObject.name;
+        return n.Contains("SportsRoom") || n.Contains("Tutorial");
+    }
+
+    private bool IsCafeteriaRoom()
+    {
+        string n = gameObject.name;
+        return n.Contains("CafeteriaRoom");
+    }
+
+    private bool IsBossGroup(SpawnGroup group)
+    {
+        if (group == null) return false;
+        if (!string.IsNullOrEmpty(group.groupName) &&
+            group.groupName.Contains("CafeteriaBoss"))
+            return true;
+        string prefabName = group.prefab != null ? group.prefab.name : "";
+        if (prefabName.Contains("CafeteriaBoss")) return true;
         return false;
     }
 
