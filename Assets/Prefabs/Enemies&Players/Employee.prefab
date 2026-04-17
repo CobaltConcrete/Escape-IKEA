@@ -183,7 +183,7 @@ MonoBehaviour:
   detectionRadius: 6
   wanderChangeInterval: 2
   useEmployeeRedTint: 1
-  employeeTint: {r: 0.9, g: 0.2, b: 0.15, a: 1}
+  employeeTint: {r: 1, g: 1, b: 1, a: 1}
   useBounds: 0
   minBounds: {x: 0, y: 0}
   maxBounds: {x: 0, y: 0}
@@ -191,6 +191,9 @@ MonoBehaviour:
   recoilDistance: 0.3
   recoilDuration: 0.12
   stunDurationAfterHit: 2
+  dashStaggerDistance: 0.8
+  dashStaggerDuration: 0.14
+  dashSideBias: 0.7
   wallBounceCooldown: 0.15
   wallRecoverDuration: 0.4
 --- !u!114 &7776932078797165444
@@ -249,6 +252,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 6033468489796418918}
+  enemy: {fileID: 0}
+  enemyCombat: {fileID: 0}
   enemyWander: {fileID: 0}
   enemyAimerShooter: {fileID: 0}
   enemyDashCharger: {fileID: 0}
+  staggerDistance: 0.9
+  staggerDuration: 0.14
+  sidewaysOffsetStrength: 0.35
