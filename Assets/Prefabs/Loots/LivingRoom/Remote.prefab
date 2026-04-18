@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 910001}
   - component: {fileID: 2737704106839303599}
+  - component: {fileID: 910004}
   - component: {fileID: 910002}
   - component: {fileID: 910003}
-  - component: {fileID: 910004}
   m_Layer: 12
   m_Name: Remote
   m_TagString: Loot
@@ -50,6 +50,20 @@ MonoBehaviour:
   itemDefinition: {fileID: 11400000, guid: 152e75307e5872b4998c1bbdd722e961, type: 2}
   amount: 1
   spawnedObjectName: Remote
+--- !u!114 &910004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 910000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnCategory: 0
+  isPickable: 0
 --- !u!212 &910002
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -151,24 +165,3 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 0.5, y: 1}
   m_EdgeRadius: 0
---- !u!114 &910004
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 910000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomType: 5
-  spawnCategory: 0
-  shoppingListKey: 
-  pickupDisplayName: Remote
-  lootValue: 0
-  canAppearInShoppingList: 0
-  minRequiredAmount: 1
-  maxRequiredAmount: 1
-  spawnWeight: 1

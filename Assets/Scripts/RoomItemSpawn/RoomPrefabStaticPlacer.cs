@@ -874,10 +874,30 @@ public static class RoomPrefabStaticPlacer
         if (def == null)
             return;
 
-        if (!def.canAppearInShoppingList)
+        if (!def.isPickable)
             return;
 
-        string key = def.shoppingListKey;
+        if (def.spawnCategory != RoomSpawnCategory.Item)
+            return;
+
+        ItemWorldSpawner spawner = instance.GetComponent<ItemWorldSpawner>();
+        if (spawner == null)
+            spawner = instance.GetComponentInChildren<ItemWorldSpawner>(true);
+
+        if (spawner == null)
+            return;
+
+        ItemDefinition itemDef = spawner.ItemDefinition;
+        if (itemDef == null)
+            return;
+
+        if (!itemDef.IsLoot())
+            return;
+
+        if (!itemDef.canAppearInShoppingList)
+            return;
+
+        string key = itemDef.GetShoppingListKey();
         if (string.IsNullOrWhiteSpace(key))
             return;
 
@@ -888,15 +908,15 @@ public static class RoomPrefabStaticPlacer
 
     private static void StripLegacySpawnerPath(GameObject instance)
     {
-        if (instance == null)
-            return;
+        //if (instance == null)
+        //    return;
 
-        ItemWorldSpawner[] spawners = instance.GetComponentsInChildren<ItemWorldSpawner>(true);
-        for (int i = 0; i < spawners.Length; i++)
-        {
-            if (spawners[i] != null)
-                Object.DestroyImmediate(spawners[i]);
-        }
+        //ItemWorldSpawner[] spawners = instance.GetComponentsInChildren<ItemWorldSpawner>(true);
+        //for (int i = 0; i < spawners.Length; i++)
+        //{
+        //    if (spawners[i] != null)
+        //        Object.DestroyImmediate(spawners[i]);
+        //}
     }
 
     private static void NormalizeSpawnedVisuals(GameObject instance)

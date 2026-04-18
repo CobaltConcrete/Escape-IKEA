@@ -8,7 +8,6 @@ public class ShoppingListEntry
     public string shoppingListKey;
     public string displayName;
     public int unitValue;
-    public RoomType roomType = RoomType.None;
     public int requiredAmount;
     public int collectedAmount;
 

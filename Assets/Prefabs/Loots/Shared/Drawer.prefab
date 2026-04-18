@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 8235532205356271792}
   - component: {fileID: -59159626031353184}
+  - component: {fileID: -2356851834966802085}
   - component: {fileID: -8225381597860622731}
   - component: {fileID: -6587443007890336192}
   - component: {fileID: -5187446036180141741}
-  - component: {fileID: -2356851834966802085}
   m_Layer: 12
   m_Name: Drawer
   m_TagString: Loot
@@ -51,6 +51,20 @@ MonoBehaviour:
   itemDefinition: {fileID: 11400000, guid: 83d652b2ea1c44246a7026f83a4963f2, type: 2}
   amount: 1
   spawnedObjectName: Drawer
+--- !u!114 &-2356851834966802085
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2955381025110779136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnCategory: 1
+  isPickable: 0
 --- !u!212 &-8225381597860622731
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -204,24 +218,3 @@ MonoBehaviour:
   - {x: 0.5, y: -0.5, z: 0}
   - {x: 0.5, y: 0.5, z: 0}
   - {x: -0.5, y: 0.5, z: 0}
---- !u!114 &-2356851834966802085
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2955381025110779136}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomType: 5
-  spawnCategory: 1
-  shoppingListKey: Drawer
-  pickupDisplayName: Drawer
-  lootValue: 400
-  canAppearInShoppingList: 1
-  minRequiredAmount: 1
-  maxRequiredAmount: 3
-  spawnWeight: 1

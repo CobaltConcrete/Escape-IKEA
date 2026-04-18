@@ -568,44 +568,133 @@ public class RunObjectiveManager : MonoBehaviour
         }
     }
 
+    //private bool TryGenerateShoppingListFromPrefabMetadata()
+    //{
+    //    if (prefabSpawnCatalog == null)
+    //        return false;
+
+    //    Dictionary<string, ShoppingListEntry> uniqueByKey = new Dictionary<string, ShoppingListEntry>(StringComparer.Ordinal);
+    //    foreach (RoomPrefabSpawnCatalog.RoomPool pool in prefabSpawnCatalog.Pools)
+    //    {
+    //        if (pool == null || pool.prefabs == null)
+    //            continue;
+    //        for (int i = 0; i < pool.prefabs.Count; i++)
+    //        {
+    //            GameObject prefab = pool.prefabs[i];
+    //            if (prefab == null)
+    //                continue;
+    //            RoomSpawnPrefabDefinition def = prefab.GetComponent<RoomSpawnPrefabDefinition>();
+    //            if (def == null)
+    //            {
+    //                continue;
+    //            }
+    //            if (def.spawnCategory != RoomSpawnCategory.Item || !def.canAppearInShoppingList)
+    //                continue;
+    //            string normalizedKey = NormalizeShoppingListKey(def.shoppingListKey);
+    //            if (string.IsNullOrWhiteSpace(normalizedKey) || def.lootValue <= 0)
+    //                continue;
+    //            if (!uniqueByKey.ContainsKey(normalizedKey))
+    //            {
+    //                uniqueByKey[normalizedKey] = new ShoppingListEntry
+    //                {
+    //                    shoppingListKey = normalizedKey,
+    //                    displayName = def.GetResolvedDisplayName(),
+    //                    unitValue = def.lootValue,
+    //                    roomType = def.roomType,
+    //                    requiredAmount = 1,
+    //                    collectedAmount = 0
+    //                };
+    //            }
+
+    //        }
+    //    }
+
+    //    if (uniqueByKey.Count == 0)
+    //        return false;
+
+    //    List<ShoppingListEntry> poolDefs = new List<ShoppingListEntry>(uniqueByKey.Values);
+    //    for (int i = poolDefs.Count - 1; i > 0; i--)
+    //    {
+    //        int j = UnityEngine.Random.Range(0, i + 1);
+    //        (poolDefs[i], poolDefs[j]) = (poolDefs[j], poolDefs[i]);
+    //    }
+
+    //    // Design rule (for now): exactly 7 unique shopping-list lines.
+    //    const int targetUniqueEntries = 7;
+
+    //    int targetEntries = Mathf.Min(targetUniqueEntries, poolDefs.Count);
+
+    //    for (int i = 0; i < targetEntries; i++)
+    //    {
+    //        ShoppingListEntry seed = poolDefs[i];
+    //        seed.requiredAmount = Mathf.Max(1, seed.requiredAmount);
+    //        currentShoppingList.Add(seed);
+    //    }
+
+    //    return currentShoppingList.Count > 0;
+    //}
     private bool TryGenerateShoppingListFromPrefabMetadata()
     {
         if (prefabSpawnCatalog == null)
             return false;
 
-        Dictionary<string, ShoppingListEntry> uniqueByKey = new Dictionary<string, ShoppingListEntry>(StringComparer.Ordinal);
+        Dictionary<string, ShoppingListEntry> uniqueByKey =
+            new Dictionary<string, ShoppingListEntry>(StringComparer.Ordinal);
+
         foreach (RoomPrefabSpawnCatalog.RoomPool pool in prefabSpawnCatalog.Pools)
         {
             if (pool == null || pool.prefabs == null)
                 continue;
+
             for (int i = 0; i < pool.prefabs.Count; i++)
             {
                 GameObject prefab = pool.prefabs[i];
                 if (prefab == null)
                     continue;
+
                 RoomSpawnPrefabDefinition def = prefab.GetComponent<RoomSpawnPrefabDefinition>();
                 if (def == null)
-                {
                     continue;
-                }
-                if (def.spawnCategory != RoomSpawnCategory.Item || !def.canAppearInShoppingList)
+
+                if (!def.isPickable)
                     continue;
-                string normalizedKey = NormalizeShoppingListKey(def.shoppingListKey);
-                if (string.IsNullOrWhiteSpace(normalizedKey) || def.lootValue <= 0)
+
+                if (def.spawnCategory != RoomSpawnCategory.Item)
                     continue;
+
+                ItemWorldSpawner spawner = prefab.GetComponent<ItemWorldSpawner>();
+                if (spawner == null)
+                    spawner = prefab.GetComponentInChildren<ItemWorldSpawner>(true);
+
+                if (spawner == null)
+                    continue;
+
+                ItemDefinition itemDef = spawner.ItemDefinition;
+                if (itemDef == null)
+                    continue;
+
+                if (!itemDef.IsLoot())
+                    continue;
+
+                if (!itemDef.canAppearInShoppingList)
+                    continue;
+
+                string normalizedKey = NormalizeShoppingListKey(itemDef.GetShoppingListKey());
+                if (string.IsNullOrWhiteSpace(normalizedKey))
+                    continue;
+
+                if (itemDef.lootValue <= 0)
+                    continue;
+
                 if (!uniqueByKey.ContainsKey(normalizedKey))
                 {
                     uniqueByKey[normalizedKey] = new ShoppingListEntry
                     {
-                        shoppingListKey = normalizedKey,
-                        displayName = def.GetResolvedDisplayName(),
-                        unitValue = def.lootValue,
-                        roomType = def.roomType,
-                        requiredAmount = 1,
+                        itemDefinition = itemDef,
+                        requiredAmount = Mathf.Max(1, itemDef.minRequiredAmount),
                         collectedAmount = 0
                     };
                 }
-
             }
         }
 
@@ -613,25 +702,110 @@ public class RunObjectiveManager : MonoBehaviour
             return false;
 
         List<ShoppingListEntry> poolDefs = new List<ShoppingListEntry>(uniqueByKey.Values);
+
         for (int i = poolDefs.Count - 1; i > 0; i--)
         {
             int j = UnityEngine.Random.Range(0, i + 1);
-            (poolDefs[i], poolDefs[j]) = (poolDefs[j], poolDefs[i]);
+            ShoppingListEntry temp = poolDefs[i];
+            poolDefs[i] = poolDefs[j];
+            poolDefs[j] = temp;
         }
 
-        // Design rule (for now): exactly 7 unique shopping-list lines.
-        const int targetUniqueEntries = 7;
-
-        int targetEntries = Mathf.Min(targetUniqueEntries, poolDefs.Count);
+        int minCap = Mathf.Max(1, Mathf.Min(minListEntries, maxListEntries));
+        int maxCap = Mathf.Max(minCap, maxListEntries);
+        int desiredCount = UnityEngine.Random.Range(minCap, maxCap + 1);
+        int targetEntries = Mathf.Min(desiredCount, poolDefs.Count);
 
         for (int i = 0; i < targetEntries; i++)
         {
             ShoppingListEntry seed = poolDefs[i];
-            seed.requiredAmount = Mathf.Max(1, seed.requiredAmount);
-            currentShoppingList.Add(seed);
+            if (seed == null || seed.itemDefinition == null)
+                continue;
+
+            ItemDefinition itemDef = seed.itemDefinition;
+
+            int minAmount = Mathf.Max(1, itemDef.minRequiredAmount);
+            int maxAmount = Mathf.Max(minAmount, itemDef.maxRequiredAmount);
+
+            ShoppingListEntry entry = new ShoppingListEntry
+            {
+                itemDefinition = itemDef,
+                requiredAmount = UnityEngine.Random.Range(minAmount, maxAmount + 1),
+                collectedAmount = 0
+            };
+
+            currentShoppingList.Add(entry);
         }
 
         return currentShoppingList.Count > 0;
+    }
+    private static void ShuffleShoppingListEntries(List<ShoppingListEntry> list)
+    {
+        if (list == null || list.Count < 2)
+            return;
+
+        for (int i = list.Count - 1; i > 0; i--)
+        {
+            int j = UnityEngine.Random.Range(0, i + 1);
+            ShoppingListEntry temp = list[i];
+            list[i] = list[j];
+            list[j] = temp;
+        }
+
+    }
+    private void OnValidate()
+    {
+        AutoPopulateAllItemDefinitionsFromPrefabCatalog();
+    }
+
+    [ContextMenu("Auto Populate All Item Definitions From Prefab Catalog")]
+    private void AutoPopulateAllItemDefinitionsFromPrefabCatalog()
+    {
+        if (prefabSpawnCatalog == null)
+            return;
+
+        HashSet<ItemDefinition> uniqueDefs = new HashSet<ItemDefinition>();
+
+        foreach (RoomPrefabSpawnCatalog.RoomPool pool in prefabSpawnCatalog.Pools)
+        {
+            if (pool == null || pool.prefabs == null)
+                continue;
+
+            for (int i = 0; i < pool.prefabs.Count; i++)
+            {
+                GameObject prefab = pool.prefabs[i];
+                if (prefab == null)
+                    continue;
+
+                RoomSpawnPrefabDefinition def = prefab.GetComponent<RoomSpawnPrefabDefinition>();
+                if (def == null)
+                    continue;
+
+                if (!def.isPickable)
+                    continue;
+
+                if (def.spawnCategory != RoomSpawnCategory.Item)
+                    continue;
+
+                ItemWorldSpawner spawner = prefab.GetComponent<ItemWorldSpawner>();
+                if (spawner == null)
+                    spawner = prefab.GetComponentInChildren<ItemWorldSpawner>(true);
+
+                if (spawner == null)
+                    continue;
+
+                ItemDefinition itemDef = spawner.ItemDefinition;
+                if (itemDef == null)
+                    continue;
+
+                uniqueDefs.Add(itemDef);
+            }
+        }
+
+        allItemDefinitions = uniqueDefs
+            .Where(d => d != null)
+            .OrderBy(d => d.itemName)
+            .ToList();
     }
 
     private static string NormalizeShoppingListKey(string key)

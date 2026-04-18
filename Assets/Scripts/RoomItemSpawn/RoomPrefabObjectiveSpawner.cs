@@ -175,15 +175,15 @@ public class RoomPrefabObjectiveSpawner : MonoBehaviour
 
     private static void StripLegacySpawnerPath(GameObject obj)
     {
-        if (obj == null)
-            return;
+        //if (obj == null)
+        //    return;
 
-        ItemWorldSpawner[] spawners = obj.GetComponentsInChildren<ItemWorldSpawner>(true);
-        for (int i = 0; i < spawners.Length; i++)
-        {
-            if (spawners[i] != null)
-                DestroyImmediate(spawners[i]);
-        }
+        //ItemWorldSpawner[] spawners = obj.GetComponentsInChildren<ItemWorldSpawner>(true);
+        //for (int i = 0; i < spawners.Length; i++)
+        //{
+        //    if (spawners[i] != null)
+        //        DestroyImmediate(spawners[i]);
+        //}
     }
 
     private static bool HasBehaviourNamed(GameObject obj, string typeName)
