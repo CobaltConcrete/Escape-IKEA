@@ -67,7 +67,9 @@ public static class RoomDecorationPlacer
         decorRoot.layer = 0;
 
         Room room = roomRoot.GetComponent<Room>();
-        Transform pickupParent = roomRoot.Find(SpawnedItemsName);
+        Transform pickupParent =
+    roomRoot.Find("SpawnedLoots") ??
+    roomRoot.Find("SpawnedItems");
 
         if (roomType == RoomType.LivingRoom)
         {
@@ -278,31 +280,123 @@ public static class RoomDecorationPlacer
         AddBlockingCollider(go, sprite);
         return go;
     }
+    private static RoomSpawnPrefabDefinition GetRoomSpawnDefinition(GameObject obj)
+    {
+        if (obj == null)
+            return null;
 
+        RoomSpawnPrefabDefinition def = obj.GetComponent<RoomSpawnPrefabDefinition>();
+        if (def == null)
+            def = obj.GetComponentInChildren<RoomSpawnPrefabDefinition>(true);
+
+        return def;
+    }
+
+    private static Transform ResolveContainerForSpawnCategory(Transform roomRoot, RoomSpawnPrefabDefinition def)
+    {
+        if (roomRoot == null)
+            return null;
+
+        if (def == null)
+            return roomRoot.Find("SpawnedObjects") ?? roomRoot;
+
+        switch (def.spawnCategory)
+        {
+            case RoomSpawnCategory.Decoration:
+                return roomRoot.Find("SpawnedObjects") ?? roomRoot;
+
+            case RoomSpawnCategory.Weapon:
+                return roomRoot.Find("SpawnedItems") ?? roomRoot;
+
+            case RoomSpawnCategory.Item:
+                return roomRoot.Find("SpawnedLoots")
+                    ?? roomRoot.Find("SpawnedLoot")
+                    ?? roomRoot;
+
+            default:
+                return roomRoot.Find("SpawnedObjects") ?? roomRoot;
+        }
+    }
+
+    private static void AssignSpawnParentToAnyItemWorldSpawner(GameObject instance, Transform spawnParent)
+    {
+        if (instance == null)
+            return;
+
+        ItemWorldSpawner[] spawners = instance.GetComponentsInChildren<ItemWorldSpawner>(true);
+        for (int i = 0; i < spawners.Length; i++)
+        {
+            if (spawners[i] == null)
+                continue;
+
+            Transform finalParent = spawnParent;
+
+            if (finalParent == null)
+            {
+                Room room = spawners[i].GetComponentInParent<Room>();
+                if (room != null)
+                {
+                    finalParent =
+                        room.transform.Find("SpawnedLoots") ??
+                        room.transform.Find("SpawnedItems") ??
+                        room.transform.Find("SpawnedObjects") ??
+                        room.transform;
+                }
+            }
+
+            spawners[i].SetSpawnParent(finalParent);
+        }
+    }
     private static GameObject SpawnLayoutObject(
-        Transform parent,
-        string name,
-        GameObject prefab,
-        Sprite fallbackSprite,
-        Vector3 localPos,
-        int sortingOrder,
-        float uniformScale = 1f,
-        bool addMovementBlockingCollider = true)
+    Transform parent,
+    string name,
+    GameObject prefab,
+    Sprite fallbackSprite,
+    Vector3 localPos,
+    int sortingOrder,
+    float uniformScale = 1f,
+    bool addMovementBlockingCollider = true)
     {
         if (prefab != null && parent != null)
         {
-            GameObject go = Object.Instantiate(prefab, parent, false);
+            Transform roomRoot = parent.GetComponentInParent<Room>() != null
+                ? parent.GetComponentInParent<Room>().transform
+                : parent;
+
+            RoomSpawnPrefabDefinition def = GetRoomSpawnDefinition(prefab);
+            Transform targetContainer = ResolveContainerForSpawnCategory(roomRoot, def);
+
+            Transform instantiateParent =
+                def != null && def.spawnCategory == RoomSpawnCategory.Decoration
+                    ? parent
+                    : (targetContainer != null ? targetContainer : parent);
+
+            GameObject go = Object.Instantiate(prefab, instantiateParent, false);
+
+            // 关键：先关掉，别让 ItemWorldSpawner 抢跑
+            go.SetActive(false);
+
             go.name = name;
             go.transform.localPosition = localPos;
             go.transform.localRotation = Quaternion.identity;
+
             float s = Mathf.Max(0.01f, uniformScale);
             go.transform.localScale = new Vector3(s, s, 1f);
+
+            // 关键：在重新激活前，先把所有 ItemWorldSpawner 的 parent 塞好
+            AssignSpawnParentToAnyItemWorldSpawner(
+                go,
+                targetContainer != null ? targetContainer : instantiateParent);
+
             if (addMovementBlockingCollider && go.GetComponentInChildren<Collider2D>(true) == null)
             {
                 Sprite refSprite = GetPrefabReferenceSprite(prefab);
                 if (refSprite != null)
                     AddBlockingCollider(go, refSprite);
             }
+
+            // 最后再开
+            go.SetActive(true);
             return go;
         }
 
@@ -391,7 +485,9 @@ public static class RoomDecorationPlacer
             return;
 
         Room room = roomRoot.GetComponent<Room>();
-        Transform pickupParent = roomRoot.Find(SpawnedItemsName);
+        Transform pickupParent =
+    roomRoot.Find("SpawnedLoots") ??
+    roomRoot.Find("SpawnedItems");
 
         float left = minL.x + WallPadding;
         float right = maxL.x - WallPadding;
@@ -1220,12 +1316,17 @@ public static class RoomDecorationPlacer
     }
 
     private static void TrySpawnCatalogPickup(
-        Transform roomRoot,
-        Room room,
-        Transform pickupParent,
-        RoomDecorationCatalog.DecorationEntry entry,
-        Vector3 resolvedLocalPosition)
+    Transform roomRoot,
+    Room room,
+    Transform pickupParent,
+    RoomDecorationCatalog.DecorationEntry entry,
+    Vector3 resolvedLocalPosition)
     {
+        Debug.Log(
+            $"[DECOR ROUTE] room={roomRoot.name}, key={entry.catalogPickup?.GetShoppingListKey()}, " +
+            $"pickupParent={(pickupParent != null ? pickupParent.name : "NULL")}"
+        );
+
         if (entry?.catalogPickup == null || pickupParent == null)
             return;
 
@@ -1233,12 +1334,17 @@ public static class RoomDecorationPlacer
     }
 
     private static void TrySpawnCatalogPickupForDefinition(
-        Transform roomRoot,
-        Room room,
-        Transform pickupParent,
-        ItemDefinition def,
-        Vector3 resolvedLocalPosition)
+    Transform roomRoot,
+    Room room,
+    Transform pickupParent,
+    ItemDefinition def,
+    Vector3 resolvedLocalPosition)
     {
+        Debug.Log(
+            $"[DECOR SPAWN] room={roomRoot.name}, item={def.itemName}, " +
+            $"pickupParent={(pickupParent != null ? pickupParent.name : "NULL")}"
+        );
+
         if (def == null || pickupParent == null || roomRoot == null)
             return;
 

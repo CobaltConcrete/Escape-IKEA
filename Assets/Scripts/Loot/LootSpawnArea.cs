@@ -22,6 +22,29 @@ public class LootSpawnArea : MonoBehaviour
     private void Awake()
     {
         RefreshSubAreas();
+
+        if (spawnParent == null)
+        {
+            Room room = GetComponentInParent<Room>();
+            if (room != null)
+            {
+                Transform fallback = room.transform.Find("SpawnedLoots");
+                if (fallback == null) fallback = room.transform.Find("SpawnedItems");
+                if (fallback == null) fallback = room.transform.Find("SpawnedObjects");
+
+                if (fallback == null)
+                {
+                    GameObject created = new GameObject("SpawnedLoots");
+                    created.transform.SetParent(room.transform, false);
+                    created.transform.localPosition = Vector3.zero;
+                    created.transform.localRotation = Quaternion.identity;
+                    created.transform.localScale = Vector3.one;
+                    fallback = created.transform;
+                }
+
+                spawnParent = fallback;
+            }
+        }
     }
 
     [ContextMenu("Refresh Sub Areas")]

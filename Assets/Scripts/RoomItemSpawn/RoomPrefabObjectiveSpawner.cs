@@ -43,12 +43,12 @@ public class RoomPrefabObjectiveSpawner : MonoBehaviour
     }
 
     private bool TrySpawnOnePrefab(
-        GameObject prefab,
-        LootSpawnArea[] areas,
-        Dictionary<string, int> roomKeySpawnCount,
-        RoomType roomType,
-        string shoppingListKey,
-        bool sideBias = false)
+    GameObject prefab,
+    LootSpawnArea[] areas,
+    Dictionary<string, int> roomKeySpawnCount,
+    RoomType roomType,
+    string shoppingListKey,
+    bool sideBias = false)
     {
         List<LootSpawnArea> validAreas = new List<LootSpawnArea>();
         for (int i = 0; i < areas.Length; i++)
@@ -79,29 +79,41 @@ public class RoomPrefabObjectiveSpawner : MonoBehaviour
                 Vector2 point = sideBias
                     ? GetSportsSidePoint(room != null ? room.transform : area.transform, area, attempt)
                     : area.GetRandomPoint(footprint);
+
                 if (Physics2D.OverlapBox(point, footprint, 0f, blockedLayerMask) != null)
                     continue;
 
                 Transform parent = area.SpawnParent != null ? area.SpawnParent : area.transform;
-                if (room != null)
-                {
-                    Transform spawnedItems = room.transform.Find("SpawnedItems");
-                    if (spawnedItems != null)
-                        parent = spawnedItems;
-                }
+                Transform roomLootRoot = room != null ? ResolveRoomLootRoot(room.transform) : null;
+                if (roomLootRoot != null)
+                    parent = roomLootRoot;
+
                 GameObject obj = Instantiate(prefab, point, Quaternion.identity, parent);
+
                 if (IsWeaponPrefab(prefab))
                     obj.name = SportsRoomBatPlacer.BatInstanceName;
+
                 obj.SetActive(false);
+
                 StripLegacySpawnerPath(obj);
+
+                // Critical: if this prefab contains ItemWorldSpawner, force it to spawn
+                // under the room-local loot root instead of hierarchy root.
+                AssignSpawnParentToAnyItemWorldSpawner(obj, roomLootRoot != null ? roomLootRoot : parent);
+
                 EnsureInteractionComponent(obj, prefab, shoppingListKey);
+
                 obj.SetActive(true);
+
                 if (room != null)
                     room.RefreshRendererRegistry();
+
                 RoomContentActivation.RefreshPlayerRoomsAfterMapSetup();
                 area.RegisterSpawn();
+
                 if (!string.IsNullOrWhiteSpace(shoppingListKey))
                     roomKeySpawnCount[roomKey] = 1;
+
                 return true;
             }
         }
@@ -228,5 +240,41 @@ public class RoomPrefabObjectiveSpawner : MonoBehaviour
 
         return null;
     }
+    private static Transform ResolveRoomLootRoot(Transform roomRoot)
+    {
+        if (roomRoot == null)
+            return null;
 
+        Transform root = roomRoot.Find("SpawnedLoots");
+        if (root != null)
+            return root;
+
+        root = roomRoot.Find("SpawnedItems");
+        if (root != null)
+            return root;
+
+        root = roomRoot.Find("SpawnedObjects");
+        if (root != null)
+            return root;
+
+        GameObject created = new GameObject("SpawnedLoots");
+        created.transform.SetParent(roomRoot, false);
+        created.transform.localPosition = Vector3.zero;
+        created.transform.localRotation = Quaternion.identity;
+        created.transform.localScale = Vector3.one;
+        return created.transform;
+    }
+
+    private static void AssignSpawnParentToAnyItemWorldSpawner(GameObject instance, Transform spawnParent)
+    {
+        if (instance == null || spawnParent == null)
+            return;
+
+        ItemWorldSpawner[] spawners = instance.GetComponentsInChildren<ItemWorldSpawner>(true);
+        for (int i = 0; i < spawners.Length; i++)
+        {
+            if (spawners[i] != null)
+                spawners[i].SetSpawnParent(spawnParent);
+        }
+    }
 }

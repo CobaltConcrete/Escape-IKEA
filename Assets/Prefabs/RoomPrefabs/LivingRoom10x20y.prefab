@@ -636,6 +636,37 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!1 &2217868466855362234
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6375989768810482542}
+  m_Layer: 0
+  m_Name: SpawnedEnemies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6375989768810482542
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2217868466855362234}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3125483003241167705}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2476438942487111152
 GameObject:
   m_ObjectHideFlags: 0
@@ -1869,6 +1900,37 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!1 &5412206102632554697
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 701095843205343735}
+  m_Layer: 0
+  m_Name: SpawnedLoots
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &701095843205343735
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5412206102632554697}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3125483003241167705}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5540407143314748755
 GameObject:
   m_ObjectHideFlags: 0
@@ -2192,7 +2254,7 @@ MonoBehaviour:
   roomType: 5
   maxSpawnCount: 4
   areaWeight: 1
-  spawnParent: {fileID: 2025712274201392123}
+  spawnParent: {fileID: 701095843205343735}
 --- !u!1 &6467175207506182088
 GameObject:
   m_ObjectHideFlags: 0
@@ -2344,6 +2406,8 @@ Transform:
   - {fileID: 8189788221543139054}
   - {fileID: 2025712274201392123}
   - {fileID: 5640877987964570561}
+  - {fileID: 6375989768810482542}
+  - {fileID: 701095843205343735}
   - {fileID: 6990419294973220445}
   - {fileID: 3703653494114497661}
   - {fileID: 7730096293467302012}
@@ -2373,6 +2437,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   explored: 0
   roomVisuals: {fileID: 6749980618424993291}
+  sportsBatHintRadius: 2.35
+  sportsBatHintCooldownSeconds: 7
 --- !u!61 &5256496874783605114
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -2446,7 +2512,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemySpawnAreaCollider: {fileID: 5660571354825917036}
   enemyWanderAreaCollider: {fileID: 8437461692891624488}
-  spawnParent: {fileID: 5640877987964570561}
+  spawnParent: {fileID: 6375989768810482542}
   spawnGroups:
   - groupName: Employee
     prefab: {fileID: 6291527677918437734, guid: e473e2195ce4e41b6bfde2257fe2d519, type: 3}
@@ -2492,8 +2558,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomTrigger: {fileID: 5256496874783605114}
-  enemyContainer: {fileID: 5640877987964570561}
+  enemyContainer: {fileID: 6375989768810482542}
+  objectContainer: {fileID: 5640877987964570561}
   itemContainer: {fileID: 2025712274201392123}
+  lootContainer: {fileID: 701095843205343735}
   ignoreRoomActivationInThisScene: 0
 --- !u!114 &5908432402617768914
 MonoBehaviour:
@@ -2507,7 +2575,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0140c6c542f3296439a03f99e00c0aad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyParent: {fileID: 5640877987964570561}
+  enemyParent: {fileID: 6375989768810482542}
   enemyPrefabs:
   - {fileID: 3464154710725457275, guid: 73a96bd0a680f8949861c27cf368dbe9, type: 3}
   - {fileID: 6291527677918437734, guid: e473e2195ce4e41b6bfde2257fe2d519, type: 3}

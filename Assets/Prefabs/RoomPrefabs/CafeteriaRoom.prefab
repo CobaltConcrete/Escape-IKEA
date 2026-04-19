@@ -466,6 +466,8 @@ Transform:
   - {fileID: 1874970537131865891}
   - {fileID: 1359586083509128961}
   - {fileID: 6958675699673471726}
+  - {fileID: 591671320427659556}
+  - {fileID: 5978752859482371619}
   - {fileID: 7231128956070510764}
   - {fileID: 5767902746863405124}
   - {fileID: 5918444733958727438}
@@ -541,6 +543,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   explored: 0
   roomVisuals: {fileID: 652476656982324103}
+  sportsBatHintRadius: 2.35
+  sportsBatHintCooldownSeconds: 7
 --- !u!114 &7871331883554067030
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -568,7 +572,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemySpawnAreaCollider: {fileID: 7338557846905206980}
   enemyWanderAreaCollider: {fileID: 3948193875352072267}
-  spawnParent: {fileID: 6958675699673471726}
+  spawnParent: {fileID: 5978752859482371619}
   spawnGroups:
   - groupName: CafeteriaBoss
     prefab: {fileID: 1626777669089237922, guid: 5f2d51f8a8eb4c4db1b7e5a399e8db49, type: 3}
@@ -596,8 +600,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomTrigger: {fileID: 186864520387980171}
-  enemyContainer: {fileID: 6958675699673471726}
+  enemyContainer: {fileID: 5978752859482371619}
+  objectContainer: {fileID: 6958675699673471726}
   itemContainer: {fileID: 1359586083509128961}
+  lootContainer: {fileID: 591671320427659556}
   ignoreRoomActivationInThisScene: 0
 --- !u!114 &6189421176342105510
 MonoBehaviour:
@@ -611,10 +617,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9e9e3b5fd4e84d2ca2e4b8dd9d8224a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyContainer: {fileID: 6958675699673471726}
+  enemyContainer: {fileID: 5978752859482371619}
   bossNameHint: CafeteriaEmployee
   clearMessage: Boss defeated! Leave the store.
   winDoorDistance: 1.1
+--- !u!1 &1458100216889019563
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5978752859482371619}
+  m_Layer: 0
+  m_Name: SpawnedEnemies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5978752859482371619
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1458100216889019563}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 624148864710777306}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1697749999502467874
 GameObject:
   m_ObjectHideFlags: 0
@@ -1458,7 +1495,7 @@ MonoBehaviour:
   roomType: 3
   maxSpawnCount: 4
   areaWeight: 1
-  spawnParent: {fileID: 1359586083509128961}
+  spawnParent: {fileID: 591671320427659556}
 --- !u!1 &4564581890875930414
 GameObject:
   m_ObjectHideFlags: 0
@@ -1702,6 +1739,37 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!1 &4991851711177849300
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 591671320427659556}
+  m_Layer: 0
+  m_Name: SpawnedLoots
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &591671320427659556
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4991851711177849300}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 624148864710777306}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5290136256438630869
 GameObject:
   m_ObjectHideFlags: 0
