@@ -42,12 +42,6 @@ public class ItemWorldSpawner : MonoBehaviour
 
         item.InitializeRuntimeDataIfNeeded();
 
-        Debug.Log(
-            $"[ItemWorldSpawner BEFORE SPAWN] spawner={name}, item={itemDefinition.itemName}, " +
-            $"spawnParent={(spawnParent != null ? spawnParent.name : "NULL")}, " +
-            $"room={(GetComponentInParent<Room>() != null ? GetComponentInParent<Room>().name : "NULL")}",
-            this);
-
         ItemWorld spawned = ItemWorld.SpawnItemWorld(
             transform.position,
             transform.rotation,
@@ -76,10 +70,6 @@ public class ItemWorldSpawner : MonoBehaviour
             {
                 spawned.transform.SetParent(spawnParent, true);
             }
-
-            Debug.Log(
-                $"[ItemWorldSpawner AFTER SPAWN] spawned={spawned.name}, parent={(spawned.transform.parent != null ? spawned.transform.parent.name : "ROOT")}",
-                spawned);
 
             Room room = GetComponentInParent<Room>();
             room?.RefreshRendererRegistry();

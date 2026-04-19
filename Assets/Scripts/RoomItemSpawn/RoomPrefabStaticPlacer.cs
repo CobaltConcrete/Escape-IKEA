@@ -1071,26 +1071,26 @@ public static class RoomPrefabStaticPlacer
         if (pickup != null)
             Object.DestroyImmediate(pickup);
     }
-    private static Transform ResolveRoomLootRoot(Transform roomRoot)
-    {
-        if (roomRoot == null)
-            return null;
+    //private static Transform ResolveRoomLootRoot(Transform roomRoot)
+    //{
+    //    if (roomRoot == null)
+    //        return null;
 
-        Transform root = roomRoot.Find("SpawnedLoots");
-        if (root != null)
-            return root;
+    //    Transform root = roomRoot.Find("SpawnedLoots");
+    //    if (root != null)
+    //        return root;
 
-        //root = roomRoot.Find("SpawnedLoot");
-        //if (root != null)
-        //    return root;
+    //    //root = roomRoot.Find("SpawnedLoot");
+    //    //if (root != null)
+    //    //    return root;
 
-        GameObject created = new GameObject("SpawnedLoots");
-        created.transform.SetParent(roomRoot, false);
-        created.transform.localPosition = Vector3.zero;
-        created.transform.localRotation = Quaternion.identity;
-        created.transform.localScale = Vector3.one;
-        return created.transform;
-    }
+    //    GameObject created = new GameObject("SpawnedLoots");
+    //    created.transform.SetParent(roomRoot, false);
+    //    created.transform.localPosition = Vector3.zero;
+    //    created.transform.localRotation = Quaternion.identity;
+    //    created.transform.localScale = Vector3.one;
+    //    return created.transform;
+    //}
 
     private static void AssignSpawnParentToAnyItemWorldSpawner(GameObject instance, Transform container)
     {
@@ -1121,7 +1121,6 @@ public static class RoomPrefabStaticPlacer
 
             spawner.SetSpawnParent(finalParent);
 
-            Debug.Log($"[FORCE FIX] Assign spawnParent={finalParent?.name ?? "NULL"} to {spawner.name}", spawner);
         }
     }
     private static Transform ResolveContainerForSpawnCategory(Transform roomRoot, RoomSpawnPrefabDefinition def)
