@@ -214,33 +214,6 @@ public static class RoomPrefabStaticPlacer
                     SpawnKitchenSurfaceItem(apronPrefab, apronDrawer.transform.position + new Vector3(0.06f, 1.05f, 0f), parent, roomRoot, 0.72f);
                 }
             }
-
-            Vector3 leftSinkDrawerPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
-                roomRoot,
-                RoomDecorInteriorAnchor.InteriorMiddleCenter,
-                new Vector3(-2.65f, -0.25f, 0f));
-            GameObject leftSinkDrawer = SpawnConfiguredPrefab(drawerPrefab, leftSinkDrawerPos, parent, roomRoot);
-            if (leftSinkDrawer != null)
-            {
-                SetItemSortingOrder(leftSinkDrawer, 10);
-                used.Add(leftSinkDrawer.transform.position);
-                spawnedAny = true;
-                SpawnKitchenSurfaceItem(knifePrefab, leftSinkDrawer.transform.position + new Vector3(-0.28f, 1.05f, 0f), parent, roomRoot, 0.7f);
-                SpawnKitchenSurfaceItem(whiskPrefab, leftSinkDrawer.transform.position + new Vector3(0.34f, 1.04f, 0f), parent, roomRoot, 0.7f);
-            }
-
-            Vector3 rightSinkDrawerPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
-                roomRoot,
-                RoomDecorInteriorAnchor.InteriorMiddleCenter,
-                new Vector3(2.65f, -0.25f, 0f));
-            GameObject rightSinkDrawer = SpawnConfiguredPrefab(drawerPrefab, rightSinkDrawerPos, parent, roomRoot);
-            if (rightSinkDrawer != null)
-            {
-                SetItemSortingOrder(rightSinkDrawer, 10);
-                used.Add(rightSinkDrawer.transform.position);
-                spawnedAny = true;
-                SpawnKitchenSurfaceItem(ladlePrefab, rightSinkDrawer.transform.position + new Vector3(0.04f, 1.05f, 0f), parent, roomRoot, 0.72f);
-            }
         }
 
         if (dishwasherPrefab != null)
@@ -489,7 +462,7 @@ public static class RoomPrefabStaticPlacer
         Vector3 leftCabinetOffset = wideRoom ? new Vector3(1.55f, -0.72f, 0f) : new Vector3(0.85f, -0.72f, 0f);
         Vector3 rightCabinetOffset = wideRoom ? new Vector3(-1.55f, -0.72f, 0f) : new Vector3(-0.85f, -0.72f, 0f);
         RoomDecorInteriorAnchor rightCabinetAnchor = RoomDecorInteriorAnchor.InteriorTopRight;
-        Vector3 plantOffset = wideRoom ? new Vector3(2.75f, -0.75f, 0f) : new Vector3(0.72f, -0.62f, 0f);
+        Vector3 plantOffset = wideRoom ? new Vector3(2.75f, -0.75f, 0f) : new Vector3(0.72f, 0.62f, 0f);
         Vector3 lampOffset = wideRoom ? new Vector3(-2.75f, -0.75f, 0f) : new Vector3(-0.72f, 0.62f, 0f);
         Vector3 couchOffset = wideRoom ? new Vector3(0f, 1.8f, 0f) : new Vector3(-0.2f, 1.35f, 0f);
 

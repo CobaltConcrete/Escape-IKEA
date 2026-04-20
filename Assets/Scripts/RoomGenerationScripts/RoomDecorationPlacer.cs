@@ -207,7 +207,7 @@ public static class RoomDecorationPlacer
         Vector3 leftCabinetPos = wideRoom ? new Vector3(left + 1.0f, top - 0.45f, 0f) : new Vector3(left + 0.85f, top - 0.65f, 0f);
         Vector3 rightCabinetPos = wideRoom ? new Vector3(right - 1.0f, top - 0.45f, 0f) : new Vector3(right - 0.85f, top - 0.65f, 0f);
         Vector3 curtainPos = wideRoom ? new Vector3(midX, top - 0.1f, 0f) : new Vector3(midX, top - 0.2f, 0f);
-        Vector3 plantPos = wideRoom ? new Vector3(left + 2.75f, bottom + 0.75f, 0f) : new Vector3(left + 0.55f, midY - 0.4f, 0f);
+        Vector3 plantPos = wideRoom ? new Vector3(left + 2.75f, bottom + 0.75f, 0f) : new Vector3(left + 0.55f, midY + 0.25f, 0f);
         Vector3 lampPos = wideRoom ? new Vector3(right - 2.75f, bottom + 0.75f, 0f) : new Vector3(right - 0.55f, midY + 0.25f, 0f);
 
         List<Bounds> occupied = new List<Bounds>();

@@ -781,6 +781,7 @@ public class RunObjectiveManager : MonoBehaviour
     private static Dictionary<string, int> CountAvailableShoppingListPickupsInGeneratedMap()
     {
         Dictionary<string, int> counts = new Dictionary<string, int>(StringComparer.Ordinal);
+        HashSet<string> countedPickupSlots = new HashSet<string>(StringComparer.Ordinal);
 
         RoomGeneratedPickup[] generatedPickups = UnityEngine.Object.FindObjectsByType<RoomGeneratedPickup>(
             FindObjectsInactive.Include,
@@ -798,7 +799,7 @@ public class RunObjectiveManager : MonoBehaviour
             if (spawner == null || spawner.ItemDefinition == null)
                 continue;
 
-            AddPickupCount(counts, spawner.ItemDefinition, 1);
+            AddPickupCountAtPosition(counts, countedPickupSlots, spawner.ItemDefinition, 1, pickup.transform.position);
         }
 
         ItemWorldSpawner[] itemSpawners = UnityEngine.Object.FindObjectsByType<ItemWorldSpawner>(
@@ -825,7 +826,7 @@ public class RunObjectiveManager : MonoBehaviour
             if (spawner == null || countedSpawners.Contains(spawner))
                 continue;
 
-            AddPickupCount(counts, spawner.ItemDefinition, 1);
+            AddPickupCountAtPosition(counts, countedPickupSlots, spawner.ItemDefinition, 1, spawner.transform.position);
         }
 
         ItemWorld[] itemWorlds = UnityEngine.Object.FindObjectsByType<ItemWorld>(
@@ -842,10 +843,45 @@ public class RunObjectiveManager : MonoBehaviour
             if (item == null || item.definition == null)
                 continue;
 
-            AddPickupCount(counts, item.definition, Mathf.Max(1, item.amount));
+            AddPickupCountAtPosition(counts, countedPickupSlots, item.definition, Mathf.Max(1, item.amount), itemWorld.transform.position);
         }
 
         return counts;
+    }
+
+    private static void AddPickupCountAtPosition(
+        Dictionary<string, int> counts,
+        HashSet<string> countedPickupSlots,
+        ItemDefinition itemDef,
+        int amount,
+        Vector3 position)
+    {
+        if (countedPickupSlots == null)
+        {
+            AddPickupCount(counts, itemDef, amount);
+            return;
+        }
+
+        string slotKey = MakePickupSlotKey(itemDef, position);
+        if (string.IsNullOrWhiteSpace(slotKey) || countedPickupSlots.Contains(slotKey))
+            return;
+
+        countedPickupSlots.Add(slotKey);
+        AddPickupCount(counts, itemDef, amount);
+    }
+
+    private static string MakePickupSlotKey(ItemDefinition itemDef, Vector3 position)
+    {
+        if (itemDef == null)
+            return string.Empty;
+
+        string key = NormalizeShoppingListKey(itemDef.GetShoppingListKey());
+        if (string.IsNullOrWhiteSpace(key))
+            return string.Empty;
+
+        int x = Mathf.RoundToInt(position.x * 20f);
+        int y = Mathf.RoundToInt(position.y * 20f);
+        return $"{key}:{x}:{y}";
     }
 
     private static void AddPickupCount(Dictionary<string, int> counts, ItemDefinition itemDef, int amount)

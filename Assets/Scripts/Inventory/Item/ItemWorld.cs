@@ -222,8 +222,7 @@ public class ItemWorld : MonoBehaviour, IInteractable
             }
         }
 
-        // collider，直接用 pfItemWorld prefab 上原本设置好的 collider
-        // ApplyColliderFromDefinition();
+        ConfigureColliderForCurrentItem();
 
         if (spriteRenderer != null)
         {

@@ -86,8 +86,8 @@ SpriteRenderer:
   m_SortingLayerID: -1295074419
   m_SortingLayer: 5
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: a0e35f6b808bb7447826cc6c69ffe448, type: 3}
-  m_Color: {r: 1, g: 0.25, b: 0.65, a: 1}
+  m_Sprite: {fileID: 5234158871693162790, guid: b3e04aac124534b108a6169ca45048ed, type: 3}
+  m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -386,9 +386,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 3311330670656350568}
+  enemy: {fileID: 0}
+  enemyCombat: {fileID: 0}
   enemyWander: {fileID: 3189414846442038637}
   enemyAimerShooter: {fileID: 1148303909692211348}
   enemyDashCharger: {fileID: 6259989672804943158, guid: 73a96bd0a680f8949861c27cf368dbe9, type: 3}
+  staggerDistance: 0.9
+  staggerDuration: 0.14
+  sidewaysOffsetStrength: 0.35
 --- !u!1 &6020604292169883429
 GameObject:
   m_ObjectHideFlags: 0
