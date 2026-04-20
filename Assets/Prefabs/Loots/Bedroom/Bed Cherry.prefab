@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 8235532205356271792}
   - component: {fileID: -59159626031353184}
+  - component: {fileID: -3410277950867269211}
   - component: {fileID: -8225381597860622731}
   - component: {fileID: -5187446036180141741}
-  - component: {fileID: -3410277950867269211}
   - component: {fileID: 6345650912529973297}
   m_Layer: 12
   m_Name: Bed Cherry
@@ -51,6 +51,20 @@ MonoBehaviour:
   itemDefinition: {fileID: 11400000, guid: c6142730141f3ec47823df46ceaf548e, type: 2}
   amount: 1
   spawnedObjectName: Cherry
+--- !u!114 &-3410277950867269211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2955381025110779136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnCategory: 1
+  isPickable: 1
 --- !u!212 &-8225381597860622731
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -95,12 +109,12 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -4266958613824459029, guid: 86b11c561b1ee4d9e82658ad00e11742, type: 3}
+  m_Sprite: {fileID: 4855168555884740677, guid: ac08da5c24d22447bbb841e16c994877, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 8, y: 8}
+  m_Size: {x: 1.26, y: 1.27}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -158,29 +172,6 @@ MonoBehaviour:
   - {x: 0.5, y: -0.5, z: 0}
   - {x: 0.5, y: 0.5, z: 0}
   - {x: -0.5, y: 0.5, z: 0}
---- !u!114 &-3410277950867269211
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2955381025110779136}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomType: 2
-  spawnCategory: 1
-  shoppingListKey: BedCherry
-  pickupDisplayName: Bed Cherry
-  lootValue: 900
-  canAppearInShoppingList: 1
-  minRequiredAmount: 1
-  maxRequiredAmount: 3
-  spawnWeight: 1
-  isPickable: 1
-  linkedItemDefinition: {fileID: 11400000, guid: c6142730141f3ec47823df46ceaf548e, type: 2}
 --- !u!61 &6345650912529973297
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -220,7 +211,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1.26, y: 1.27}
-    newSize: {x: 8, y: 8}
+    newSize: {x: 1.26, y: 1.27}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0

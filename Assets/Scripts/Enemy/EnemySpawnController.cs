@@ -217,8 +217,11 @@ public class EnemySpawnController : MonoBehaviour
 
     private bool IsTutorialRoom()
     {
+        if (GetComponentInParent<StartingRoomSafeZone>() != null)
+            return true;
+
         string n = gameObject.name;
-        return n.Contains("SportsRoom") || n.Contains("Tutorial");
+        return n.Contains("Tutorial");
     }
 
     private bool IsCafeteriaRoom()

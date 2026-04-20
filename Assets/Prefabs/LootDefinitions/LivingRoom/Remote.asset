@@ -31,7 +31,7 @@ MonoBehaviour:
   canAppearInShoppingList: 1
   minRequiredAmount: 1
   maxRequiredAmount: 3
-  shoppingListKey: Curtain
+  shoppingListKey: Remote
   allowedRoomTypes: 04000000
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.8, y: 0.8, z: 0.8}

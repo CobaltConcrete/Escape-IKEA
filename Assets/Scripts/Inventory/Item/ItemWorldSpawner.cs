@@ -26,8 +26,11 @@ public class ItemWorldSpawner : MonoBehaviour
             return;
         }
 
-        // Prefab transform scale is the authoritative world size for this spawner path.
-        // This allows designers to tune pickup size directly in prefab Transform.
+        if (spawnParent == null)
+        {
+            spawnParent = ResolveFallbackSpawnParent();
+        }
+
         Vector3 spawnScale = GetWorldSpawnScale(itemDefinition, transform);
 
         Item item = new Item
@@ -45,6 +48,7 @@ public class ItemWorldSpawner : MonoBehaviour
             spawnScale,
             item
         );
+
         if (spawned != null)
         {
             Room room = GetComponentInParent<Room>();
@@ -52,6 +56,7 @@ public class ItemWorldSpawner : MonoBehaviour
             {
                 spawned.SetRoom(room);
             }
+
             if (!string.IsNullOrWhiteSpace(spawnedObjectName))
                 spawned.name = spawnedObjectName;
         }
@@ -88,17 +93,25 @@ public class ItemWorldSpawner : MonoBehaviour
         if (sourceCollider is BoxCollider2D sourceBox)
         {
             BoxCollider2D box = target.AddComponent<BoxCollider2D>();
-            box.isTrigger = sourceBox.isTrigger;
+            box.isTrigger = itemDefinition == null || !itemDefinition.IsLoot()
+                ? sourceBox.isTrigger
+                : false;
             box.offset = sourceBox.offset;
-            box.size = sourceBox.size;
+            box.size = itemDefinition != null && itemDefinition.IsLoot()
+                ? new Vector2(Mathf.Max(0.1f, sourceBox.size.x * 0.42f), Mathf.Max(0.1f, sourceBox.size.y * 0.34f))
+                : sourceBox.size;
             box.edgeRadius = sourceBox.edgeRadius;
         }
         else if (sourceCollider is CircleCollider2D sourceCircle)
         {
             CircleCollider2D circle = target.AddComponent<CircleCollider2D>();
-            circle.isTrigger = sourceCircle.isTrigger;
+            circle.isTrigger = itemDefinition == null || !itemDefinition.IsLoot()
+                ? sourceCircle.isTrigger
+                : false;
             circle.offset = sourceCircle.offset;
-            circle.radius = sourceCircle.radius;
+            circle.radius = itemDefinition != null && itemDefinition.IsLoot()
+                ? Mathf.Max(0.08f, sourceCircle.radius * 0.38f)
+                : sourceCircle.radius;
         }
     }
 
@@ -143,5 +156,60 @@ public class ItemWorldSpawner : MonoBehaviour
         {
             SetLayerRecursively(child.gameObject, layer);
         }
+    }
+    private Transform ResolveFallbackSpawnParent()
+    {
+        Room room = GetComponentInParent<Room>();
+        if (room == null)
+            return null;
+
+        RoomSpawnPrefabDefinition def = GetComponent<RoomSpawnPrefabDefinition>();
+        if (def == null)
+            def = GetComponentInChildren<RoomSpawnPrefabDefinition>(true);
+
+        if (def != null)
+        {
+            switch (def.spawnCategory)
+            {
+                case RoomSpawnCategory.Decoration:
+                    return room.transform.Find("SpawnedObjects") ?? room.transform;
+
+                case RoomSpawnCategory.Weapon:
+                    return room.transform.Find("SpawnedItems") ?? room.transform;
+
+                case RoomSpawnCategory.Item:
+                    return room.transform.Find("SpawnedLoots")
+                        ?? room.transform.Find("SpawnedLoot")
+                        ?? room.transform;
+
+                default:
+                    return room.transform.Find("SpawnedLoots")
+                        ?? room.transform.Find("SpawnedItems")
+                        ?? room.transform.Find("SpawnedObjects")
+                        ?? room.transform;
+            }
+        }
+
+        // If no RoomSpawnPrefabDefinition is found, infer from ItemDefinition.
+        if (itemDefinition != null)
+        {
+            if (itemDefinition.IsLoot())
+            {
+                return room.transform.Find("SpawnedLoots")
+                    ?? room.transform.Find("SpawnedLoot")
+                    ?? room.transform;
+            }
+
+            if (itemDefinition.itemCategory == ItemCategory.Normal &&
+                itemDefinition.equipTag == EquipmentEnum.EquipTag.Weapon)
+            {
+                return room.transform.Find("SpawnedItems") ?? room.transform;
+            }
+        }
+
+        return room.transform.Find("SpawnedLoots")
+            ?? room.transform.Find("SpawnedItems")
+            ?? room.transform.Find("SpawnedObjects")
+            ?? room.transform;
     }
 }

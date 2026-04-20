@@ -33,11 +33,22 @@ public static class SportsRoomBatPlacer
         if (parent.Find(BatInstanceName) != null)
             return;
 
+        ItemWorldSpawner prefabSpawner = batSpawnerPrefab.GetComponent<ItemWorldSpawner>();
+        ItemDefinition batDefinition = prefabSpawner != null ? prefabSpawner.ItemDefinition : null;
+
         GameObject instance = Object.Instantiate(batSpawnerPrefab, parent);
         instance.name = BatInstanceName;
         ItemWorldSpawner spawner = instance.GetComponent<ItemWorldSpawner>();
         if (spawner != null)
-            spawner.SetSpawnParent(parent);
+            Object.DestroyImmediate(spawner);
+
+        MonoBehaviour pickup = GetOrAddWeaponPickup(instance);
+        ConfigureWeaponPickup(pickup, batDefinition, 1);
+
+        SportsRoomBatAutoPickup autoPickup = instance.GetComponent<SportsRoomBatAutoPickup>();
+        if (autoPickup == null)
+            autoPickup = instance.AddComponent<SportsRoomBatAutoPickup>();
+        autoPickup.Configure(batDefinition, 1);
 
         // Keep prefab-authored transform scale as authoritative for bat size.
         // (Do not overwrite with ItemDefinition worldDropScale.)
@@ -74,5 +85,69 @@ public static class SportsRoomBatPlacer
         }
 
         return preferredWorld;
+    }
+
+    private static MonoBehaviour GetOrAddWeaponPickup(GameObject instance)
+    {
+        if (instance == null)
+            return null;
+
+        MonoBehaviour[] behaviours = instance.GetComponents<MonoBehaviour>();
+        for (int i = 0; i < behaviours.Length; i++)
+        {
+            MonoBehaviour behaviour = behaviours[i];
+            if (behaviour != null && string.Equals(behaviour.GetType().Name, "WeaponWorldPickup", System.StringComparison.Ordinal))
+                return behaviour;
+        }
+
+        System.Type weaponPickupType = FindTypeByName("WeaponWorldPickup");
+        if (weaponPickupType == null)
+        {
+            Debug.LogError("SportsRoomBatPlacer: WeaponWorldPickup type could not be found.");
+            return null;
+        }
+
+        return instance.AddComponent(weaponPickupType) as MonoBehaviour;
+    }
+
+    private static void ConfigureWeaponPickup(MonoBehaviour pickup, ItemDefinition batDefinition, int amount)
+    {
+        if (pickup == null)
+            return;
+
+        System.Reflection.MethodInfo configure = pickup.GetType().GetMethod(
+            "Configure",
+            new[] { typeof(ItemDefinition), typeof(int) });
+        if (configure != null)
+            configure.Invoke(pickup, new object[] { batDefinition, amount });
+    }
+
+    private static System.Type FindTypeByName(string typeName)
+    {
+        System.AppDomain domain = System.AppDomain.CurrentDomain;
+        System.Reflection.Assembly[] assemblies = domain.GetAssemblies();
+        for (int i = 0; i < assemblies.Length; i++)
+        {
+            System.Type[] types;
+            try
+            {
+                types = assemblies[i].GetTypes();
+            }
+            catch (System.Reflection.ReflectionTypeLoadException ex)
+            {
+                types = ex.Types;
+            }
+
+            if (types == null)
+                continue;
+
+            for (int j = 0; j < types.Length; j++)
+            {
+                if (types[j] != null && string.Equals(types[j].Name, typeName, System.StringComparison.Ordinal))
+                    return types[j];
+            }
+        }
+
+        return null;
     }
 }

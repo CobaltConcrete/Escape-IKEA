@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 8235532205356271792}
   - component: {fileID: -59159626031353184}
+  - component: {fileID: -3410277950867269211}
   - component: {fileID: -8225381597860622731}
   - component: {fileID: -5187446036180141741}
-  - component: {fileID: -3410277950867269211}
   - component: {fileID: 3662806810277505863}
   m_Layer: 12
   m_Name: Bed Night Owl
@@ -51,6 +51,20 @@ MonoBehaviour:
   itemDefinition: {fileID: 11400000, guid: 2a1a42b089e13ad4fbc1c32c941833db, type: 2}
   amount: 1
   spawnedObjectName: Night Owl
+--- !u!114 &-3410277950867269211
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2955381025110779136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnCategory: 1
+  isPickable: 1
 --- !u!212 &-8225381597860622731
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -158,29 +172,6 @@ MonoBehaviour:
   - {x: 0.5, y: -0.5, z: 0}
   - {x: 0.5, y: 0.5, z: 0}
   - {x: -0.5, y: 0.5, z: 0}
---- !u!114 &-3410277950867269211
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2955381025110779136}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomType: 2
-  spawnCategory: 1
-  shoppingListKey: BedNightOwl
-  pickupDisplayName: Bed Night Owl
-  lootValue: 900
-  canAppearInShoppingList: 1
-  minRequiredAmount: 1
-  maxRequiredAmount: 3
-  spawnWeight: 1
-  isPickable: 1
-  linkedItemDefinition: {fileID: 11400000, guid: 2a1a42b089e13ad4fbc1c32c941833db, type: 2}
 --- !u!61 &3662806810277505863
 BoxCollider2D:
   m_ObjectHideFlags: 0

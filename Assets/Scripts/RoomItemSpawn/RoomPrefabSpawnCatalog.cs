@@ -172,12 +172,32 @@ public class RoomPrefabSpawnCatalog : ScriptableObject
                 map[RoomType.SportsRoom].Add(prefab);
                 return;
             case "Shared":
-                map[RoomType.Bedroom].Add(prefab);
-                map[RoomType.LivingRoom].Add(prefab);
+                AddSharedPrefabToAllowedRooms(prefab, map);
                 return;
             default:
                 return;
         }
+    }
+
+    private static void AddSharedPrefabToAllowedRooms(
+        GameObject prefab,
+        Dictionary<RoomType, List<GameObject>> map)
+    {
+        RoomSpawnPrefabDefinition spawnDef = prefab != null ? prefab.GetComponent<RoomSpawnPrefabDefinition>() : null;
+        ItemDefinition itemDef = spawnDef != null ? spawnDef.GetItemDefinition() : null;
+        if (itemDef != null && itemDef.allowedRoomTypes != null && itemDef.allowedRoomTypes.Count > 0)
+        {
+            for (int i = 0; i < itemDef.allowedRoomTypes.Count; i++)
+            {
+                RoomType roomType = itemDef.allowedRoomTypes[i];
+                if (map.ContainsKey(roomType))
+                    map[roomType].Add(prefab);
+            }
+            return;
+        }
+
+        map[RoomType.Bedroom].Add(prefab);
+        map[RoomType.LivingRoom].Add(prefab);
     }
 #endif
 }

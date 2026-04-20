@@ -8,7 +8,9 @@ public class RoomContentActivation : MonoBehaviour
 
     [Header("Containers")]
     [SerializeField] private Transform enemyContainer;
+    [SerializeField] private Transform objectContainer;
     [SerializeField] private Transform itemContainer;
+    [SerializeField] private Transform lootContainer;
 
     [Header("Debug / Test Scene Override")]
     [SerializeField]
@@ -29,6 +31,35 @@ public class RoomContentActivation : MonoBehaviour
         if (roomTrigger != null)
         {
             roomTrigger.isTrigger = true;
+        }
+
+        if (objectContainer == null)
+        {
+            Transform t = transform.Find("SpawnedObjects");
+            if (t != null)
+                objectContainer = t;
+        }
+
+        if (itemContainer == null)
+        {
+            Transform t = transform.Find("SpawnedItems");
+            if (t != null)
+                itemContainer = t;
+        }
+
+        if (lootContainer == null)
+        {
+            Transform t = transform.Find("SpawnedLoots");
+            if (t == null) t = transform.Find("SpawnedLoot");
+            if (t != null)
+                lootContainer = t;
+        }
+        if (enemyContainer == null)
+        {
+            Transform t = transform.Find("SpawnedEnemies");
+            if (t == null) t = transform.Find("SpawnedObjects");
+            if (t != null)
+                enemyContainer = t;
         }
     }
 
@@ -90,11 +121,6 @@ public class RoomContentActivation : MonoBehaviour
         ReevaluateActiveRoom();
     }
 
-    /// <summary>
-    /// Adds this room to <see cref="playerRooms"/> when the player is already overlapping the room trigger
-    /// (e.g. starting room after teleport). Uses bounds + trigger point tests so <see cref="SpawnedItems"/>
-    /// is not left inactive (which would disable loot / bat colliders only in that room).
-    /// </summary>
     public void RegisterIfPlayerInsideVolume()
     {
         if (roomTrigger == null || ignoreRoomActivationInThisScene)
@@ -127,11 +153,6 @@ public class RoomContentActivation : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// Rebuilds which room owns active pickups after map generation / loot spawn / player teleport.
-    /// Call from <see cref="MapManager"/> once the player is at their start cell so the starting room
-    /// (often Sports) does not keep <see cref="itemContainer"/> disabled.
-    /// </summary>
     public static void RefreshPlayerRoomsAfterMapSetup()
     {
         playerRooms.Clear();
@@ -166,6 +187,9 @@ public class RoomContentActivation : MonoBehaviour
         if (playerTransform == null)
             return;
 
+        if (playerRooms.Count == 0)
+            RebuildPlayerRoomsFromCurrentPosition();
+
         RoomContentActivation bestRoom = null;
         float bestDistance = float.MaxValue;
 
@@ -188,7 +212,11 @@ public class RoomContentActivation : MonoBehaviour
         }
 
         if (bestRoom == currentActiveRoom)
+        {
+            if (currentActiveRoom != null)
+                currentActiveRoom.SetRoomContentActive(true);
             return;
+        }
 
         if (currentActiveRoom != null)
         {
@@ -202,6 +230,46 @@ public class RoomContentActivation : MonoBehaviour
             currentActiveRoom.OnPlayerEnteredThisRoom();
             currentActiveRoom.SetRoomContentActive(true);
         }
+    }
+
+    private static void RebuildPlayerRoomsFromCurrentPosition()
+    {
+        if (playerTransform == null)
+            return;
+
+        RoomContentActivation[] rooms = Object.FindObjectsByType<RoomContentActivation>(
+            FindObjectsInactive.Exclude,
+            FindObjectsSortMode.None);
+
+        RoomContentActivation nearestRoom = null;
+        float nearestDistance = float.MaxValue;
+        Vector2 playerPos = playerTransform.position;
+
+        foreach (RoomContentActivation room in rooms)
+        {
+            if (room == null || room.roomTrigger == null || room.ignoreRoomActivationInThisScene)
+                continue;
+
+            Collider2D trigger = room.roomTrigger;
+            if (trigger.OverlapPoint(playerPos))
+            {
+                playerRooms.Add(room);
+                continue;
+            }
+
+            Vector2 closest = trigger.ClosestPoint(playerPos);
+            float distance = (playerPos - closest).sqrMagnitude;
+            if (distance < nearestDistance)
+            {
+                nearestDistance = distance;
+                nearestRoom = room;
+            }
+        }
+
+        // Door seams can briefly put the player outside every room trigger. Keep the closest
+        // room alive instead of dropping to a fully black view.
+        if (playerRooms.Count == 0 && nearestRoom != null && nearestDistance <= 4f)
+            playerRooms.Add(nearestRoom);
     }
 
     private void OnPlayerEnteredThisRoom()
@@ -227,7 +295,9 @@ public class RoomContentActivation : MonoBehaviour
     public void SetRoomContentActive(bool active)
     {
         SetEnemiesActive(active);
-        SetItemsActive(active);
+        SetContainerItemsActive(objectContainer, active);
+        SetContainerItemsActive(itemContainer, active);
+        SetContainerItemsActive(lootContainer, active);
     }
 
     private void SetEnemiesActive(bool active)
@@ -245,12 +315,12 @@ public class RoomContentActivation : MonoBehaviour
         }
     }
 
-    private void SetItemsActive(bool active)
+    private void SetContainerItemsActive(Transform container, bool active)
     {
-        if (itemContainer == null)
+        if (container == null)
             return;
 
-        ItemWorld[] items = itemContainer.GetComponentsInChildren<ItemWorld>(true);
+        ItemWorld[] items = container.GetComponentsInChildren<ItemWorld>(true);
         foreach (ItemWorld item in items)
         {
             if (item != null)
@@ -259,8 +329,7 @@ public class RoomContentActivation : MonoBehaviour
             }
         }
 
-        // Avoid direct compile-time dependency on WeaponWorldPickup (can fail on some script compile orders).
-        MonoBehaviour[] behaviours = itemContainer.GetComponentsInChildren<MonoBehaviour>(true);
+        MonoBehaviour[] behaviours = container.GetComponentsInChildren<MonoBehaviour>(true);
         foreach (MonoBehaviour behaviour in behaviours)
         {
             if (behaviour == null)
@@ -273,7 +342,7 @@ public class RoomContentActivation : MonoBehaviour
                 method.Invoke(behaviour, new object[] { active });
         }
 
-        RoomGeneratedPickup[] generated = itemContainer.GetComponentsInChildren<RoomGeneratedPickup>(true);
+        RoomGeneratedPickup[] generated = container.GetComponentsInChildren<RoomGeneratedPickup>(true);
         for (int i = 0; i < generated.Length; i++)
         {
             if (generated[i] == null)
@@ -281,6 +350,6 @@ public class RoomContentActivation : MonoBehaviour
             generated[i].SetRoomVisible(active);
         }
 
-        itemContainer.gameObject.SetActive(active);
+        container.gameObject.SetActive(active);
     }
 }

@@ -182,6 +182,47 @@ public class PlayerInventoryInteraction : MonoBehaviour
         return equipmentData.GetEquippedArmor();
     }
 
+    public int CountOwnedItemsByName(string itemName, bool includeEquipped = true)
+    {
+        if (string.IsNullOrWhiteSpace(itemName))
+            return 0;
+
+        int total = 0;
+        if (inventory != null)
+        {
+            List<Item> items = inventory.GetItemList();
+            for (int i = 0; i < items.Count; i++)
+            {
+                Item item = items[i];
+                if (ItemNameMatches(item, itemName))
+                    total += Mathf.Max(1, item.amount);
+            }
+        }
+
+        if (includeEquipped && equipmentData != null)
+        {
+            total += CountEquippedItemByName(EquipTag.Weapon, itemName);
+            total += CountEquippedItemByName(EquipTag.Armor, itemName);
+            total += CountEquippedItemByName(EquipTag.Utility, itemName);
+        }
+
+        return total;
+    }
+
+    private int CountEquippedItemByName(EquipTag equipTag, string itemName)
+    {
+        Item item = equipmentData.GetEquippedItem(equipTag);
+        return ItemNameMatches(item, itemName) ? Mathf.Max(1, item.amount) : 0;
+    }
+
+    private static bool ItemNameMatches(Item item, string itemName)
+    {
+        if (item == null || item.definition == null || string.IsNullOrWhiteSpace(item.definition.itemName))
+            return false;
+
+        return item.definition.itemName.IndexOf(itemName, System.StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
     public void BreakEquippedArmor()
     {
         if (equipmentData == null)

@@ -67,7 +67,9 @@ public static class RoomDecorationPlacer
         decorRoot.layer = 0;
 
         Room room = roomRoot.GetComponent<Room>();
-        Transform pickupParent = roomRoot.Find(SpawnedItemsName);
+        Transform pickupParent =
+    roomRoot.Find("SpawnedLoots") ??
+    roomRoot.Find("SpawnedItems");
 
         if (roomType == RoomType.LivingRoom)
         {
@@ -179,6 +181,7 @@ public static class RoomDecorationPlacer
         float bottom = minL.y + WallPadding;
         float midX = (left + right) * 0.5f;
         float midY = (bottom + top) * 0.5f;
+        bool wideRoom = (right - left) >= (top - bottom);
 
         Sprite couchSprite = FindSpriteByName(catalog, "Couch");
         Sprite cushionSprite = FindSpriteByName(catalog, "Cushion");
@@ -188,7 +191,9 @@ public static class RoomDecorationPlacer
         Sprite pictureSprite = FindSpriteByName(catalog, "Picture");
         Sprite curtainSprite = FindSpriteByName(catalog, "Curtain");
         Sprite plantSprite = FindSpriteByName(catalog, "Houseplant");
+        Sprite monsteraSprite = FindSpriteByName(catalog, "Monstera");
         Sprite lampSprite = FindSpriteByName(catalog, "Lamp");
+        Sprite cartSprite = FindSpriteByName(catalog, "Tiered_Cart");
         GameObject couchPrefab = FindPrefabByName(catalog, "Couch");
         GameObject cushionPrefab = FindPrefabByName(catalog, "Cushion");
         GameObject coffeePrefab = FindPrefabByName(catalog, "Coffeetable");
@@ -197,14 +202,20 @@ public static class RoomDecorationPlacer
         GameObject picturePrefab = FindPrefabByName(catalog, "Picture");
         GameObject curtainPrefab = FindPrefabByName(catalog, "Curtain");
         GameObject plantPrefab = FindPrefabByName(catalog, "Houseplant");
+        GameObject monsteraPrefab = FindPrefabByName(catalog, "Monstera");
         GameObject lampPrefab = FindPrefabByName(catalog, "Lamp");
+        GameObject cartPrefab = FindPrefabByName(catalog, "Tiered_Cart");
 
-        Vector3 couchPos = new Vector3(midX, bottom + 0.85f, 0f);
-        Vector3 tablePos = new Vector3(midX, couchPos.y + 1.0f, 0f);
-        Vector3 cabinetPos = new Vector3(left + 1.0f, top - 0.45f, 0f);
-        Vector3 curtainPos = new Vector3(midX, top - 0.1f, 0f);
-        Vector3 plantPos = new Vector3(left + 0.45f, bottom + 0.55f, 0f);
-        Vector3 lampPos = new Vector3(right - 0.45f, bottom + 0.55f, 0f);
+        Vector3 couchPos = wideRoom ? new Vector3(midX, bottom + 1.45f, 0f) : new Vector3(midX, midY + 1.15f, 0f);
+        Vector3 tablePos = wideRoom ? new Vector3(midX, bottom + 0.55f, 0f) : new Vector3(midX, midY - 1.15f, 0f);
+        Vector3 leftCabinetPos = wideRoom ? new Vector3(left + 1.0f, top - 0.45f, 0f) : new Vector3(left + 0.85f, top - 0.65f, 0f);
+        Vector3 rightCabinetPos = wideRoom ? new Vector3(right - 1.0f, top - 0.45f, 0f) : new Vector3(right - 0.85f, top - 0.65f, 0f);
+        Vector3 curtainPos = wideRoom ? new Vector3(midX, top - 0.1f, 0f) : new Vector3(midX, top - 0.2f, 0f);
+        Vector3 plantPos = wideRoom ? new Vector3(left + 2.85f, bottom + 0.75f, 0f) : new Vector3(left + 0.95f, midY + 0.25f, 0f);
+        Vector3 lampPos = wideRoom ? new Vector3(right - 3.35f, bottom + 0.75f, 0f) : new Vector3(right - 0.95f, midY + 0.25f, 0f);
+        Vector3 cartPos = wideRoom ? new Vector3(left + 1.25f, bottom + 0.72f, 0f) : new Vector3(left + 0.72f, bottom + 1.35f, 0f);
+        Vector3 leftMonsteraPos = wideRoom ? new Vector3(left + 2.35f, bottom + 0.78f, 0f) : new Vector3(left + 0.82f, bottom + 2.35f, 0f);
+        Vector3 rightMonsteraPos = wideRoom ? new Vector3(right - 2.35f, bottom + 0.78f, 0f) : new Vector3(right - 0.82f, bottom + 2.35f, 0f);
 
         List<Bounds> occupied = new List<Bounds>();
 
@@ -238,17 +249,20 @@ public static class RoomDecorationPlacer
         GameObject table = SpawnLayoutObject(decorRoot, "Living_Coffeetable", coffeePrefab, coffeeSprite, tablePlaced, 8);
         if (table != null)
         {
-            Vector3 remotePos = new Vector3(0.1f, 0.2f, 0f);
-            SpawnLayoutObject(table.transform, "Living_Remote", remotePrefab, remoteSprite, remotePos, 9, 1f, false);
+            Vector3 remotePos = wideRoom ? new Vector3(0.22f, -0.48f, 0f) : new Vector3(0.58f, 0.4f, 0f);
+            SpawnLayoutObject(table.transform, "Living_Remote", remotePrefab, remoteSprite, remotePos, 12, 0.8f, false);
         }
 
-        Vector3 cabinetPlaced = PlaceLivingLocal("Living_Cabinet", cabinetPrefab, cabinetSprite, cabinetPos);
-        GameObject cabinet = SpawnLayoutObject(decorRoot, "Living_Cabinet", cabinetPrefab, cabinetSprite, cabinetPlaced, 8);
-        if (cabinet != null)
+        Vector3 leftCabinetPlaced = PlaceLivingLocal("Living_Cabinet_Left", cabinetPrefab, cabinetSprite, leftCabinetPos);
+        GameObject leftCabinet = SpawnLayoutObject(decorRoot, "Living_Cabinet_Left", cabinetPrefab, cabinetSprite, leftCabinetPlaced, 8);
+        if (leftCabinet != null)
         {
-            Vector3 picturePos = new Vector3(0f, 0.45f, 0f);
-            SpawnLayoutObject(cabinet.transform, "Living_Picture", picturePrefab, pictureSprite, picturePos, 9, 1f, false);
+            Vector3 picturePos = wideRoom ? new Vector3(0f, -0.55f, 0f) : new Vector3(0f, -0.45f, 0f);
+            SpawnLayoutObject(leftCabinet.transform, "Living_Picture", picturePrefab, pictureSprite, picturePos, 9, 1f, false);
         }
+
+        Vector3 rightCabinetPlaced = PlaceLivingLocal("Living_Cabinet_Right", cabinetPrefab, cabinetSprite, rightCabinetPos);
+        SpawnLayoutObject(decorRoot, "Living_Cabinet_Right", cabinetPrefab, cabinetSprite, rightCabinetPlaced, 8);
 
         Vector3 curtainPlaced = PlaceLivingLocal("Living_Curtain", curtainPrefab, curtainSprite, curtainPos);
         SpawnLayoutObject(decorRoot, "Living_Curtain", curtainPrefab, curtainSprite, curtainPlaced, 8);
@@ -256,6 +270,12 @@ public static class RoomDecorationPlacer
         SpawnLayoutObject(decorRoot, "Living_Houseplant", plantPrefab, plantSprite, plantPlaced, 8);
         Vector3 lampPlaced = PlaceLivingLocal("Living_Lamp", lampPrefab, lampSprite, lampPos);
         SpawnLayoutObject(decorRoot, "Living_Lamp", lampPrefab, lampSprite, lampPlaced, 8);
+        Vector3 cartPlaced = PlaceLivingLocal("Living_TieredCart", cartPrefab, cartSprite, cartPos);
+        SpawnLayoutObject(decorRoot, "Living_TieredCart", cartPrefab, cartSprite, cartPlaced, 8);
+        Vector3 leftMonsteraPlaced = PlaceLivingLocal("Living_Monstera_Left", monsteraPrefab, monsteraSprite, leftMonsteraPos);
+        SpawnLayoutObject(decorRoot, "Living_Monstera_Left", monsteraPrefab, monsteraSprite, leftMonsteraPlaced, 8);
+        Vector3 rightMonsteraPlaced = PlaceLivingLocal("Living_Monstera_Right", monsteraPrefab, monsteraSprite, rightMonsteraPos);
+        SpawnLayoutObject(decorRoot, "Living_Monstera_Right", monsteraPrefab, monsteraSprite, rightMonsteraPlaced, 8);
     }
 
     private static GameObject SpawnLayoutSprite(Transform parent, string name, Sprite sprite, Vector3 localPos, int sortingOrder, float uniformScale = 1f)
@@ -278,31 +298,123 @@ public static class RoomDecorationPlacer
         AddBlockingCollider(go, sprite);
         return go;
     }
+    private static RoomSpawnPrefabDefinition GetRoomSpawnDefinition(GameObject obj)
+    {
+        if (obj == null)
+            return null;
 
+        RoomSpawnPrefabDefinition def = obj.GetComponent<RoomSpawnPrefabDefinition>();
+        if (def == null)
+            def = obj.GetComponentInChildren<RoomSpawnPrefabDefinition>(true);
+
+        return def;
+    }
+
+    private static Transform ResolveContainerForSpawnCategory(Transform roomRoot, RoomSpawnPrefabDefinition def)
+    {
+        if (roomRoot == null)
+            return null;
+
+        if (def == null)
+            return roomRoot.Find("SpawnedObjects") ?? roomRoot;
+
+        switch (def.spawnCategory)
+        {
+            case RoomSpawnCategory.Decoration:
+                return roomRoot.Find("SpawnedObjects") ?? roomRoot;
+
+            case RoomSpawnCategory.Weapon:
+                return roomRoot.Find("SpawnedItems") ?? roomRoot;
+
+            case RoomSpawnCategory.Item:
+                return roomRoot.Find("SpawnedLoots")
+                    ?? roomRoot.Find("SpawnedLoot")
+                    ?? roomRoot;
+
+            default:
+                return roomRoot.Find("SpawnedObjects") ?? roomRoot;
+        }
+    }
+
+    private static void AssignSpawnParentToAnyItemWorldSpawner(GameObject instance, Transform spawnParent)
+    {
+        if (instance == null)
+            return;
+
+        ItemWorldSpawner[] spawners = instance.GetComponentsInChildren<ItemWorldSpawner>(true);
+        for (int i = 0; i < spawners.Length; i++)
+        {
+            if (spawners[i] == null)
+                continue;
+
+            Transform finalParent = spawnParent;
+
+            if (finalParent == null)
+            {
+                Room room = spawners[i].GetComponentInParent<Room>();
+                if (room != null)
+                {
+                    finalParent =
+                        room.transform.Find("SpawnedLoots") ??
+                        room.transform.Find("SpawnedItems") ??
+                        room.transform.Find("SpawnedObjects") ??
+                        room.transform;
+                }
+            }
+
+            spawners[i].SetSpawnParent(finalParent);
+        }
+    }
     private static GameObject SpawnLayoutObject(
-        Transform parent,
-        string name,
-        GameObject prefab,
-        Sprite fallbackSprite,
-        Vector3 localPos,
-        int sortingOrder,
-        float uniformScale = 1f,
-        bool addMovementBlockingCollider = true)
+    Transform parent,
+    string name,
+    GameObject prefab,
+    Sprite fallbackSprite,
+    Vector3 localPos,
+    int sortingOrder,
+    float uniformScale = 1f,
+    bool addMovementBlockingCollider = true)
     {
         if (prefab != null && parent != null)
         {
-            GameObject go = Object.Instantiate(prefab, parent, false);
+            Transform roomRoot = parent.GetComponentInParent<Room>() != null
+                ? parent.GetComponentInParent<Room>().transform
+                : parent;
+
+            RoomSpawnPrefabDefinition def = GetRoomSpawnDefinition(prefab);
+            Transform targetContainer = ResolveContainerForSpawnCategory(roomRoot, def);
+
+            Transform instantiateParent =
+                def != null && def.spawnCategory == RoomSpawnCategory.Decoration
+                    ? parent
+                    : (targetContainer != null ? targetContainer : parent);
+
+            GameObject go = Object.Instantiate(prefab, instantiateParent, false);
+
+            // 关键：先关掉，别让 ItemWorldSpawner 抢跑
+            go.SetActive(false);
+
             go.name = name;
             go.transform.localPosition = localPos;
             go.transform.localRotation = Quaternion.identity;
+
             float s = Mathf.Max(0.01f, uniformScale);
             go.transform.localScale = new Vector3(s, s, 1f);
+
+            // 关键：在重新激活前，先把所有 ItemWorldSpawner 的 parent 塞好
+            AssignSpawnParentToAnyItemWorldSpawner(
+                go,
+                targetContainer != null ? targetContainer : instantiateParent);
+
             if (addMovementBlockingCollider && go.GetComponentInChildren<Collider2D>(true) == null)
             {
                 Sprite refSprite = GetPrefabReferenceSprite(prefab);
                 if (refSprite != null)
                     AddBlockingCollider(go, refSprite);
             }
+
+            // 最后再开
+            go.SetActive(true);
             return go;
         }
 
@@ -391,7 +503,9 @@ public static class RoomDecorationPlacer
             return;
 
         Room room = roomRoot.GetComponent<Room>();
-        Transform pickupParent = roomRoot.Find(SpawnedItemsName);
+        Transform pickupParent =
+    roomRoot.Find("SpawnedLoots") ??
+    roomRoot.Find("SpawnedItems");
 
         float left = minL.x + WallPadding;
         float right = maxL.x - WallPadding;
@@ -451,26 +565,22 @@ public static class RoomDecorationPlacer
 
         float towelX = Mathf.Min(midX + Mathf.Clamp(spanX * 0.17f, 1.2f, 1.95f), right - 0.72f);
         BathroomTryPlaceDecor(
-            decorRoot, occupied, minL, maxL, "Bath_Towel", towelPrefab, towel, new Vector3(towelX, top - 0.44f, 0f),
+            decorRoot, occupied, minL, maxL, "Bath_Towel", towelPrefab, towel, new Vector3(towelX, top - 0.7f, 0f),
             BathroomUniformScaleForSprite(towel, bathroomTargetSpan * bathroomTowelSpanMul));
 
-        float trayY = bottom + Mathf.Clamp(spanY * 0.12f, 0.55f, 0.88f);
+        float cartY = bottom + Mathf.Clamp(spanY * 0.3f, 1.0f, 1.55f);
         BathroomTryPlaceDecor(
-            decorRoot, occupied, minL, maxL, "Bath_Tray", trayPrefab, tray, new Vector3(midX, trayY, 0f),
+            decorRoot, occupied, minL, maxL, "Bath_Tray", trayPrefab, tray, new Vector3(midX + 0.22f, cartY, 0f),
             BathroomUniformScaleForSprite(tray, bathroomTargetSpan));
 
         float plantInset = Mathf.Clamp(spanX * 0.075f, 0.58f, 0.95f);
         BathroomTryPlaceDecor(
-            decorRoot, occupied, minL, maxL, "Bath_MonsteraL", monsteraPrefab, monstera, new Vector3(left + plantInset, midY + 0.24f, 0f),
+            decorRoot, occupied, minL, maxL, "Bath_MonsteraL", monsteraPrefab, monstera, new Vector3(left + plantInset - 0.35f, top - 0.82f, 0f),
             BathroomUniformScaleForSprite(monstera, bathroomTargetSpan));
         BathroomTryPlaceDecor(
-            decorRoot, occupied, minL, maxL, "Bath_MonsteraR", monsteraPrefab, monstera, new Vector3(right - plantInset, midY + 0.24f, 0f),
+            decorRoot, occupied, minL, maxL, "Bath_MonsteraR", monsteraPrefab, monstera, new Vector3(left + plantInset + 0.33f, top - 0.82f, 0f),
             BathroomUniformScaleForSprite(monstera, bathroomTargetSpan));
 
-        Vector3 cartDesired = new Vector3(midX + 0.22f, bottom + Mathf.Clamp(spanY * 0.3f, 1.0f, 1.55f), 0f);
-        BathroomTryPlaceDecor(
-            decorRoot, occupied, minL, maxL, "Bath_TieredCart", cartPrefab, cart, cartDesired,
-            BathroomUniformScaleForSprite(cart, bathroomTargetSpan));
         if (pickupParent != null && wantsToiletPickup)
         {
             PlacementExtents pickExt = BathroomExtentsForLootDefinition(toiletLoot);
@@ -564,14 +674,14 @@ public static class RoomDecorationPlacer
         float top = maxL.y - WallPadding;
         float bottom = minL.y + WallPadding;
 
-        // Beds hug corners (slight inset so props stay inside the walkable area).
+        // Beds hug corners again; colliders stay smaller so doors remain usable.
         float x0 = Mathf.Lerp(left, right, 0.08f);
         float x1 = Mathf.Lerp(left, right, 0.92f);
         float y0 = Mathf.Lerp(bottom, top, 0.1f);
         float y1 = Mathf.Lerp(bottom, top, 0.9f);
 
-        const float referenceBedLayoutScale = 1.48f;
-        const float sideFurnitureScale = 1.32f;
+        const float referenceBedLayoutScale = 1.16f;
+        const float sideFurnitureScale = 1.0f;
 
         ItemDefinition bedLoot = FindLootDefinitionByKey(catalog, "Bed", RoomType.Bedroom);
         ItemDefinition lampLoot = FindLootDefinitionByKey(catalog, "Lamp", RoomType.None);
@@ -646,12 +756,12 @@ public static class RoomDecorationPlacer
 
                 BoxCollider2D cherryBedCol = cherryBed.AddComponent<BoxCollider2D>();
                 cherryBedCol.isTrigger = false;
-                cherryBedCol.size = new Vector2(1.05f * cherryScale, 0.75f * cherryScale);
-                occupiedBedroom.Add(BuildLocalBounds(bedPositions[i], 0.52f * cherryScale, 0.38f * cherryScale));
+                cherryBedCol.size = new Vector2(0.56f * cherryScale, 0.32f * cherryScale);
+                occupiedBedroom.Add(BuildLocalBounds(bedPositions[i], 0.3f * cherryScale, 0.19f * cherryScale));
 
                 bool cherryLampSide = (i % 2 == 0);
                 Sprite cherrySideSprite = cherryLampSide ? lampSprite : drawerSprite;
-                float cherrySideX = (i % 2 == 0 ? 0.92f : -0.92f) * cherryScale;
+                float cherrySideX = (i % 2 == 0 ? 0.86f : -0.86f) * cherryScale;
                 Vector3 cherrySideLocal = new Vector3(cherrySideX, -0.02f * cherryScale, 0f);
                 Vector3 cherrySideDesired = bedPositions[i] + cherrySideLocal;
                 var cherrySideEntry = new RoomDecorationCatalog.DecorationEntry
@@ -679,7 +789,7 @@ public static class RoomDecorationPlacer
                 {
                     BoxCollider2D cherrySideCol = cherrySide.AddComponent<BoxCollider2D>();
                     cherrySideCol.isTrigger = false;
-                    cherrySideCol.size = new Vector2(0.55f * sideFurnitureScale, 0.5f * sideFurnitureScale);
+                    cherrySideCol.size = new Vector2(0.22f * sideFurnitureScale, 0.2f * sideFurnitureScale);
                     occupiedBedroom.Add(BuildLocalBounds(cherrySidePlaced, cherrySideExt.HalfX, cherrySideExt.HalfY));
 
                     bool shouldForcePickup = cherryLampSide ? lampOnList : drawerOnList;
@@ -717,8 +827,8 @@ public static class RoomDecorationPlacer
 
             BoxCollider2D bedCol = bed.AddComponent<BoxCollider2D>();
             bedCol.isTrigger = false;
-            bedCol.size = new Vector2(1.05f * bedScale, 0.75f * bedScale);
-            occupiedBedroom.Add(BuildLocalBounds(bedPositions[i], 0.52f * bedScale, 0.38f * bedScale));
+            bedCol.size = new Vector2(0.56f * bedScale, 0.32f * bedScale);
+            occupiedBedroom.Add(BuildLocalBounds(bedPositions[i], 0.3f * bedScale, 0.19f * bedScale));
 
             Sprite plushSprite = useBee ? beePlush : owlPlush;
             float plushYOffset = 0.18f * bedScale;
@@ -734,7 +844,7 @@ public static class RoomDecorationPlacer
 
             bool lampSide = (i % 2 == 0);
             Sprite sideSprite = lampSide ? lampSprite : drawerSprite;
-            float sideX = (i % 2 == 0 ? 0.92f : -0.92f) * bedScale;
+            float sideX = (i % 2 == 0 ? 0.86f : -0.86f) * bedScale;
             Vector3 sideLocal = new Vector3(sideX, -0.02f * bedScale, 0f);
             Vector3 sideDesired = bedPositions[i] + sideLocal;
             var sideEntry = new RoomDecorationCatalog.DecorationEntry
@@ -762,7 +872,7 @@ public static class RoomDecorationPlacer
             {
                 BoxCollider2D sideCol = side.AddComponent<BoxCollider2D>();
                 sideCol.isTrigger = false;
-                sideCol.size = new Vector2(0.55f * sideFurnitureScale, 0.5f * sideFurnitureScale);
+                sideCol.size = new Vector2(0.22f * sideFurnitureScale, 0.2f * sideFurnitureScale);
                 occupiedBedroom.Add(BuildLocalBounds(sidePlaced, sideExt.HalfX, sideExt.HalfY));
 
                 bool shouldForcePickup = lampSide ? lampOnList : drawerOnList;
@@ -909,6 +1019,7 @@ public static class RoomDecorationPlacer
         if (box == null)
             box = target.AddComponent<BoxCollider2D>();
 
+        target.layer = 6;
         box.isTrigger = false;
         Vector2 spriteSize = sprite.bounds.size;
         box.size = new Vector2(
@@ -1220,12 +1331,17 @@ public static class RoomDecorationPlacer
     }
 
     private static void TrySpawnCatalogPickup(
-        Transform roomRoot,
-        Room room,
-        Transform pickupParent,
-        RoomDecorationCatalog.DecorationEntry entry,
-        Vector3 resolvedLocalPosition)
+    Transform roomRoot,
+    Room room,
+    Transform pickupParent,
+    RoomDecorationCatalog.DecorationEntry entry,
+    Vector3 resolvedLocalPosition)
     {
+        Debug.Log(
+            $"[DECOR ROUTE] room={roomRoot.name}, key={entry.catalogPickup?.GetShoppingListKey()}, " +
+            $"pickupParent={(pickupParent != null ? pickupParent.name : "NULL")}"
+        );
+
         if (entry?.catalogPickup == null || pickupParent == null)
             return;
 
@@ -1233,12 +1349,17 @@ public static class RoomDecorationPlacer
     }
 
     private static void TrySpawnCatalogPickupForDefinition(
-        Transform roomRoot,
-        Room room,
-        Transform pickupParent,
-        ItemDefinition def,
-        Vector3 resolvedLocalPosition)
+    Transform roomRoot,
+    Room room,
+    Transform pickupParent,
+    ItemDefinition def,
+    Vector3 resolvedLocalPosition)
     {
+        Debug.Log(
+            $"[DECOR SPAWN] room={roomRoot.name}, item={def.itemName}, " +
+            $"pickupParent={(pickupParent != null ? pickupParent.name : "NULL")}"
+        );
+
         if (def == null || pickupParent == null || roomRoot == null)
             return;
 

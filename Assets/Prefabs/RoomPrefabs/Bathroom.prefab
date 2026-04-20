@@ -127,7 +127,9 @@ Transform:
   - {fileID: 6077659195215923032}
   - {fileID: 3669614442451969324}
   - {fileID: 2880658391314670249}
+  - {fileID: 4838621098202771195}
   - {fileID: 9012392692916595599}
+  - {fileID: 3362024735932827000}
   - {fileID: 474166244792718767}
   - {fileID: 3877753836869701407}
   m_Father: {fileID: 0}
@@ -146,6 +148,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   explored: 0
   roomVisuals: {fileID: 520739178390693697}
+  sportsBatHintRadius: 2.35
+  sportsBatHintCooldownSeconds: 7
 --- !u!61 &2841542118079122019
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -219,7 +223,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemySpawnAreaCollider: {fileID: 3936281308942464385}
   enemyWanderAreaCollider: {fileID: 8316041361562263767}
-  spawnParent: {fileID: 2880658391314670249}
+  spawnParent: {fileID: 4838621098202771195}
   spawnGroups:
   - groupName: Employee
     prefab: {fileID: 6291527677918437734, guid: e473e2195ce4e41b6bfde2257fe2d519, type: 3}
@@ -265,8 +269,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomTrigger: {fileID: 2841542118079122019}
-  enemyContainer: {fileID: 2880658391314670249}
+  enemyContainer: {fileID: 4838621098202771195}
+  objectContainer: {fileID: 2880658391314670249}
   itemContainer: {fileID: 9012392692916595599}
+  lootContainer: {fileID: 3362024735932827000}
   ignoreRoomActivationInThisScene: 0
 --- !u!114 &2220368115588389194
 MonoBehaviour:
@@ -280,7 +286,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0140c6c542f3296439a03f99e00c0aad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyParent: {fileID: 2880658391314670249}
+  enemyParent: {fileID: 4838621098202771195}
   enemyPrefabs:
   - {fileID: 3464154710725457275, guid: 73a96bd0a680f8949861c27cf368dbe9, type: 3}
   - {fileID: 6291527677918437734, guid: e473e2195ce4e41b6bfde2257fe2d519, type: 3}
@@ -453,6 +459,37 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!1 &1429446205265285962
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 4838621098202771195}
+  m_Layer: 0
+  m_Name: SpawnedEnemies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &4838621098202771195
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1429446205265285962}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6378411985123387850}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1465282200120262079
 GameObject:
   m_ObjectHideFlags: 0
@@ -2159,6 +2196,37 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 3.5173583, y: 3.4360538}
   m_EdgeRadius: 0
+--- !u!1 &5646704496958610581
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3362024735932827000}
+  m_Layer: 0
+  m_Name: SpawnedLoots
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3362024735932827000
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5646704496958610581}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6378411985123387850}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &7805332991600758700
 GameObject:
   m_ObjectHideFlags: 0
@@ -2288,7 +2356,7 @@ MonoBehaviour:
   roomType: 1
   maxSpawnCount: 4
   areaWeight: 1
-  spawnParent: {fileID: 9012392692916595599}
+  spawnParent: {fileID: 3362024735932827000}
 --- !u!1 &8268931546309050120
 GameObject:
   m_ObjectHideFlags: 0

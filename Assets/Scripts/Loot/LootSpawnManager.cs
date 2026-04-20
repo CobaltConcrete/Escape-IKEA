@@ -44,6 +44,8 @@ public class LootSpawnManager : MonoBehaviour
         {
             if (area == null)
                 continue;
+            if (area.GetComponentInParent<StartingRoomSafeZone>() != null)
+                continue;
             if (area.RoomType == RoomType.Cafeteria)
                 continue;
             if (!def.allowedRoomTypes.Contains(area.RoomType))
@@ -585,10 +587,10 @@ public class LootSpawnManager : MonoBehaviour
         foreach (LootSpawnArea area in allSpawnAreas)
         {
             if (area == null) continue;
+            if (area.GetComponentInParent<StartingRoomSafeZone>() != null)
+                continue;
             if (!area.CanSpawn()) continue;
             if (area.RoomType == RoomType.Cafeteria)
-                continue;
-            if (area.RoomType == RoomType.SportsRoom)
                 continue;
 
             if (itemDefinition.allowedRoomTypes.Contains(area.RoomType))
@@ -701,10 +703,28 @@ public class LootSpawnManager : MonoBehaviour
     private void SpawnLootObject(ItemDefinition itemDefinition, Vector2 position, LootSpawnArea area)
     {
         Transform parent = null;
+        Room room = area != null ? area.GetComponentInParent<Room>() : null;
 
         if (area != null && area.SpawnParent != null)
         {
             parent = area.SpawnParent;
+        }
+
+        // Fallback: if LootSpawnArea didn't provide a parent, try room-local containers in priority order.
+        if (parent == null && room != null)
+        {
+            Transform roomRoot = room.transform;
+
+            parent = roomRoot.Find("SpawnedLoots");
+            if (parent == null) parent = roomRoot.Find("SpawnedItems");
+            if (parent == null) parent = roomRoot.Find("SpawnedObjects");
+
+            if (parent == null)
+            {
+                GameObject created = new GameObject("SpawnedLoots");
+                created.transform.SetParent(roomRoot, false);
+                parent = created.transform;
+            }
         }
 
         Vector3 lootScale = ItemWorldSpawner.GetWorldSpawnScale(itemDefinition, parent);
@@ -725,14 +745,11 @@ public class LootSpawnManager : MonoBehaviour
 
         if (itemWorld == null) return;
 
-        // parent
         if (parent != null)
         {
             itemWorld.transform.SetParent(parent, true);
         }
 
-        // room
-        Room room = area != null ? area.GetComponentInParent<Room>() : null;
         if (room != null)
         {
             itemWorld.SetRoom(room);

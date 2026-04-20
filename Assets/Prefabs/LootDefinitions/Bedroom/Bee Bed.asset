@@ -31,7 +31,7 @@ MonoBehaviour:
   canAppearInShoppingList: 1
   minRequiredAmount: 1
   maxRequiredAmount: 3
-  shoppingListKey: Bed
+  shoppingListKey: Bee Bed
   allowedRoomTypes: 02000000
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.37, y: 0.37, z: 0.37}

@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 8235532205356271792}
   - component: {fileID: -59159626031353184}
+  - component: {fileID: -5532860366352538676}
   - component: {fileID: -8225381597860622731}
   - component: {fileID: 5471441844054288425}
   - component: {fileID: -5187446036180141741}
-  - component: {fileID: -5532860366352538676}
   m_Layer: 12
   m_Name: Sink
   m_TagString: Loot
@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: -7.44, y: 2.76, z: -4.3825064}
-  m_LocalScale: {x: 1.6, y: 1.6, z: 1.6}
+  m_LocalScale: {x: 3.8, y: 3.8, z: 3.8}
   m_ConstrainProportionsScale: 1
   m_Children: []
   m_Father: {fileID: 0}
@@ -50,7 +50,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   itemDefinition: {fileID: 11400000, guid: 19454d86210960d4091fe59b6384180f, type: 2}
   amount: 1
-  spawnedObjectName: Sink
+  spawnedObjectName: Bathroom Sink
+--- !u!114 &-5532860366352538676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2955381025110779136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnCategory: 1
+  isPickable: 1
 --- !u!212 &-8225381597860622731
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -95,7 +109,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 7613071095470564417, guid: bebe5ed273dae46c8b50bfbfd7d594f0, type: 3}
+  m_Sprite: {fileID: 834619308395806614, guid: 019dcb5a96a394c329894a7a3f7cb2b2, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -144,7 +158,7 @@ BoxCollider2D:
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
-    oldSize: {x: 1.82, y: 1.3}
+    oldSize: {x: 0.64, y: 0.56}
     newSize: {x: 8, y: 8}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
@@ -204,24 +218,3 @@ MonoBehaviour:
   - {x: 0.5, y: -0.5, z: 0}
   - {x: 0.5, y: 0.5, z: 0}
   - {x: -0.5, y: 0.5, z: 0}
---- !u!114 &-5532860366352538676
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2955381025110779136}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomType: 1
-  spawnCategory: 1
-  shoppingListKey: Sink
-  pickupDisplayName: Sink
-  lootValue: 1000
-  canAppearInShoppingList: 1
-  minRequiredAmount: 1
-  maxRequiredAmount: 3
-  spawnWeight: 1

@@ -22,6 +22,7 @@ public class RoomPresentation : MonoBehaviour
     [SerializeField] private string floorBackdropSortingLayerName = "Default";
     [Tooltip("Room fill (legacy stretched sprite). Keeps tiles visually above this layer.")]
     [SerializeField] private int floorBackdropSortingOrder = -500;
+    [SerializeField] private Color floorFallbackColor = new Color(0.72f, 0.58f, 0.38f, 1f);
     [SerializeField] private string floorSortingLayerName = "Floor";
     [SerializeField] private int floorTileSortingOrder = 0;
     [Tooltip("SpriteMask sorting on Floor layer; tiles use mask range between back and front orders.")]
@@ -30,7 +31,7 @@ public class RoomPresentation : MonoBehaviour
     [SerializeField] private int floorMaskRangeFrontOrder = 15;
     [Header("Floor tiles")]
     [Tooltip("Uniform scale per tile. Spacing matches tile.bounds.size * this so tiles stay edge-to-edge with no gaps.")]
-    [SerializeField] [Min(0.01f)] private float floorTileScaleFactor = 1f;
+    [SerializeField] [Min(0.01f)] private float floorTileScaleFactor = 1.5f;
     [Tooltip("Use the same layer as floor tiles so world-space TMP sorts with the room; Player layer sorts after Floor, so the player draws on top.")]
     [SerializeField] private string labelSortingLayerName = "Item";
     [SerializeField] private int labelSortingOrder = 200;
@@ -56,6 +57,9 @@ public class RoomPresentation : MonoBehaviour
 
         Bounds coverage = ComputeFloorCoverageBounds(transform);
         Transform floorRoot = FindLegacyFloor(transform);
+
+        if (floorRoot != null)
+            ConfigureFloorFallback(floorRoot, coverage);
 
         if (floorTileSprite != null && floorRoot != null)
             BuildFloorWithMaskAndTiles(floorRoot, floorTileSprite, coverage, referencePixelsPerUnit);
@@ -143,21 +147,14 @@ public class RoomPresentation : MonoBehaviour
 
         float spanX = floorWorldBounds.size.x;
         float spanY = floorWorldBounds.size.y;
-        int countX = Mathf.CeilToInt(spanX / cellStride.x);
-        int countY = Mathf.CeilToInt(spanY / cellStride.y);
+        int countX = Mathf.CeilToInt(spanX / cellStride.x) + 1;
+        int countY = Mathf.CeilToInt(spanY / cellStride.y) + 1;
         if (countX < 1 || countY < 1)
             return;
 
         int floorLayerId = SortingLayer.NameToID(floorSortingLayerName);
 
-        // Match the tiled floor art so the stretched backdrop is tan like the tiles (not prefab grey tint).
-        legacySr.sprite = tile;
-        legacySr.color = Color.white;
-        legacySr.drawMode = SpriteDrawMode.Simple;
-        legacySr.enabled = true;
-        legacySr.sortingLayerName = floorBackdropSortingLayerName;
-        legacySr.sortingOrder = floorBackdropSortingOrder;
-        legacySr.maskInteraction = SpriteMaskInteraction.None;
+        ConfigureFloorFallback(floorTransform, floorWorldBounds);
 
         GameObject clipRoot = new GameObject(FloorClipRootName);
         clipRoot.transform.SetParent(transform, false);
@@ -168,12 +165,14 @@ public class RoomPresentation : MonoBehaviour
         Sprite maskSprite = GetWhiteRectMaskSprite();
         GameObject maskGo = new GameObject(FloorInteriorMaskName);
         maskGo.transform.SetParent(clipRoot.transform, false);
-        float minX = SnapScalarToPpuGrid(floorWorldBounds.min.x, ppu);
-        float minY = SnapScalarToPpuGrid(floorWorldBounds.min.y, ppu);
+        float maskMinX = SnapScalarToPpuGrid(floorWorldBounds.min.x, ppu);
+        float maskMinY = SnapScalarToPpuGrid(floorWorldBounds.min.y, ppu);
+        float tileStartX = SnapDownScalarToPpuGrid(floorWorldBounds.center.x - (countX * cellStride.x * 0.5f), ppu);
+        float tileStartY = SnapDownScalarToPpuGrid(floorWorldBounds.center.y - (countY * cellStride.y * 0.5f), ppu);
         float z = floorWorldBounds.center.z;
         Vector3 maskCenter = new Vector3(
-            minX + spanX * 0.5f,
-            minY + spanY * 0.5f,
+            maskMinX + spanX * 0.5f,
+            maskMinY + spanY * 0.5f,
             z);
         maskGo.transform.position = maskCenter;
         maskGo.transform.rotation = Quaternion.identity;
@@ -209,8 +208,8 @@ public class RoomPresentation : MonoBehaviour
             for (int y = 0; y < countY; y++)
             {
                 Vector3 bottomLeftWorld = new Vector3(
-                    minX + x * cellStride.x,
-                    minY + y * cellStride.y,
+                    tileStartX + x * cellStride.x,
+                    tileStartY + y * cellStride.y,
                     z);
 
                 Vector3 minLocal = tile.bounds.min;
@@ -236,6 +235,28 @@ public class RoomPresentation : MonoBehaviour
                 sr.motionVectorGenerationMode = MotionVectorGenerationMode.ForceNoMotion;
             }
         }
+    }
+
+    private void ConfigureFloorFallback(Transform floorTransform, Bounds floorWorldBounds)
+    {
+        if (floorTransform == null)
+            return;
+
+        SpriteRenderer legacySr = floorTransform.GetComponent<SpriteRenderer>();
+        if (legacySr == null)
+            return;
+
+        legacySr.sprite = GetWhiteRectMaskSprite();
+        legacySr.color = floorFallbackColor;
+        legacySr.drawMode = SpriteDrawMode.Tiled;
+        Vector3 floorScale = floorTransform.lossyScale;
+        legacySr.size = new Vector2(
+            floorWorldBounds.size.x / Mathf.Max(0.0001f, Mathf.Abs(floorScale.x)),
+            floorWorldBounds.size.y / Mathf.Max(0.0001f, Mathf.Abs(floorScale.y)));
+        legacySr.enabled = true;
+        legacySr.sortingLayerName = floorBackdropSortingLayerName;
+        legacySr.sortingOrder = floorBackdropSortingOrder;
+        legacySr.maskInteraction = SpriteMaskInteraction.None;
     }
 
     private void DestroyPreviousFloorClipHierarchy()
@@ -264,6 +285,13 @@ public class RoomPresentation : MonoBehaviour
         if (pixelsPerUnit < 0.0001f)
             return value;
         return Mathf.Round(value * pixelsPerUnit) / pixelsPerUnit;
+    }
+
+    private static float SnapDownScalarToPpuGrid(float value, float pixelsPerUnit)
+    {
+        if (pixelsPerUnit < 0.0001f)
+            return value;
+        return Mathf.Floor(value * pixelsPerUnit) / pixelsPerUnit;
     }
 
     private static Vector3 SnapWorldPositionToPpuGrid(Vector3 world, float pixelsPerUnit)

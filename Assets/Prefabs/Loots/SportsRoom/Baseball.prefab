@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 8235532205356271792}
   - component: {fileID: -59159626031353184}
+  - component: {fileID: -6794167987599835741}
   - component: {fileID: -8225381597860622731}
   - component: {fileID: 4867517578095119939}
   - component: {fileID: -5187446036180141741}
-  - component: {fileID: -6794167987599835741}
   m_Layer: 12
   m_Name: Baseball
   m_TagString: Loot
@@ -51,6 +51,20 @@ MonoBehaviour:
   itemDefinition: {fileID: 11400000, guid: 2441ad719a3e21f4186058d60accec95, type: 2}
   amount: 1
   spawnedObjectName: Baseball
+--- !u!114 &-6794167987599835741
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2955381025110779136}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnCategory: 1
+  isPickable: 1
 --- !u!212 &-8225381597860622731
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -204,24 +218,3 @@ MonoBehaviour:
   - {x: 0.5, y: -0.5, z: 0}
   - {x: 0.5, y: 0.5, z: 0}
   - {x: -0.5, y: 0.5, z: 0}
---- !u!114 &-6794167987599835741
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2955381025110779136}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomType: 6
-  spawnCategory: 1
-  shoppingListKey: Baseball
-  pickupDisplayName: Baseball
-  lootValue: 500
-  canAppearInShoppingList: 1
-  minRequiredAmount: 1
-  maxRequiredAmount: 3
-  spawnWeight: 1

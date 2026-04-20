@@ -1,4 +1,3 @@
-
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
@@ -52,12 +51,16 @@ public class PageManager : MonoBehaviour
         }
     }
 
+    private void Start() { }
+
     private void Update() {
         blackOutTimer += Time.deltaTime;
         if (Input.GetKeyDown(KeyCode.P) && SceneManager.GetActiveScene().name == "IKEAscene" && !SceneManager.GetSceneByName("Pause").isLoaded)
         {
-            blackOutScreen.SetActive(false);
-            blackOutText.SetActive(false);
+            if (blackOutScreen != null)
+                blackOutScreen.SetActive(false);
+            if (blackOutText != null)
+                blackOutText.SetActive(false);
             PauseGame();
         }
 
@@ -75,8 +78,10 @@ public class PageManager : MonoBehaviour
             image.color = new Color(image.color.r, image.color.g, image.color.b, image.color.a+increment);
         }
         else{
-            blackOutScreen.SetActive(false);
-            blackOutText.SetActive(false);
+            if (blackOutScreen != null)
+                blackOutScreen.SetActive(false);
+            if (blackOutText != null)
+                blackOutText.SetActive(false);
         }
     }
     #endregion

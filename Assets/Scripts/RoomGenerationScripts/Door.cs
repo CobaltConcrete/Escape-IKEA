@@ -64,6 +64,11 @@ public class Door : MonoBehaviour
         {
             if (Input.GetKeyDown(interactKey) && !isMoving)
             {
+                if (!HasTraversableConnection())
+                {
+                    return;
+                }
+
                 if (IsBlockedByBossObjective())
                 {
                     ShowBossLockedNotice();
@@ -126,6 +131,7 @@ public class Door : MonoBehaviour
     public void ToggleDoor(bool propagate)
     {
         if (isLocked) return;
+        if (!HasTraversableConnection()) return;
 
         if (IsBlockedByBossObjective())
         {
@@ -145,6 +151,17 @@ public class Door : MonoBehaviour
 
             linkedDoor.ToggleDoor(false);
         }
+    }
+
+    private bool HasTraversableConnection()
+    {
+        if (roomA != null && roomB != null)
+            return true;
+
+        if (linkedDoor != null && roomA != null && linkedDoor.roomA != null)
+            return true;
+
+        return false;
     }
 
     public void SetLocked(bool locked, bool propagate = true)

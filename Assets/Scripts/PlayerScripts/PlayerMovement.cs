@@ -11,6 +11,13 @@ public class PlayerMovement : MonoBehaviour
 
     private Rigidbody2D rb;
     private Vector2 move;
+    private Vector2 lastMoveDirection = Vector2.down;
+
+    [Header("Animation")]
+    [SerializeField]
+    private Animator animator;
+
+    private string currentAnimationState;
 
     //Speed Pill Stuffs
     private float originalSpeed;
@@ -21,6 +28,11 @@ public class PlayerMovement : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         rb.interpolation = RigidbodyInterpolation2D.Interpolate;
         rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
+
+        if (animator == null)
+            animator = GetComponentInChildren<Animator>();
+
+        UpdateAnimation();
     }
 
     void Update()
@@ -30,12 +42,41 @@ public class PlayerMovement : MonoBehaviour
 
         // Normalize to prevent faster diagonal movement
         move.Normalize();
+
+        if (move.sqrMagnitude > 0.001f)
+            lastMoveDirection = move;
+
+        UpdateAnimation();
     }
 
     void FixedUpdate()
     {
         // Move the player
         rb.MovePosition(rb.position + move * speed * Time.fixedDeltaTime);
+    }
+
+    private void UpdateAnimation()
+    {
+        if (animator == null)
+            return;
+
+        bool isMoving = move.sqrMagnitude > 0.001f;
+        string direction = GetAnimationDirection(isMoving ? move : lastMoveDirection);
+        string nextState = direction + (isMoving ? "_WALKING" : "_IDLE");
+
+        if (currentAnimationState == nextState)
+            return;
+
+        animator.Play(nextState);
+        currentAnimationState = nextState;
+    }
+
+    private static string GetAnimationDirection(Vector2 direction)
+    {
+        if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+            return direction.x > 0f ? "Right" : "Left";
+
+        return direction.y > 0f ? "Back" : "Front";
     }
 
     public void BoostSpeedFor10Seconds()

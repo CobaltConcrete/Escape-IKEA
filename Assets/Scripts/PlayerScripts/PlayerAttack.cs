@@ -5,6 +5,7 @@ using static EquipmentEnum;
 public class PlayerAttack : MonoBehaviour
 {
     [SerializeField] private float attackDamage = 15f;
+    [SerializeField] private float bonusDamagePerExtraBat = 7.5f;
     [SerializeField] private float attackRadius = 1.25f;
     [SerializeField] private KeyCode attackKey = KeyCode.J;
     [SerializeField] private float bulletClearRadius = 1.6f;
@@ -56,7 +57,7 @@ public class PlayerAttack : MonoBehaviour
 
             if (enemyCombat != null && !damagedEnemies.Contains(enemyCombat))
             {
-                enemyCombat.TakeDamageFrom(transform.position, attackDamage);
+                enemyCombat.TakeDamageFrom(transform.position, GetCurrentAttackDamage());
                 damagedEnemies.Add(enemyCombat);
             }
         }
@@ -81,6 +82,16 @@ public class PlayerAttack : MonoBehaviour
         string itemName = equippedWeapon.definition.itemName;
         return !string.IsNullOrWhiteSpace(itemName) &&
                itemName.IndexOf(BatWeapon.ItemName, System.StringComparison.OrdinalIgnoreCase) >= 0;
+    }
+
+    private float GetCurrentAttackDamage()
+    {
+        int batCount = inventoryInteraction != null
+            ? inventoryInteraction.CountOwnedItemsByName(BatWeapon.ItemName, includeEquipped: true)
+            : 1;
+
+        int extraBats = Mathf.Max(0, batCount - 1);
+        return attackDamage + extraBats * bonusDamagePerExtraBat;
     }
 
     private bool WasAttackPressed()

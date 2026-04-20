@@ -32,7 +32,7 @@ public class MapManager : MonoBehaviour
     [SerializeField] private GameObject verticalBoundaryDoorPrefab;
 
     [Header("Room presentation")]
-    [Tooltip("Sprites/Generic/Floor_Connecting (32px @ 100 PPU). Tiled in a grid; wood tiles use Sprite Mask to room interior.")]
+    [Tooltip("UIArt/fixedtile (64px @ 100 PPU). Tiled in a grid; edge tiles are clipped to the room interior by a Sprite Mask.")]
     [SerializeField] private Sprite roomFloorTileSprite;
     [SerializeField] private RoomDecorationCatalog roomDecorationCatalog;
     [SerializeField] private RoomPrefabSpawnCatalog roomPrefabSpawnCatalog;
@@ -56,11 +56,6 @@ public class MapManager : MonoBehaviour
 
         ChooseBossLocation();
 
-        if (RunObjectiveManager.Instance != null)
-        {
-            RunObjectiveManager.Instance.GenerateShoppingListAndGoals();
-        }
-
         GenerateMap();
         GenerateDoors();
 
@@ -79,6 +74,7 @@ public class MapManager : MonoBehaviour
 
         if (RunObjectiveManager.Instance != null)
         {
+            RunObjectiveManager.Instance.GenerateShoppingListAndGoals();
             RunObjectiveManager.Instance.SpawnLootForCurrentObjective();
         }
 
@@ -139,6 +135,7 @@ public class MapManager : MonoBehaviour
 
         // Spawn start room
         GameObject startRoomObj = Instantiate(startingRoomPrefab, MapToWorld(centerX, centerY), Quaternion.identity, transform);
+        startRoomObj.AddComponent<StartingRoomSafeZone>();
         
         if (ItemSpawnManager.Instance != null)
         {
@@ -249,10 +246,11 @@ public class MapManager : MonoBehaviour
 
     private RoomPrefab PickRoomPrefabForType(RoomType targetType)
     {
-        List<RoomPrefab> candidates = new List<RoomPrefab>();
-        for (int i = 0; i < roomPrefabs.Length; i++)
+        List<RoomPrefab> matches = new List<RoomPrefab>();
+        List<RoomPrefab> candidates = BuildRoomPrefabCandidates();
+        for (int i = 0; i < candidates.Count; i++)
         {
-            RoomPrefab rp = roomPrefabs[i];
+            RoomPrefab rp = candidates[i];
             if (rp == null || rp.prefab == null)
                 continue;
 
@@ -260,12 +258,12 @@ public class MapManager : MonoBehaviour
                 continue;
             if (prefabType != targetType)
                 continue;
-            candidates.Add(rp);
+            matches.Add(rp);
         }
 
-        if (candidates.Count == 0)
+        if (matches.Count == 0)
             return null;
-        return candidates[Random.Range(0, candidates.Count)];
+        return matches[Random.Range(0, matches.Count)];
     }
 
     void Shuffle(List<Vector2Int> list)
@@ -281,7 +279,8 @@ public class MapManager : MonoBehaviour
     {
         List<RoomPrefab> candidates = new List<RoomPrefab>();
 
-        foreach (var room in roomPrefabs)
+        List<RoomPrefab> allCandidates = BuildRoomPrefabCandidates();
+        foreach (var room in allCandidates)
         {
             if (CanPlace(room, x, y))
                 candidates.Add(room);
@@ -294,6 +293,9 @@ public class MapManager : MonoBehaviour
 
     bool CanPlace(RoomPrefab room, int x, int y)
     {
+        if (room == null || room.prefab == null)
+            return false;
+
         if (x + room.cellWidth > maxCellCols || y + room.cellHeight > maxCellRows)
             return false;
 
@@ -303,6 +305,38 @@ public class MapManager : MonoBehaviour
                     return false;
 
         return true;
+    }
+
+    private List<RoomPrefab> BuildRoomPrefabCandidates()
+    {
+        List<RoomPrefab> candidates = new List<RoomPrefab>();
+        HashSet<GameObject> seen = new HashSet<GameObject>();
+
+        if (roomPrefabs != null)
+        {
+            for (int i = 0; i < roomPrefabs.Length; i++)
+            {
+                RoomPrefab rp = roomPrefabs[i];
+                if (rp == null || rp.prefab == null || !seen.Add(rp.prefab))
+                    continue;
+                candidates.Add(rp);
+            }
+        }
+
+        if (startingRoomPrefab != null &&
+            !seen.Contains(startingRoomPrefab) &&
+            RoomLootSpawnTypeHelper.TryGetRoomType(startingRoomPrefab.transform, out RoomType startType) &&
+            startType == RoomType.SportsRoom)
+        {
+            candidates.Add(new RoomPrefab
+            {
+                prefab = startingRoomPrefab,
+                cellWidth = 1,
+                cellHeight = 1
+            });
+        }
+
+        return candidates;
     }
 
     void PlaceRoom(RoomPrefab room, int x, int y)
@@ -423,6 +457,9 @@ public class MapManager : MonoBehaviour
     {
         for (int x = 0; x < maxCellCols; x++)
         {
+            if (!occupied[x, maxCellRows - 1] || !occupied[x, 0])
+                continue;
+
             Door top = SpawnDoor(horizontalBoundaryDoorPrefab,
                 MapToWorld(x, maxCellRows - 1) + new Vector3(0, unitCellSize.y / 2f, 0), true);
 
@@ -437,6 +474,9 @@ public class MapManager : MonoBehaviour
 
         for (int y = 0; y < maxCellRows; y++)
         {
+            if (!occupied[0, y] || !occupied[maxCellCols - 1, y])
+                continue;
+
             Door left = SpawnDoor(verticalBoundaryDoorPrefab,
                 MapToWorld(0, y) + new Vector3(-unitCellSize.x / 2f, 0, 0), false);
 

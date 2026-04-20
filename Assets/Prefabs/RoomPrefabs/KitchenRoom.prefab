@@ -41,6 +41,8 @@ Transform:
   - {fileID: 4366254947244829306}
   - {fileID: 1073763448518008747}
   - {fileID: 11473468546602180}
+  - {fileID: 7767018937297135804}
+  - {fileID: 1268351388331556443}
   - {fileID: 8946126566194890640}
   - {fileID: 5064850490441458051}
   - {fileID: 6994992828002748645}
@@ -68,6 +70,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   explored: 0
   roomVisuals: {fileID: 520739178390693697}
+  sportsBatHintRadius: 2.35
+  sportsBatHintCooldownSeconds: 7
 --- !u!61 &2841542118079122019
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -141,7 +145,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemySpawnAreaCollider: {fileID: 1282012321719609488}
   enemyWanderAreaCollider: {fileID: 6574905403644843136}
-  spawnParent: {fileID: 11473468546602180}
+  spawnParent: {fileID: 7767018937297135804}
   spawnGroups:
   - groupName: Employee
     prefab: {fileID: 6291527677918437734, guid: e473e2195ce4e41b6bfde2257fe2d519, type: 3}
@@ -187,8 +191,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomTrigger: {fileID: 2841542118079122019}
-  enemyContainer: {fileID: 11473468546602180}
+  enemyContainer: {fileID: 7767018937297135804}
+  objectContainer: {fileID: 11473468546602180}
   itemContainer: {fileID: 1073763448518008747}
+  lootContainer: {fileID: 1268351388331556443}
   ignoreRoomActivationInThisScene: 0
 --- !u!114 &3901139520355764070
 MonoBehaviour:
@@ -202,7 +208,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0140c6c542f3296439a03f99e00c0aad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyParent: {fileID: 11473468546602180}
+  enemyParent: {fileID: 7767018937297135804}
   enemyPrefabs:
   - {fileID: 3464154710725457275, guid: 73a96bd0a680f8949861c27cf368dbe9, type: 3}
   - {fileID: 6291527677918437734, guid: e473e2195ce4e41b6bfde2257fe2d519, type: 3}
@@ -505,7 +511,7 @@ MonoBehaviour:
   roomType: 4
   maxSpawnCount: 4
   areaWeight: 1
-  spawnParent: {fileID: 1073763448518008747}
+  spawnParent: {fileID: 1268351388331556443}
 --- !u!1 &1511168097789166982
 GameObject:
   m_ObjectHideFlags: 0
@@ -774,6 +780,37 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!1 &1835695481544590792
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7767018937297135804}
+  m_Layer: 0
+  m_Name: SpawnedEnemies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7767018937297135804
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1835695481544590792}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6378411985123387850}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1996262630253448460
 GameObject:
   m_ObjectHideFlags: 0
@@ -2488,3 +2525,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0b83e878cbfe295448ee6fdf5f066cf7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!1 &8740055403538935376
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1268351388331556443}
+  m_Layer: 0
+  m_Name: SpawnedLoots
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1268351388331556443
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8740055403538935376}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6378411985123387850}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
