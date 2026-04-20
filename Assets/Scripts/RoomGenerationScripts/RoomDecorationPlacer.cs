@@ -206,7 +206,7 @@ public static class RoomDecorationPlacer
         GameObject lampPrefab = FindPrefabByName(catalog, "Lamp");
         GameObject cartPrefab = FindPrefabByName(catalog, "Tiered_Cart");
 
-        Vector3 couchPos = wideRoom ? new Vector3(midX, bottom + 0.95f, 0f) : new Vector3(midX, midY + 1.15f, 0f);
+        Vector3 couchPos = wideRoom ? new Vector3(midX, bottom + 1.45f, 0f) : new Vector3(midX, midY + 1.15f, 0f);
         Vector3 tablePos = wideRoom ? new Vector3(midX, bottom + 0.55f, 0f) : new Vector3(midX, midY - 1.15f, 0f);
         Vector3 leftCabinetPos = wideRoom ? new Vector3(left + 1.0f, top - 0.45f, 0f) : new Vector3(left + 0.85f, top - 0.65f, 0f);
         Vector3 rightCabinetPos = wideRoom ? new Vector3(right - 1.0f, top - 0.45f, 0f) : new Vector3(right - 0.85f, top - 0.65f, 0f);
@@ -581,10 +581,6 @@ public static class RoomDecorationPlacer
             decorRoot, occupied, minL, maxL, "Bath_MonsteraR", monsteraPrefab, monstera, new Vector3(left + plantInset + 0.33f, top - 0.82f, 0f),
             BathroomUniformScaleForSprite(monstera, bathroomTargetSpan));
 
-        Vector3 cartDesired = new Vector3(left + plantInset, midY + 0.24f, 0f);
-        BathroomTryPlaceDecor(
-            decorRoot, occupied, minL, maxL, "Bath_TieredCart", cartPrefab, cart, cartDesired,
-            BathroomUniformScaleForSprite(cart, bathroomTargetSpan));
         if (pickupParent != null && wantsToiletPickup)
         {
             PlacementExtents pickExt = BathroomExtentsForLootDefinition(toiletLoot);
