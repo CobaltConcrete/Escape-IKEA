@@ -8,8 +8,9 @@ public class BossRoomController : MonoBehaviour
     [SerializeField] private float winDoorDistance = 1.1f;
     [Header("Exit Signs")]
     [SerializeField] private Sprite exitSignSprite;
-    [SerializeField] private Vector2 exitSignScale = new Vector2(1.8f, 1.8f);
-    [SerializeField] private float exitSignDoorOffset = 0.72f;
+    [SerializeField] private Vector2 exitSignScale = new Vector2(0.85f, 0.85f);
+    [SerializeField] private float exitSignDoorOffset = 0.9f;
+    [SerializeField] private float exitSignVerticalLift = 0.25f;
     [SerializeField] private int exitSignSortingOrder = 220;
 
     private EnemyCombat bossCombat;
@@ -162,14 +163,21 @@ public class BossRoomController : MonoBehaviour
                 continue;
 
             Vector3 outward = GetDoorOutwardDirection(door.transform.position, roomCenter);
+            if (outward.y < 0.5f)
+                continue;
+
             GameObject sign = new GameObject("BossExitSign");
             sign.transform.SetParent(parent, true);
-            sign.transform.position = door.transform.position + outward * exitSignDoorOffset;
+            sign.transform.position = door.transform.position + outward * exitSignDoorOffset + Vector3.up * exitSignVerticalLift;
             sign.transform.localScale = new Vector3(exitSignScale.x, exitSignScale.y, 1f);
-            sign.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(outward.y, outward.x) * Mathf.Rad2Deg);
+            sign.transform.rotation = Quaternion.identity;
 
             SpriteRenderer renderer = sign.AddComponent<SpriteRenderer>();
             renderer.sprite = exitSignSprite;
+            renderer.color = Color.white;
+            Shader spriteShader = Shader.Find("Sprites/Default");
+            if (spriteShader != null)
+                renderer.sharedMaterial = new Material(spriteShader);
             renderer.sortingLayerName = "Item";
             renderer.sortingOrder = exitSignSortingOrder;
         }

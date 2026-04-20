@@ -622,8 +622,9 @@ MonoBehaviour:
   clearMessage: Boss defeated! Leave the store.
   winDoorDistance: 1.1
   exitSignSprite: {fileID: -1922979618149193216, guid: 5eff9d0e664f4485e907ee231164642c, type: 3}
-  exitSignScale: {x: 1.8, y: 1.8}
-  exitSignDoorOffset: 0.72
+  exitSignScale: {x: 0.85, y: 0.85}
+  exitSignDoorOffset: 0.9
+  exitSignVerticalLift: 0.25
   exitSignSortingOrder: 220
 --- !u!1 &1458100216889019563
 GameObject:

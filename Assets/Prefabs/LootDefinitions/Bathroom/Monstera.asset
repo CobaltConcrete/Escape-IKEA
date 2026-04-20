@@ -28,11 +28,11 @@ MonoBehaviour:
   armorSpecialAbility: 0
   armorDurabilityLossMultiplier: 1
   lootValue: 1200
-  canAppearInShoppingList: 0
+  canAppearInShoppingList: 1
   minRequiredAmount: 1
   maxRequiredAmount: 3
   shoppingListKey: Monstera
-  allowedRoomTypes: 01000000
+  allowedRoomTypes: 0100000005000000
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.9, y: 0.9, z: 0.9}
   spawnFootprint: {x: 1.1, y: 1.1}

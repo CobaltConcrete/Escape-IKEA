@@ -12,8 +12,9 @@ public class InstructionsOverlayUI : MonoBehaviour
 
     private void Awake()
     {
-        if (transform.Find("InstructionsCanvas") != null)
-            return;
+        Transform existingCanvas = transform.Find("InstructionsCanvas");
+        if (existingCanvas != null)
+            Destroy(existingCanvas.gameObject);
 
         BuildOverlay();
     }
@@ -22,6 +23,11 @@ public class InstructionsOverlayUI : MonoBehaviour
     {
         GameObject canvasObject = new GameObject("InstructionsCanvas", typeof(RectTransform), typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
         canvasObject.transform.SetParent(transform, false);
+        RectTransform canvasRect = canvasObject.GetComponent<RectTransform>();
+        canvasRect.anchorMin = Vector2.zero;
+        canvasRect.anchorMax = Vector2.one;
+        canvasRect.offsetMin = Vector2.zero;
+        canvasRect.offsetMax = Vector2.zero;
 
         Canvas canvas = canvasObject.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
@@ -39,12 +45,13 @@ public class InstructionsOverlayUI : MonoBehaviour
         backdropRect.offsetMin = Vector2.zero;
         backdropRect.offsetMax = Vector2.zero;
 
-        GameObject panel = CreateImage("Panel", backdrop.transform, panelColor);
+        GameObject panel = CreateImage("Panel", canvasObject.transform, panelColor);
         RectTransform panelRect = panel.GetComponent<RectTransform>();
         panelRect.anchorMin = new Vector2(0.5f, 0.5f);
         panelRect.anchorMax = new Vector2(0.5f, 0.5f);
         panelRect.sizeDelta = new Vector2(760f, 500f);
         panelRect.anchoredPosition = Vector2.zero;
+        panel.transform.SetAsLastSibling();
 
         GameObject title = CreateText("Title", panel.transform, "INSTRUCTIONS", 42, FontStyle.Bold, TextAnchor.MiddleCenter);
         RectTransform titleRect = title.GetComponent<RectTransform>();
@@ -54,6 +61,8 @@ public class InstructionsOverlayUI : MonoBehaviour
         titleRect.offsetMax = new Vector2(-64f, -24f);
 
         string instructions =
+            "Search each room and collect every item on your shopping list.\n" +
+            "Once the list is complete, find the final boss, defeat her, and escape the store.\n\n" +
             "WASD - Move\n" +
             "Click - Attack\n" +
             "F - Interact / pick up nearby loot\n" +
@@ -64,7 +73,7 @@ public class InstructionsOverlayUI : MonoBehaviour
             "P - Pause menu\n" +
             "H - Open these instructions";
 
-        GameObject body = CreateText("InstructionText", panel.transform, instructions, 28, FontStyle.Normal, TextAnchor.UpperLeft);
+        GameObject body = CreateText("InstructionText", panel.transform, instructions, 26, FontStyle.Normal, TextAnchor.UpperLeft);
         RectTransform bodyRect = body.GetComponent<RectTransform>();
         bodyRect.anchorMin = Vector2.zero;
         bodyRect.anchorMax = Vector2.one;

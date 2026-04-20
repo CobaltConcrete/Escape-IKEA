@@ -41,7 +41,7 @@ public static class RoomPrefabStaticPlacer
         else if (roomType == RoomType.Bathroom)
             spawnedAny = PlaceBathroomLayout(roomRoot, decorRoot.transform, prefabs, used);
         else if (roomType == RoomType.LivingRoom)
-            spawnedAny = PlaceLivingRoomLayout(roomRoot, decorRoot.transform, prefabs, used);
+            spawnedAny = PlaceLivingRoomLayout(roomRoot, decorRoot.transform, catalog, prefabs, used);
         else if (roomType == RoomType.Cafeteria)
             spawnedAny = PlaceCafeteriaLayout(roomRoot, decorRoot.transform, prefabs, used);
 
@@ -189,6 +189,33 @@ public static class RoomPrefabStaticPlacer
 
         if (drawerPrefab != null)
         {
+            Vector3 leftSinkDrawerPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorMiddleCenter,
+                new Vector3(-3.05f, -0.2f, 0f));
+            GameObject leftSinkDrawer = SpawnConfiguredPrefab(drawerPrefab, leftSinkDrawerPos, parent, roomRoot);
+            if (leftSinkDrawer != null)
+            {
+                SetItemSortingOrder(leftSinkDrawer, 10);
+                used.Add(leftSinkDrawer.transform.position);
+                spawnedAny = true;
+                SpawnKitchenSurfaceItem(knifePrefab, leftSinkDrawer.transform.position + new Vector3(-0.3f, 1.08f, 0f), parent, roomRoot, 0.85f);
+                SpawnKitchenSurfaceItem(whiskPrefab, leftSinkDrawer.transform.position + new Vector3(0.28f, 1.1f, 0f), parent, roomRoot, 0.85f);
+            }
+
+            Vector3 rightSinkDrawerPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorMiddleCenter,
+                new Vector3(3.05f, -0.2f, 0f));
+            GameObject rightSinkDrawer = SpawnConfiguredPrefab(drawerPrefab, rightSinkDrawerPos, parent, roomRoot);
+            if (rightSinkDrawer != null)
+            {
+                SetItemSortingOrder(rightSinkDrawer, 10);
+                used.Add(rightSinkDrawer.transform.position);
+                spawnedAny = true;
+                SpawnKitchenSurfaceItem(ladlePrefab, rightSinkDrawer.transform.position + new Vector3(0.02f, 1.12f, 0f), parent, roomRoot, 0.85f);
+            }
+
             Vector3 originalTableDrawerPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
                 roomRoot,
                 RoomDecorInteriorAnchor.InteriorBottomCenter,
@@ -318,20 +345,6 @@ public static class RoomPrefabStaticPlacer
             }
         }
 
-        if (tieredCartPrefab != null)
-        {
-            Vector3 cartPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
-                roomRoot,
-                RoomDecorInteriorAnchor.InteriorMiddleLeft,
-                new Vector3(0.88f, -0.05f, 0f));
-            GameObject cart = SpawnConfiguredPrefab(tieredCartPrefab, cartPos, parent, roomRoot);
-            if (cart != null)
-            {
-                used.Add(cart.transform.position);
-                spawnedAny = true;
-            }
-        }
-
         if (cupboardPrefab != null)
         {
             Vector3[] cupboardSlots =
@@ -342,7 +355,8 @@ public static class RoomPrefabStaticPlacer
 
             for (int i = 0; i < cupboardSlots.Length; i++)
             {
-                GameObject cupboard = SpawnConfiguredPrefab(cupboardPrefab, cupboardSlots[i], parent, roomRoot);
+                GameObject bathroomStoragePrefab = (i == 1 && tieredCartPrefab != null) ? tieredCartPrefab : cupboardPrefab;
+                GameObject cupboard = SpawnConfiguredPrefab(bathroomStoragePrefab, cupboardSlots[i], parent, roomRoot);
                 if (cupboard == null)
                     continue;
                 used.Add(cupboard.transform.position);
@@ -380,10 +394,8 @@ public static class RoomPrefabStaticPlacer
         bool spawnedAny = false;
         Vector3[] trashSlots =
         {
-            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopLeft, new Vector3(0.7f, -0.58f, 0f)),
-            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopLeft, new Vector3(2.05f, -0.58f, 0f)),
-            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopRight, new Vector3(-2.05f, -0.58f, 0f)),
-            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopRight, new Vector3(-0.7f, -0.58f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopLeft, new Vector3(3.65f, -0.55f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopRight, new Vector3(-3.65f, -0.55f, 0f)),
         };
 
         for (int i = 0; i < Mathf.Min(trashSlots.Length, trashPrefabs.Count > 0 ? trashSlots.Length : 0); i++)
@@ -408,9 +420,10 @@ public static class RoomPrefabStaticPlacer
         for (int i = 0; i < Mathf.Min(tableSlots.Length, tablePrefabs.Count > 0 ? tableSlots.Length : 0); i++)
         {
             GameObject tablePrefab = tablePrefabs[i % tablePrefabs.Count];
-            GameObject table = SpawnConfiguredPrefab(tablePrefab, tableSlots[i], parent, roomRoot, makePushableProp: true, skipShoppingListPickup: true, makeDecorOnly: true);
+            GameObject table = SpawnConfiguredPrefab(tablePrefab, tableSlots[i], parent, roomRoot, skipShoppingListPickup: true, makeDecorOnly: true);
             if (table == null)
                 continue;
+            RebuildSolidPropCollider(table, 0.82f, 0.62f);
             used.Add(table.transform.position);
             spawnedAny = true;
         }
@@ -432,9 +445,10 @@ public static class RoomPrefabStaticPlacer
         for (int i = 0; i < Mathf.Min(chairSlots.Length, chairPrefabs.Count > 0 ? chairSlots.Length : 0); i++)
         {
             GameObject chairPrefab = chairPrefabs[i % chairPrefabs.Count];
-            GameObject chair = SpawnConfiguredPrefab(chairPrefab, chairSlots[i], parent, roomRoot, makePushableProp: true, skipShoppingListPickup: true, makeDecorOnly: true);
+            GameObject chair = SpawnConfiguredPrefab(chairPrefab, chairSlots[i], parent, roomRoot, skipShoppingListPickup: true, makeDecorOnly: true);
             if (chair == null)
                 continue;
+            RebuildSolidPropCollider(chair, 0.7f, 0.7f);
             used.Add(chair.transform.position);
             spawnedAny = true;
         }
@@ -445,6 +459,7 @@ public static class RoomPrefabStaticPlacer
     private static bool PlaceLivingRoomLayout(
         Transform roomRoot,
         Transform parent,
+        RoomPrefabSpawnCatalog catalog,
         List<GameObject> livingRoomPrefabs,
         List<Vector2> used)
     {
@@ -455,17 +470,20 @@ public static class RoomPrefabStaticPlacer
         GameObject lampPrefab = FindByToken(livingRoomPrefabs, "lamp");
         GameObject housePlantPrefab = FindByToken(livingRoomPrefabs, "houseplant") ?? FindByToken(livingRoomPrefabs, "plant");
         GameObject tieredCartPrefab = FindByToken(livingRoomPrefabs, "tiered") ?? FindByToken(livingRoomPrefabs, "cart");
+        GameObject monsteraPrefab = FindByToken(livingRoomPrefabs, "monstera");
+        if (monsteraPrefab == null && catalog != null)
+            monsteraPrefab = FindByToken(catalog.GetAllPrefabs(RoomType.Bathroom), "monstera");
         bool wideRoom = IsRoomWiderThanTall(roomRoot);
         bool spawnedAny = false;
 
-        Vector3 tableOffset = wideRoom ? new Vector3(0f, -2.35f, 0f) : new Vector3(0f, -0.55f, 0f);
-        Vector3 remoteOffset = wideRoom ? new Vector3(0.42f, -1.82f, 0f) : new Vector3(1.28f, 0.25f, 0f);
+        Vector3 tableOffset = wideRoom ? new Vector3(0f, -2.75f, 0f) : new Vector3(0f, -1.35f, 0f);
+        Vector3 remoteOffset = wideRoom ? new Vector3(0.42f, -2.22f, 0f) : new Vector3(1.28f, -0.55f, 0f);
         Vector3 leftCabinetOffset = wideRoom ? new Vector3(1.55f, -0.72f, 0f) : new Vector3(0.85f, -0.72f, 0f);
         Vector3 rightCabinetOffset = wideRoom ? new Vector3(-1.55f, -0.72f, 0f) : new Vector3(-0.85f, -0.72f, 0f);
         RoomDecorInteriorAnchor rightCabinetAnchor = RoomDecorInteriorAnchor.InteriorTopRight;
-        Vector3 plantOffset = wideRoom ? new Vector3(3.35f, -0.75f, 0f) : new Vector3(1.08f, 0.62f, 0f);
+        Vector3 plantOffset = wideRoom ? new Vector3(2.75f, -0.75f, 0f) : new Vector3(1.08f, 0.62f, 0f);
         Vector3 lampOffset = wideRoom ? new Vector3(-3.35f, -0.75f, 0f) : new Vector3(-1.08f, 0.62f, 0f);
-        Vector3 couchOffset = wideRoom ? new Vector3(0f, 2.75f, 0f) : new Vector3(-0.2f, 1.35f, 0f);
+        Vector3 couchOffset = wideRoom ? new Vector3(0f, -0.15f, 0f) : new Vector3(-0.2f, 2.05f, 0f);
 
         if (coffeeTablePrefab != null)
         {
@@ -565,6 +583,31 @@ public static class RoomPrefabStaticPlacer
             }
         }
 
+        if (monsteraPrefab != null)
+        {
+            Vector3 leftMonsteraPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorBottomLeft,
+                wideRoom ? new Vector3(2.35f, 0.78f, 0f) : new Vector3(0.82f, 2.35f, 0f));
+            GameObject leftMonstera = SpawnConfiguredPrefab(monsteraPrefab, leftMonsteraPos, parent, roomRoot);
+            if (leftMonstera != null)
+            {
+                used.Add(leftMonstera.transform.position);
+                spawnedAny = true;
+            }
+
+            Vector3 rightMonsteraPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorBottomRight,
+                wideRoom ? new Vector3(-2.35f, 0.78f, 0f) : new Vector3(-0.82f, 2.35f, 0f));
+            GameObject rightMonstera = SpawnConfiguredPrefab(monsteraPrefab, rightMonsteraPos, parent, roomRoot);
+            if (rightMonstera != null)
+            {
+                used.Add(rightMonstera.transform.position);
+                spawnedAny = true;
+            }
+        }
+
         if (couchPrefab != null)
         {
             Vector3 topCouchPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
@@ -641,20 +684,20 @@ public static class RoomPrefabStaticPlacer
             new Vector3(-1.48f, 0.92f, 0f),
         };
 
-        float[] bedScaleVariants = new[] { 0.82f, 0.82f, 0.82f, 0.82f };
+        float[] bedScaleVariants = new[] { 0.72f, 0.72f, 0.72f, 0.72f };
         Vector3[] lampOffsets = new[]
         {
-            new Vector3(-1.52f, -0.18f, 0f),
-            new Vector3(1.52f, -0.18f, 0f),
-            new Vector3(-1.52f, 0.18f, 0f),
-            new Vector3(1.52f, 0.18f, 0f)
+            new Vector3(-1.28f, -0.18f, 0f),
+            new Vector3(1.28f, -0.18f, 0f),
+            new Vector3(-1.28f, 0.18f, 0f),
+            new Vector3(1.28f, 0.18f, 0f)
         };
         Vector3[] drawerOffsets = new[]
         {
-            new Vector3(1.78f, 0f, 0f),
-            new Vector3(-1.78f, 0f, 0f),
-            new Vector3(1.78f, 0f, 0f),
-            new Vector3(-1.78f, 0f, 0f)
+            new Vector3(1.48f, 0f, 0f),
+            new Vector3(-1.48f, 0f, 0f),
+            new Vector3(1.48f, 0f, 0f),
+            new Vector3(-1.48f, 0f, 0f)
         };
         bool spawnedAny = false;
 
@@ -853,7 +896,7 @@ public static class RoomPrefabStaticPlacer
             return RoomDecorationPlacer.GetAnchoredWorldPosition(
                 roomRoot,
                 RoomDecorInteriorAnchor.InteriorMiddleCenter,
-                IsRoomWiderThanTall(roomRoot) ? new Vector3(0f, 2.35f, 0f) : new Vector3(0f, 1.45f, 0f));
+                IsRoomWiderThanTall(roomRoot) ? new Vector3(0f, 2.85f, 0f) : new Vector3(0f, 2.05f, 0f));
         }
 
         if (name.Contains("coffee") && name.Contains("table"))
@@ -861,7 +904,7 @@ public static class RoomPrefabStaticPlacer
             return RoomDecorationPlacer.GetAnchoredWorldPosition(
                 roomRoot,
                 RoomDecorInteriorAnchor.InteriorMiddleCenter,
-                IsRoomWiderThanTall(roomRoot) ? new Vector3(0f, -1.95f, 0f) : new Vector3(0f, -1.25f, 0f));
+                IsRoomWiderThanTall(roomRoot) ? new Vector3(0f, -2.45f, 0f) : new Vector3(0f, -1.65f, 0f));
         }
 
         if (name.Contains("remote"))
@@ -877,7 +920,7 @@ public static class RoomPrefabStaticPlacer
             return RoomDecorationPlacer.GetAnchoredWorldPosition(
                 roomRoot,
                 RoomDecorInteriorAnchor.InteriorTopCenter,
-                IsRoomWiderThanTall(roomRoot) ? new Vector3(0f, -2.65f, 0f) : new Vector3(0f, -1.75f, 0f));
+                IsRoomWiderThanTall(roomRoot) ? new Vector3(0f, -0.95f, 0f) : new Vector3(0f, -1.45f, 0f));
         }
 
         if (name.Contains("houseplant"))
@@ -885,7 +928,7 @@ public static class RoomPrefabStaticPlacer
             return RoomDecorationPlacer.GetAnchoredWorldPosition(
                 roomRoot,
                 RoomDecorInteriorAnchor.InteriorMiddleLeft,
-                IsRoomWiderThanTall(roomRoot) ? new Vector3(1.3f, -0.15f, 0f) : new Vector3(1.15f, -0.15f, 0f));
+                IsRoomWiderThanTall(roomRoot) ? new Vector3(0.9f, -0.15f, 0f) : new Vector3(1.15f, -0.15f, 0f));
         }
 
         return Vector3.zero;
@@ -1036,6 +1079,7 @@ public static class RoomPrefabStaticPlacer
                HasToken(prefab.name, "lamp") ||
                HasToken(prefab.name, "houseplant") ||
                HasToken(prefab.name, "plant") ||
+               HasToken(prefab.name, "monstera") ||
                HasToken(prefab.name, "tiered") ||
                HasToken(prefab.name, "cart");
     }
@@ -1440,6 +1484,11 @@ public static class RoomPrefabStaticPlacer
 
     private static void RebuildSolidPropCollider(GameObject instance)
     {
+        RebuildSolidPropCollider(instance, 0.3f, 0.25f);
+    }
+
+    private static void RebuildSolidPropCollider(GameObject instance, float widthMultiplier, float heightMultiplier)
+    {
         if (instance == null)
             return;
 
@@ -1447,10 +1496,15 @@ public static class RoomPrefabStaticPlacer
         if (existing != null)
             Object.DestroyImmediate(existing.gameObject);
 
-        EnsureSolidPropCollider(instance);
+        EnsureSolidPropCollider(instance, widthMultiplier, heightMultiplier);
     }
 
     private static void EnsureSolidPropCollider(GameObject instance)
+    {
+        EnsureSolidPropCollider(instance, 0.3f, 0.25f);
+    }
+
+    private static void EnsureSolidPropCollider(GameObject instance, float widthMultiplier, float heightMultiplier)
     {
         if (instance == null)
             return;
@@ -1480,8 +1534,8 @@ public static class RoomPrefabStaticPlacer
         box.isTrigger = false;
         box.offset = Vector2.zero;
         box.size = new Vector2(
-            Mathf.Max(0.09f, width * 0.3f),
-            Mathf.Max(0.09f, height * 0.25f));
+            Mathf.Max(0.09f, width * widthMultiplier),
+            Mathf.Max(0.09f, height * heightMultiplier));
 
         Rigidbody2D body = solid.AddComponent<Rigidbody2D>();
         body.bodyType = RigidbodyType2D.Static;
