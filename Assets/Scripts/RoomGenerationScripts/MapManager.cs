@@ -32,7 +32,7 @@ public class MapManager : MonoBehaviour
     [SerializeField] private GameObject verticalBoundaryDoorPrefab;
 
     [Header("Room presentation")]
-    [Tooltip("Sprites/Generic/Floor_Connecting (32px @ 100 PPU). Tiled in a grid; wood tiles use Sprite Mask to room interior.")]
+    [Tooltip("UIArt/fixedtile (64px @ 100 PPU). Tiled in a grid; edge tiles are clipped to the room interior by a Sprite Mask.")]
     [SerializeField] private Sprite roomFloorTileSprite;
     [SerializeField] private RoomDecorationCatalog roomDecorationCatalog;
     [SerializeField] private RoomPrefabSpawnCatalog roomPrefabSpawnCatalog;
