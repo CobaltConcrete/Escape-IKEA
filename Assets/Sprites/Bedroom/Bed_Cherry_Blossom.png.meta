@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 86b11c561b1ee4d9e82658ad00e11742
+guid: ac08da5c24d22447bbb841e16c994877
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -4266958613824459029
-    second: Bed_Cherry_Blossom_0
+      213: 4855168555884740677
+    second: Untitled 04-15-2026 02-26-43_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,7 +100,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Bed_Cherry_Blossom_0
+      name: Untitled 04-15-2026 02-26-43_0
       rect:
         serializedVersion: 2
         x: 2
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: bee23bf7fb7b8c4c0800000000000000
-      internalID: -4266958613824459029
+      spriteID: 540082ae316016340800000000000000
+      internalID: 4855168555884740677
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Bed_Cherry_Blossom_0: -4266958613824459029
+      Untitled 04-15-2026 02-26-43_0: 4855168555884740677
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

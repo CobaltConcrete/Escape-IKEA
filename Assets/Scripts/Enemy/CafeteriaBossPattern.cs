@@ -4,8 +4,16 @@ public class CafeteriaBossPattern : MonoBehaviour
 {
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform firePoint;
-    [SerializeField] private float moveRadius = 2f;
-    [SerializeField] private float angularSpeed = 1.2f;
+
+    [Header("Movement")]
+    [SerializeField] private float walkSpeed = 2.4f;
+    [SerializeField] private float waypointReachDistance = 0.18f;
+    [SerializeField] private float minWalkDuration = 0.8f;
+    [SerializeField] private float maxWalkDuration = 1.8f;
+    [SerializeField] private float minPauseBetweenWalks = 0.15f;
+    [SerializeField] private float maxPauseBetweenWalks = 0.45f;
+    [SerializeField] private float boundsPadding = 0.65f;
+
     [SerializeField] private int bulletsPerVolley = 3;
     [SerializeField] private float volleySpread = 24f;
     [SerializeField] private float shotInterval = 0.6f;
@@ -20,8 +28,10 @@ public class CafeteriaBossPattern : MonoBehaviour
     [SerializeField] private float chaseDotThreshold = 0.2f;
     [SerializeField] private float minPlayerSpeed = 0.35f;
 
-    private Vector3 center;
-    private float angle;
+    private Vector3 homePosition;
+    private Vector2 walkTarget;
+    private float walkTimer;
+    private float walkPauseTimer;
     private float shotTimer;
     private float phaseTimer;
     private bool attacking = true;
@@ -34,11 +44,12 @@ public class CafeteriaBossPattern : MonoBehaviour
     private void Awake()
     {
         EnsureReferences();
-        center = transform.position;
+        homePosition = transform.position;
         phaseTimer = attackDuration;
         shotTimer = 0f;
 
         CacheRoomBounds();
+        PickNewWalkTarget();
     }
 
     private void OnEnable()
@@ -66,11 +77,12 @@ public class CafeteriaBossPattern : MonoBehaviour
     {
         roomBounds = bounds;
         hasRoomBounds = true;
+        PickNewWalkTarget();
     }
 
     private void Update()
     {
-        MoveCircle();
+        MoveLikePerson();
 
         phaseTimer -= Time.deltaTime;
         if (phaseTimer <= 0f)
@@ -89,48 +101,132 @@ public class CafeteriaBossPattern : MonoBehaviour
         }
     }
 
-    private void MoveCircle()
+    private void MoveLikePerson()
     {
-        angle += angularSpeed * Time.deltaTime;
-        float x = Mathf.Cos(angle) * moveRadius;
-        float y = Mathf.Sin(angle) * moveRadius;
-        Vector2 tangent = new Vector2(-Mathf.Sin(angle), Mathf.Cos(angle));
-        if (tangent.sqrMagnitude > 0.0001f)
-            transform.right = tangent.normalized;
+        Vector2 current = transform.position;
+        bool isFleeing = TryGetFleeDirection(current, out Vector2 fleeDirection);
+        if (isFleeing)
+        {
+            walkTarget = ClampToWalkableBounds(current + fleeDirection * fleeRadius);
+            walkTimer = Mathf.Max(walkTimer, 0.35f);
+            walkPauseTimer = 0f;
+        }
 
-        Vector3 pos = center + new Vector3(x, y, 0f);
+        if (walkPauseTimer > 0f)
+        {
+            walkPauseTimer -= Time.deltaTime;
+            return;
+        }
+
+        if (walkTimer <= 0f || Vector2.Distance(current, walkTarget) <= waypointReachDistance)
+            PickNewWalkTarget();
+
+        float currentSpeed = isFleeing ? Mathf.Max(walkSpeed, fleePushPerSecond) : walkSpeed;
+        float stepDistance = currentSpeed * Time.deltaTime;
+        Vector2 next = Vector2.MoveTowards(current, walkTarget, stepDistance);
+        Vector2 clampedNext = ClampToWalkableBounds(next);
+        bool hitBounds = (clampedNext - next).sqrMagnitude > 0.0001f;
+
+        Vector2 actualMove = clampedNext - current;
+        if (actualMove.sqrMagnitude > 0.0001f)
+            transform.right = actualMove.normalized;
+
+        transform.position = new Vector3(clampedNext.x, clampedNext.y, transform.position.z);
+        walkTimer -= Time.deltaTime;
+
+        if (hitBounds || walkTimer <= 0f || Vector2.Distance(clampedNext, walkTarget) <= waypointReachDistance)
+        {
+            walkPauseTimer = Random.Range(Mathf.Min(minPauseBetweenWalks, maxPauseBetweenWalks), Mathf.Max(minPauseBetweenWalks, maxPauseBetweenWalks));
+            walkTimer = 0f;
+        }
+    }
+
+    private bool TryGetFleeDirection(Vector2 bossPosition, out Vector2 fleeDirection)
+    {
+        fleeDirection = Vector2.zero;
         EnsurePlayerRefs();
 
-        if (playerTransform != null && playerRb != null && fleeRadius > 0.01f)
+        if (playerTransform == null || playerRb == null || fleeRadius <= 0.01f)
+            return false;
+
+        Vector2 playerPosition = playerTransform.position;
+        Vector2 toBoss = bossPosition - playerPosition;
+        float distance = toBoss.magnitude;
+        if (distance <= 0.05f || distance >= fleeRadius)
+            return false;
+
+        Vector2 playerVelocity = playerRb.linearVelocity;
+        if (playerVelocity.magnitude < minPlayerSpeed)
+            return false;
+
+        Vector2 toBossNormal = toBoss / distance;
+        float towardBoss = Vector2.Dot(playerVelocity.normalized, toBossNormal);
+        if (towardBoss <= chaseDotThreshold)
+            return false;
+
+        fleeDirection = toBossNormal;
+        return true;
+    }
+
+    private void PickNewWalkTarget()
+    {
+        Vector2 current = transform.position;
+        walkTarget = PickRandomWalkablePoint(current);
+        walkTimer = Random.Range(Mathf.Min(minWalkDuration, maxWalkDuration), Mathf.Max(minWalkDuration, maxWalkDuration));
+        walkPauseTimer = 0f;
+    }
+
+    private Vector2 PickRandomWalkablePoint(Vector2 current)
+    {
+        GetWalkableBounds(out float minX, out float maxX, out float minY, out float maxY);
+
+        for (int i = 0; i < 10; i++)
         {
-            Vector2 playerPos = playerTransform.position;
-            Vector2 bossPos = pos;
-            Vector2 toBoss = bossPos - playerPos;
-            float dist = toBoss.magnitude;
-            if (dist > 0.05f && dist < fleeRadius)
-            {
-                float speed = playerRb.linearVelocity.magnitude;
-                if (speed >= minPlayerSpeed)
-                {
-                    Vector2 toBossN = toBoss / dist;
-                    float toward = Vector2.Dot(playerRb.linearVelocity.normalized, toBossN);
-                    if (toward > chaseDotThreshold)
-                    {
-                        float proximity = 1f - Mathf.Clamp01(dist / fleeRadius);
-                        Vector2 flee = toBossN * (fleePushPerSecond * proximity * Time.deltaTime);
-                        pos += (Vector3)flee;
-                    }
-                }
-            }
+            Vector2 candidate = hasRoomBounds
+                ? new Vector2(
+                    Random.Range(minX, maxX),
+                    Random.Range(minY, maxY))
+                : (Vector2)homePosition + Random.insideUnitCircle * 3f;
+
+            if ((candidate - current).sqrMagnitude >= 1f)
+                return candidate;
         }
 
-        if (hasRoomBounds)
+        Vector2 fallbackDirection = Random.insideUnitCircle.normalized;
+        if (fallbackDirection.sqrMagnitude <= 0.0001f)
+            fallbackDirection = Vector2.right;
+        return ClampToWalkableBounds(current + fallbackDirection * 1.5f);
+    }
+
+    private Vector2 ClampToWalkableBounds(Vector2 position)
+    {
+        if (!hasRoomBounds)
+            return position;
+
+        GetWalkableBounds(out float minX, out float maxX, out float minY, out float maxY);
+        return new Vector2(
+            Mathf.Clamp(position.x, minX, maxX),
+            Mathf.Clamp(position.y, minY, maxY));
+    }
+
+    private void GetWalkableBounds(out float minX, out float maxX, out float minY, out float maxY)
+    {
+        minX = roomBounds.min.x + boundsPadding;
+        maxX = roomBounds.max.x - boundsPadding;
+        minY = roomBounds.min.y + boundsPadding;
+        maxY = roomBounds.max.y - boundsPadding;
+
+        if (minX > maxX)
         {
-            pos.x = Mathf.Clamp(pos.x, roomBounds.min.x, roomBounds.max.x);
-            pos.y = Mathf.Clamp(pos.y, roomBounds.min.y, roomBounds.max.y);
+            minX = roomBounds.min.x;
+            maxX = roomBounds.max.x;
         }
 
-        transform.position = pos;
+        if (minY > maxY)
+        {
+            minY = roomBounds.min.y;
+            maxY = roomBounds.max.y;
+        }
     }
 
     private void EnsurePlayerRefs()

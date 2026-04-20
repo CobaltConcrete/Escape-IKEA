@@ -44,6 +44,8 @@ public class LootSpawnManager : MonoBehaviour
         {
             if (area == null)
                 continue;
+            if (area.GetComponentInParent<StartingRoomSafeZone>() != null)
+                continue;
             if (area.RoomType == RoomType.Cafeteria)
                 continue;
             if (!def.allowedRoomTypes.Contains(area.RoomType))
@@ -585,10 +587,10 @@ public class LootSpawnManager : MonoBehaviour
         foreach (LootSpawnArea area in allSpawnAreas)
         {
             if (area == null) continue;
+            if (area.GetComponentInParent<StartingRoomSafeZone>() != null)
+                continue;
             if (!area.CanSpawn()) continue;
             if (area.RoomType == RoomType.Cafeteria)
-                continue;
-            if (area.RoomType == RoomType.SportsRoom)
                 continue;
 
             if (itemDefinition.allowedRoomTypes.Contains(area.RoomType))

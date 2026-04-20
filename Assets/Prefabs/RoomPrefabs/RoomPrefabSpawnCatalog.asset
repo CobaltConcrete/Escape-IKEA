@@ -15,22 +15,30 @@ MonoBehaviour:
   pools:
   - roomType: 1
     prefabs:
+    - {fileID: 450000, guid: 7d3586c04e784701b1f525885c87bce8, type: 3}
     - {fileID: 2955381025110779136, guid: f8c4c8234fcaa7c4b9368a08cb62d8a6, type: 3}
     - {fileID: 400000, guid: 868c44842febc40088e0086156f41b2d, type: 3}
     - {fileID: 2955381025110779136, guid: cc0e227d46a40ac408146a082a0c87b3, type: 3}
-    - {fileID: 410000, guid: b66048a86e68a4c35babf8ea2ef8ba8d, type: 3}
     - {fileID: 2955381025110779136, guid: 0810feb9964425a41a075ee66870a17f, type: 3}
     - {fileID: 420000, guid: b4b7a628914ae418a9ab7ad1b9c72ad3, type: 3}
+    - {fileID: 430000, guid: 10e21bbf3f8764c389b8eb2bce3e4b20, type: 3}
+    - {fileID: 410000, guid: b66048a86e68a4c35babf8ea2ef8ba8d, type: 3}
   - roomType: 2
     prefabs:
     - {fileID: 2955381025110779136, guid: fdc17a9dfc23d4598a8ec6ec3b910027, type: 3}
     - {fileID: 2955381025110779136, guid: 53eb54a4c055f43ce864d3a39be76f8e, type: 3}
     - {fileID: 2955381025110779136, guid: 0ed1b265a313940c89c771325061c388, type: 3}
+    - {fileID: 2955381025110779136, guid: f3fc211676c94b1c9eb7a81337652922, type: 3}
+    - {fileID: 460000, guid: 9d27d8f3f7844cbd93c84a26bc2b88f4, type: 3}
+    - {fileID: 462000, guid: 12d23a0542864dc4a6a16e51561e570d, type: 3}
+    - {fileID: 461000, guid: 26c4962a53e54053a13158fdfc86b517, type: 3}
+    - {fileID: 463000, guid: 3cbb923a5e874379ab2354ca475197d1, type: 3}
     - {fileID: 2955381025110779136, guid: 6085a6ef8b2a0e448a69b8f631904d62, type: 3}
     - {fileID: 2955381025110779136, guid: e0e20c828d6f2e64caccfa4f0db95bfd, type: 3}
   - roomType: 3
     prefabs:
     - {fileID: 2955381025110779136, guid: 5b1ba693cdbeed44ba08fe6c45553c67, type: 3}
+    - {fileID: 470000, guid: f60c783ae333423ea3a4fc585536c951, type: 3}
     - {fileID: 2955381025110779136, guid: 685123c21ecb5e342875b005af2d46f2, type: 3}
     - {fileID: 2955381025110779136, guid: 22a5c827ecbe2d74a94828a6e2db74e4, type: 3}
     - {fileID: 2955381025110779136, guid: 185c18a09a08c67429ffbabc45ac8817, type: 3}
@@ -38,7 +46,6 @@ MonoBehaviour:
   - roomType: 4
     prefabs:
     - {fileID: 2955381025110779136, guid: ec0ec831e5ec253438281c797b5c7a0e, type: 3}
-    - {fileID: 430000, guid: 10e21bbf3f8764c389b8eb2bce3e4b20, type: 3}
     - {fileID: 2955381025110779136, guid: 71e9b61da69904343b47f6f1408e6269, type: 3}
     - {fileID: 2955381025110779136, guid: 9a8ff8492e7d50f46a6283bf387f66f2, type: 3}
     - {fileID: 2955381025110779136, guid: 3641842f736b6c944b94c171c603e0a7, type: 3}
@@ -48,6 +55,8 @@ MonoBehaviour:
     - {fileID: 440000, guid: a6e23a3411cb245b098efc4cb14138fa, type: 3}
     - {fileID: 2955381025110779136, guid: d6928896177095e47a908cf153f49794, type: 3}
     - {fileID: 2955381025110779136, guid: 2d14c8a5bab440d499c06c4377b58bbc, type: 3}
+    - {fileID: 430000, guid: 10e21bbf3f8764c389b8eb2bce3e4b20, type: 3}
+    - {fileID: 2955381025110779136, guid: 6085a6ef8b2a0e448a69b8f631904d62, type: 3}
   - roomType: 5
     prefabs:
     - {fileID: 2955381025110779136, guid: 55e55fe63456edc4da52b6dfc66addd7, type: 3}
@@ -56,10 +65,10 @@ MonoBehaviour:
     - {fileID: 930000, guid: 7d8e9f102132435465768798a9bacbdc, type: 3}
     - {fileID: 920000, guid: 2cb48d5e6f708192a3b4c5d6e7f80910, type: 3}
     - {fileID: 910000, guid: 6ab19c31f3e247d4a1b2d3c4e5f60718, type: 3}
-    - {fileID: 2955381025110779136, guid: 6085a6ef8b2a0e448a69b8f631904d62, type: 3}
     - {fileID: 2955381025110779136, guid: e0e20c828d6f2e64caccfa4f0db95bfd, type: 3}
   - roomType: 6
     prefabs:
+    - {fileID: 410000, guid: b66048a86e68a4c35babf8ea2ef8ba8d, type: 3}
     - {fileID: 2955381025110779136, guid: 48396b73e34a3784980fde37f1d795d5, type: 3}
     - {fileID: 2955381025110779136, guid: 43e9ad9b4320a41768f21ffa9b817f80, type: 3}
     - {fileID: 2955381025110779136, guid: f1b70240356ac4d4fb49fcd864374529, type: 3}

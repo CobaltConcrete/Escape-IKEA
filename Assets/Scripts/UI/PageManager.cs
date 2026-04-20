@@ -1,6 +1,7 @@
-
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
 
 public class PageManager : MonoBehaviour
 {
@@ -11,6 +12,14 @@ public class PageManager : MonoBehaviour
     private float blackOutTimer = 0;
     [SerializeField] public GameObject blackOutScreen;
     [SerializeField] public GameObject blackOutText;
+
+    [Header("Instructions")]
+    [SerializeField] private KeyCode helpKey = KeyCode.H;
+    [SerializeField] private string instructionsSceneName = "Instructions";
+
+    private float timeScaleBeforeInstructions = 1f;
+    private bool instructionsOpen;
+    private bool instructionsOpenedFromGame;
 
     #region Unity_functions
     
@@ -32,6 +41,10 @@ public class PageManager : MonoBehaviour
             blackOutScreen = GameObject.Find("BlackoutScreen");
             blackOutText = GameObject.Find("BlackoutText");
         }
+        else if (scene.name == "MainMenu")
+        {
+            EnsureMainMenuInstructionsButton();
+        }
     }
 
     private void Awake()
@@ -47,12 +60,33 @@ public class PageManager : MonoBehaviour
         }
     }
 
+    private void Start()
+    {
+        if (SceneManager.GetActiveScene().name == "MainMenu")
+            EnsureMainMenuInstructionsButton();
+    }
+
     private void Update() {
+        if (Input.GetKeyDown(helpKey) &&
+            SceneManager.GetActiveScene().name == "IKEAscene" &&
+            !SceneManager.GetSceneByName("Pause").isLoaded)
+        {
+            if (SceneManager.GetSceneByName(instructionsSceneName).isLoaded)
+                CloseInstructions();
+            else
+                OpenInstructions();
+        }
+
+        if (instructionsOpen && instructionsOpenedFromGame)
+            return;
+
         blackOutTimer += Time.deltaTime;
         if (Input.GetKeyDown(KeyCode.P) && SceneManager.GetActiveScene().name == "IKEAscene" && !SceneManager.GetSceneByName("Pause").isLoaded)
         {
-            blackOutScreen.SetActive(false);
-            blackOutText.SetActive(false);
+            if (blackOutScreen != null)
+                blackOutScreen.SetActive(false);
+            if (blackOutText != null)
+                blackOutText.SetActive(false);
             PauseGame();
         }
 
@@ -62,12 +96,16 @@ public class PageManager : MonoBehaviour
         }
 
         if ((blackOutTimer > 75.0f && blackOutTimer < 85.0f) || (blackOutTimer > 150.0f && blackOutTimer < 160.0f)){
-            blackOutScreen.SetActive(true);
-            blackOutText.SetActive(true);
+            if (blackOutScreen != null)
+                blackOutScreen.SetActive(true);
+            if (blackOutText != null)
+                blackOutText.SetActive(true);
         }
         else{
-            blackOutScreen.SetActive(false);
-            blackOutText.SetActive(false);
+            if (blackOutScreen != null)
+                blackOutScreen.SetActive(false);
+            if (blackOutText != null)
+                blackOutText.SetActive(false);
         }
     }
     #endregion
@@ -83,6 +121,9 @@ public class PageManager : MonoBehaviour
 
     public void PauseGame()
     {
+        if (instructionsOpen)
+            CloseInstructions();
+
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         
@@ -118,6 +159,9 @@ public class PageManager : MonoBehaviour
 
         if (this != Instance) { Instance.ResumeGame(); return; }
 
+        if (instructionsOpen)
+            CloseInstructions();
+
         Time.timeScale = 1f;
         SceneManager.UnloadSceneAsync("Pause");
 
@@ -148,10 +192,126 @@ public class PageManager : MonoBehaviour
 
     public void MainMenu()
     {
+        if (instructionsOpen)
+            CloseInstructions();
+
         Time.timeScale = 1f;
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         SceneManager.LoadScene("MainMenu");
+    }
+
+    public void OpenInstructions()
+    {
+        if (SceneManager.GetSceneByName(instructionsSceneName).isLoaded)
+            return;
+
+        instructionsOpenedFromGame = SceneManager.GetActiveScene().name == "IKEAscene";
+        timeScaleBeforeInstructions = Time.timeScale;
+        instructionsOpen = true;
+
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+
+        if (instructionsOpenedFromGame)
+            Time.timeScale = 0f;
+
+        SceneManager.LoadSceneAsync(instructionsSceneName, LoadSceneMode.Additive).completed += (op) =>
+        {
+            var closeButton = GameObject.Find("CloseInstructionsButton");
+            if (closeButton != null)
+            {
+                Button button = closeButton.GetComponent<Button>();
+                if (button != null)
+                    button.onClick.AddListener(CloseInstructions);
+            }
+        };
+    }
+
+    private void EnsureMainMenuInstructionsButton()
+    {
+        if (GameObject.Find("InstructionsButton") != null)
+            return;
+
+        GameObject startButton = GameObject.Find("StartButton");
+        if (startButton == null)
+            return;
+
+        RectTransform startRect = startButton.GetComponent<RectTransform>();
+        Transform parent = startRect != null ? startRect.parent : null;
+        if (parent == null)
+            return;
+
+        GameObject buttonObject = new GameObject("InstructionsButton", typeof(RectTransform), typeof(CanvasRenderer), typeof(Image), typeof(Button));
+        buttonObject.transform.SetParent(parent, false);
+
+        RectTransform rect = buttonObject.GetComponent<RectTransform>();
+        rect.anchorMin = startRect.anchorMin;
+        rect.anchorMax = startRect.anchorMax;
+        rect.sizeDelta = startRect.sizeDelta;
+        rect.pivot = startRect.pivot;
+        rect.anchoredPosition = startRect.anchoredPosition + new Vector2(0f, -42f);
+
+        Image image = buttonObject.GetComponent<Image>();
+        Image startImage = startButton.GetComponent<Image>();
+        if (startImage != null)
+        {
+            image.sprite = startImage.sprite;
+            image.type = startImage.type;
+            image.color = startImage.color;
+        }
+
+        Button button = buttonObject.GetComponent<Button>();
+        button.targetGraphic = image;
+        button.onClick.AddListener(OpenInstructions);
+
+        GameObject textObject = new GameObject("Text (TMP)", typeof(RectTransform), typeof(CanvasRenderer), typeof(TextMeshProUGUI));
+        textObject.transform.SetParent(buttonObject.transform, false);
+        RectTransform textRect = textObject.GetComponent<RectTransform>();
+        textRect.anchorMin = Vector2.zero;
+        textRect.anchorMax = Vector2.one;
+        textRect.offsetMin = Vector2.zero;
+        textRect.offsetMax = Vector2.zero;
+
+        TextMeshProUGUI text = textObject.GetComponent<TextMeshProUGUI>();
+        TextMeshProUGUI startText = startButton.GetComponentInChildren<TextMeshProUGUI>();
+        if (startText != null)
+        {
+            text.font = startText.font;
+            text.fontSharedMaterial = startText.fontSharedMaterial;
+            text.color = startText.color;
+            text.fontSize = startText.fontSize;
+            text.alignment = startText.alignment;
+        }
+        else
+        {
+            text.fontSize = 24f;
+            text.alignment = TextAlignmentOptions.Center;
+            text.color = new Color(0.2f, 0.2f, 0.2f, 1f);
+        }
+
+        text.text = "Instructions";
+        text.raycastTarget = false;
+    }
+
+    public void CloseInstructions()
+    {
+        if (!SceneManager.GetSceneByName(instructionsSceneName).isLoaded)
+        {
+            instructionsOpen = false;
+            return;
+        }
+
+        if (instructionsOpenedFromGame)
+        {
+            Time.timeScale = Mathf.Approximately(timeScaleBeforeInstructions, 0f) ? 1f : timeScaleBeforeInstructions;
+            Cursor.visible = false;
+            Cursor.lockState = CursorLockMode.Locked;
+        }
+
+        instructionsOpen = false;
+        instructionsOpenedFromGame = false;
+        SceneManager.UnloadSceneAsync(instructionsSceneName);
     }
     #endregion
 }

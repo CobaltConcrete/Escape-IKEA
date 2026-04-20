@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a735814c985e7c48bde2bdca9fc5a74, type: 3}
-  m_Name: Sink
+  m_Name: Kitchen Sink
   m_EditorClassIdentifier: 
-  itemName: Sink
+  itemName: Kitchen Sink
   icon: {fileID: 7613071095470564417, guid: bebe5ed273dae46c8b50bfbfd7d594f0, type: 3}
   stackable: 0
   uiScale: 0.7
@@ -31,7 +31,7 @@ MonoBehaviour:
   canAppearInShoppingList: 1
   minRequiredAmount: 1
   maxRequiredAmount: 3
-  shoppingListKey: Whisk
+  shoppingListKey: Kitchen Sink
   allowedRoomTypes: 04000000
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.3, y: 0.3, z: 0.3}

@@ -47,9 +47,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 895c7b0b55164e3428f6e1776c3cde1f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  itemDefinition: {fileID: 11400000, guid: 19454d86210960d4091fe59b6384180f, type: 2}
+  itemDefinition: {fileID: 11400000, guid: 1c1191b07ddbdeb4cb06758064f34bd3, type: 2}
   amount: 1
-  spawnedObjectName: Sink
+  spawnedObjectName: Kitchen Sink
 --- !u!114 &440004
 MonoBehaviour:
   m_ObjectHideFlags: 0
