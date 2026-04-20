@@ -37,6 +37,7 @@ public class CafeteriaBossPattern : MonoBehaviour
     private bool attacking = true;
     private bool hasRoomBounds;
     private Bounds roomBounds;
+    private Vector2 lastFacingDirection = Vector2.right;
 
     private Transform playerTransform;
     private Rigidbody2D playerRb;
@@ -55,6 +56,7 @@ public class CafeteriaBossPattern : MonoBehaviour
     private void OnEnable()
     {
         EnsureReferences();
+        transform.rotation = Quaternion.identity;
         EnemyWander wander = GetComponent<EnemyWander>();
         if (wander != null) wander.enabled = false;
 
@@ -129,8 +131,9 @@ public class CafeteriaBossPattern : MonoBehaviour
 
         Vector2 actualMove = clampedNext - current;
         if (actualMove.sqrMagnitude > 0.0001f)
-            transform.right = actualMove.normalized;
+            lastFacingDirection = actualMove.normalized;
 
+        transform.rotation = Quaternion.identity;
         transform.position = new Vector3(clampedNext.x, clampedNext.y, transform.position.z);
         walkTimer -= Time.deltaTime;
 
@@ -243,7 +246,8 @@ public class CafeteriaBossPattern : MonoBehaviour
         if (bulletPrefab == null) return;
         Vector3 origin = firePoint != null ? firePoint.position : transform.position;
         int count = Mathf.Max(1, bulletsPerVolley);
-        float facingAngle = Mathf.Atan2(transform.right.y, transform.right.x) * Mathf.Rad2Deg;
+        Vector2 facing = lastFacingDirection.sqrMagnitude > 0.0001f ? lastFacingDirection.normalized : Vector2.right;
+        float facingAngle = Mathf.Atan2(facing.y, facing.x) * Mathf.Rad2Deg;
         float halfSpread = volleySpread * 0.5f;
 
         for (int i = 0; i < count; i++)

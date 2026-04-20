@@ -191,6 +191,7 @@ public static class RoomDecorationPlacer
         Sprite pictureSprite = FindSpriteByName(catalog, "Picture");
         Sprite curtainSprite = FindSpriteByName(catalog, "Curtain");
         Sprite plantSprite = FindSpriteByName(catalog, "Houseplant");
+        Sprite monsteraSprite = FindSpriteByName(catalog, "Monstera");
         Sprite lampSprite = FindSpriteByName(catalog, "Lamp");
         Sprite cartSprite = FindSpriteByName(catalog, "Tiered_Cart");
         GameObject couchPrefab = FindPrefabByName(catalog, "Couch");
@@ -201,17 +202,20 @@ public static class RoomDecorationPlacer
         GameObject picturePrefab = FindPrefabByName(catalog, "Picture");
         GameObject curtainPrefab = FindPrefabByName(catalog, "Curtain");
         GameObject plantPrefab = FindPrefabByName(catalog, "Houseplant");
+        GameObject monsteraPrefab = FindPrefabByName(catalog, "Monstera");
         GameObject lampPrefab = FindPrefabByName(catalog, "Lamp");
         GameObject cartPrefab = FindPrefabByName(catalog, "Tiered_Cart");
 
-        Vector3 couchPos = wideRoom ? new Vector3(midX, bottom + 1.8f, 0f) : new Vector3(midX, bottom + 1.45f, 0f);
-        Vector3 tablePos = wideRoom ? new Vector3(midX, bottom + 0.9f, 0f) : new Vector3(midX, couchPos.y + 0.8f, 0f);
+        Vector3 couchPos = wideRoom ? new Vector3(midX, bottom + 0.95f, 0f) : new Vector3(midX, midY + 1.15f, 0f);
+        Vector3 tablePos = wideRoom ? new Vector3(midX, bottom + 0.55f, 0f) : new Vector3(midX, midY - 1.15f, 0f);
         Vector3 leftCabinetPos = wideRoom ? new Vector3(left + 1.0f, top - 0.45f, 0f) : new Vector3(left + 0.85f, top - 0.65f, 0f);
         Vector3 rightCabinetPos = wideRoom ? new Vector3(right - 1.0f, top - 0.45f, 0f) : new Vector3(right - 0.85f, top - 0.65f, 0f);
         Vector3 curtainPos = wideRoom ? new Vector3(midX, top - 0.1f, 0f) : new Vector3(midX, top - 0.2f, 0f);
-        Vector3 plantPos = wideRoom ? new Vector3(left + 3.35f, bottom + 0.75f, 0f) : new Vector3(left + 0.95f, midY + 0.25f, 0f);
+        Vector3 plantPos = wideRoom ? new Vector3(left + 2.85f, bottom + 0.75f, 0f) : new Vector3(left + 0.95f, midY + 0.25f, 0f);
         Vector3 lampPos = wideRoom ? new Vector3(right - 3.35f, bottom + 0.75f, 0f) : new Vector3(right - 0.95f, midY + 0.25f, 0f);
         Vector3 cartPos = wideRoom ? new Vector3(left + 1.25f, bottom + 0.72f, 0f) : new Vector3(left + 0.72f, bottom + 1.35f, 0f);
+        Vector3 leftMonsteraPos = wideRoom ? new Vector3(left + 2.35f, bottom + 0.78f, 0f) : new Vector3(left + 0.82f, bottom + 2.35f, 0f);
+        Vector3 rightMonsteraPos = wideRoom ? new Vector3(right - 2.35f, bottom + 0.78f, 0f) : new Vector3(right - 0.82f, bottom + 2.35f, 0f);
 
         List<Bounds> occupied = new List<Bounds>();
 
@@ -245,7 +249,7 @@ public static class RoomDecorationPlacer
         GameObject table = SpawnLayoutObject(decorRoot, "Living_Coffeetable", coffeePrefab, coffeeSprite, tablePlaced, 8);
         if (table != null)
         {
-            Vector3 remotePos = wideRoom ? new Vector3(0.22f, -0.26f, 0f) : new Vector3(0.58f, 0.4f, 0f);
+            Vector3 remotePos = wideRoom ? new Vector3(0.22f, -0.48f, 0f) : new Vector3(0.58f, 0.4f, 0f);
             SpawnLayoutObject(table.transform, "Living_Remote", remotePrefab, remoteSprite, remotePos, 12, 0.8f, false);
         }
 
@@ -253,7 +257,7 @@ public static class RoomDecorationPlacer
         GameObject leftCabinet = SpawnLayoutObject(decorRoot, "Living_Cabinet_Left", cabinetPrefab, cabinetSprite, leftCabinetPlaced, 8);
         if (leftCabinet != null)
         {
-            Vector3 picturePos = wideRoom ? new Vector3(0f, -1.05f, 0f) : new Vector3(0f, -0.25f, 0f);
+            Vector3 picturePos = wideRoom ? new Vector3(0f, -0.55f, 0f) : new Vector3(0f, -0.45f, 0f);
             SpawnLayoutObject(leftCabinet.transform, "Living_Picture", picturePrefab, pictureSprite, picturePos, 9, 1f, false);
         }
 
@@ -268,6 +272,10 @@ public static class RoomDecorationPlacer
         SpawnLayoutObject(decorRoot, "Living_Lamp", lampPrefab, lampSprite, lampPlaced, 8);
         Vector3 cartPlaced = PlaceLivingLocal("Living_TieredCart", cartPrefab, cartSprite, cartPos);
         SpawnLayoutObject(decorRoot, "Living_TieredCart", cartPrefab, cartSprite, cartPlaced, 8);
+        Vector3 leftMonsteraPlaced = PlaceLivingLocal("Living_Monstera_Left", monsteraPrefab, monsteraSprite, leftMonsteraPos);
+        SpawnLayoutObject(decorRoot, "Living_Monstera_Left", monsteraPrefab, monsteraSprite, leftMonsteraPlaced, 8);
+        Vector3 rightMonsteraPlaced = PlaceLivingLocal("Living_Monstera_Right", monsteraPrefab, monsteraSprite, rightMonsteraPos);
+        SpawnLayoutObject(decorRoot, "Living_Monstera_Right", monsteraPrefab, monsteraSprite, rightMonsteraPlaced, 8);
     }
 
     private static GameObject SpawnLayoutSprite(Transform parent, string name, Sprite sprite, Vector3 localPos, int sortingOrder, float uniformScale = 1f)
@@ -676,8 +684,8 @@ public static class RoomDecorationPlacer
         float y0 = Mathf.Lerp(bottom, top, 0.1f);
         float y1 = Mathf.Lerp(bottom, top, 0.9f);
 
-        const float referenceBedLayoutScale = 1.34f;
-        const float sideFurnitureScale = 1.14f;
+        const float referenceBedLayoutScale = 1.16f;
+        const float sideFurnitureScale = 1.0f;
 
         ItemDefinition bedLoot = FindLootDefinitionByKey(catalog, "Bed", RoomType.Bedroom);
         ItemDefinition lampLoot = FindLootDefinitionByKey(catalog, "Lamp", RoomType.None);
@@ -757,7 +765,7 @@ public static class RoomDecorationPlacer
 
                 bool cherryLampSide = (i % 2 == 0);
                 Sprite cherrySideSprite = cherryLampSide ? lampSprite : drawerSprite;
-                float cherrySideX = (i % 2 == 0 ? 0.92f : -0.92f) * cherryScale;
+                float cherrySideX = (i % 2 == 0 ? 0.86f : -0.86f) * cherryScale;
                 Vector3 cherrySideLocal = new Vector3(cherrySideX, -0.02f * cherryScale, 0f);
                 Vector3 cherrySideDesired = bedPositions[i] + cherrySideLocal;
                 var cherrySideEntry = new RoomDecorationCatalog.DecorationEntry
@@ -840,7 +848,7 @@ public static class RoomDecorationPlacer
 
             bool lampSide = (i % 2 == 0);
             Sprite sideSprite = lampSide ? lampSprite : drawerSprite;
-            float sideX = (i % 2 == 0 ? 0.92f : -0.92f) * bedScale;
+            float sideX = (i % 2 == 0 ? 0.86f : -0.86f) * bedScale;
             Vector3 sideLocal = new Vector3(sideX, -0.02f * bedScale, 0f);
             Vector3 sideDesired = bedPositions[i] + sideLocal;
             var sideEntry = new RoomDecorationCatalog.DecorationEntry

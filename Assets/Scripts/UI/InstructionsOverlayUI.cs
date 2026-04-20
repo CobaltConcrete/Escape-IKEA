@@ -54,6 +54,8 @@ public class InstructionsOverlayUI : MonoBehaviour
         titleRect.offsetMax = new Vector2(-64f, -24f);
 
         string instructions =
+            "Search each room and collect every item on your shopping list.\n" +
+            "Once the list is complete, find the final boss, defeat her, and escape the store.\n\n" +
             "WASD - Move\n" +
             "Click - Attack\n" +
             "F - Interact / pick up nearby loot\n" +
@@ -64,7 +66,7 @@ public class InstructionsOverlayUI : MonoBehaviour
             "P - Pause menu\n" +
             "H - Open these instructions";
 
-        GameObject body = CreateText("InstructionText", panel.transform, instructions, 28, FontStyle.Normal, TextAnchor.UpperLeft);
+        GameObject body = CreateText("InstructionText", panel.transform, instructions, 26, FontStyle.Normal, TextAnchor.UpperLeft);
         RectTransform bodyRect = body.GetComponent<RectTransform>();
         bodyRect.anchorMin = Vector2.zero;
         bodyRect.anchorMax = Vector2.one;
