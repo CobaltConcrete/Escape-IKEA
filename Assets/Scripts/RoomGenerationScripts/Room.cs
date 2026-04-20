@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using static EquipmentEnum;
 
 public class Room : MonoBehaviour
 {
@@ -134,80 +133,12 @@ public class Room : MonoBehaviour
             SetRenderersVisible(false);
     }
 
-    [Header("Sports bat hint")]
-    [SerializeField] private float sportsBatHintRadius = 2.35f;
-    [SerializeField] private float sportsBatHintCooldownSeconds = 7f;
-
-    private float _nextSportsBatHintUnscaledTime;
-
     private void OnTriggerEnter2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
             ApplyAsCurrentVisibleRoom();
         }
-    }
-
-    private void OnTriggerStay2D(Collider2D other)
-    {
-        if (!other.CompareTag("Player"))
-            return;
-
-        TryShowSportsBatProximityHint(other);
-    }
-
-    private void TryShowSportsBatProximityHint(Collider2D playerCollider)
-    {
-        if (!RoomLootSpawnTypeHelper.TryGetRoomType(transform, out RoomType roomType) ||
-            roomType != RoomType.SportsRoom)
-        {
-            return;
-        }
-
-        PlayerInventoryInteraction inv = playerCollider.GetComponent<PlayerInventoryInteraction>();
-        EquipmentData equipment = inv != null ? inv.EquipmentData : null;
-        if (equipment == null)
-        {
-            return;
-        }
-
-        Item weapon = equipment.GetEquippedItem(EquipTag.Weapon);
-        if (weapon != null && weapon.definition != null)
-        {
-            return;
-        }
-
-        Transform batPickup = FindSportsBatPickupTransformInRoom();
-        if (batPickup == null)
-        {
-            return;
-        }
-
-        float dist = Vector2.Distance(playerCollider.transform.position, batPickup.position);
-        if (dist > sportsBatHintRadius)
-        {
-            return;
-        }
-
-        if (Time.unscaledTime < _nextSportsBatHintUnscaledTime)
-        {
-            return;
-        }
-
-        _nextSportsBatHintUnscaledTime = Time.unscaledTime + sportsBatHintCooldownSeconds;
-        BossRoomNoticeUI.Instance?.ShowMessage(
-            "Press F to pick up the bat to defend yourself.",
-            3.8f);
-    }
-
-    /// <summary>Uses <see cref="SportsRoomBatPlacer.BatInstanceName"/> so this file does not depend on <c>WeaponWorldPickup</c> (avoids asm / import issues).</summary>
-    private Transform FindSportsBatPickupTransformInRoom()
-    {
-        Transform spawned = transform.Find("SpawnedItems");
-        if (spawned == null)
-            return null;
-
-        return spawned.Find(SportsRoomBatPlacer.BatInstanceName);
     }
 
     private void OnTriggerExit2D(Collider2D other)
