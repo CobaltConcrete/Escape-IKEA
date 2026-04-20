@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 430001}
   - component: {fileID: -2185993234904550184}
+  - component: {fileID: 430004}
   - component: {fileID: 430002}
   - component: {fileID: 430003}
-  - component: {fileID: 430004}
   m_Layer: 12
   m_Name: Cupboard
   m_TagString: Loot
@@ -50,6 +50,20 @@ MonoBehaviour:
   itemDefinition: {fileID: 11400000, guid: 3be80a8147061b04a91310fca7135263, type: 2}
   amount: 1
   spawnedObjectName: Cupboard
+--- !u!114 &430004
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 430000}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnCategory: 1
+  isPickable: 1
 --- !u!212 &430002
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -151,24 +165,3 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1.9, y: 1.5}
   m_EdgeRadius: 0
---- !u!114 &430004
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 430000}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomType: 4
-  spawnCategory: 1
-  shoppingListKey: Cupboard
-  pickupDisplayName: Cupboard
-  lootValue: 700
-  canAppearInShoppingList: 1
-  minRequiredAmount: 1
-  maxRequiredAmount: 2
-  spawnWeight: 1

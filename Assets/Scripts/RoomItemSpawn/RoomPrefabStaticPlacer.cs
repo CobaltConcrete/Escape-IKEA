@@ -23,9 +23,13 @@ public static class RoomPrefabStaticPlacer
         Transform existing = roomRoot.Find(DecorRootName);
         if (existing != null)
             Object.Destroy(existing.gameObject);
+
         GameObject decorRoot = new GameObject(DecorRootName);
-        Transform spawnedItemsRoot = roomRoot.Find("SpawnedItems");
-        decorRoot.transform.SetParent(spawnedItemsRoot != null ? spawnedItemsRoot : roomRoot, false);
+        Transform decorParent = roomRoot.Find("SpawnedObjects") ?? roomRoot;
+        decorRoot.transform.SetParent(decorParent, false);
+        decorRoot.transform.localPosition = Vector3.zero;
+        decorRoot.transform.localRotation = Quaternion.identity;
+        decorRoot.transform.localScale = Vector3.one;
 
         bool spawnedAny = false;
         List<Vector2> used = new List<Vector2>();
@@ -58,6 +62,7 @@ public static class RoomPrefabStaticPlacer
                 continue;
             if (roomType == RoomType.Cafeteria && IsCafeteriaLayoutPiece(prefab))
                 continue;
+
             RoomSpawnPrefabDefinition def = GetRoomSpawnDefinition(prefab);
             if (def == null)
                 continue;
@@ -65,15 +70,29 @@ public static class RoomPrefabStaticPlacer
                 continue;
 
             Vector3 position = ResolvePlacement(roomRoot, roomType, prefab, i, used);
-            GameObject instance = Object.Instantiate(prefab, position, Quaternion.identity, decorRoot.transform);
+
+            Transform targetContainer = ResolveContainerForSpawnCategory(roomRoot, def);
+            Transform instantiateParent = def.spawnCategory == RoomSpawnCategory.Decoration
+                ? decorRoot.transform
+                : (targetContainer != null ? targetContainer : roomRoot);
+
+            GameObject instance = Object.Instantiate(prefab, position, Quaternion.identity, instantiateParent);
             instance.SetActive(false);
+
             StripLegacySpawnerPath(instance);
             NormalizeSpawnedVisuals(instance);
             ClampInstanceInsideRoom(instance, roomRoot);
+
+            // If this prefab still contains ItemWorldSpawner, force the spawned ItemWorld
+            // into the correct room-local container based on spawn category.
+            AssignSpawnParentToAnyItemWorldSpawner(instance, targetContainer != null ? targetContainer : instantiateParent);
+
             EnsureShoppingListPickupComponent(instance, def);
+
             instance.SetActive(true);
             used.Add(instance.transform.position);
             spawnedAny = true;
+
         }
 
         if (spawnedAny)
@@ -874,10 +893,30 @@ public static class RoomPrefabStaticPlacer
         if (def == null)
             return;
 
-        if (!def.canAppearInShoppingList)
+        if (!def.isPickable)
             return;
 
-        string key = def.shoppingListKey;
+        if (def.spawnCategory != RoomSpawnCategory.Item)
+            return;
+
+        ItemWorldSpawner spawner = instance.GetComponent<ItemWorldSpawner>();
+        if (spawner == null)
+            spawner = instance.GetComponentInChildren<ItemWorldSpawner>(true);
+
+        if (spawner == null)
+            return;
+
+        ItemDefinition itemDef = spawner.ItemDefinition;
+        if (itemDef == null)
+            return;
+
+        if (!itemDef.IsLoot())
+            return;
+
+        if (!itemDef.canAppearInShoppingList)
+            return;
+
+        string key = itemDef.GetShoppingListKey();
         if (string.IsNullOrWhiteSpace(key))
             return;
 
@@ -888,15 +927,15 @@ public static class RoomPrefabStaticPlacer
 
     private static void StripLegacySpawnerPath(GameObject instance)
     {
-        if (instance == null)
-            return;
+        //if (instance == null)
+        //    return;
 
-        ItemWorldSpawner[] spawners = instance.GetComponentsInChildren<ItemWorldSpawner>(true);
-        for (int i = 0; i < spawners.Length; i++)
-        {
-            if (spawners[i] != null)
-                Object.DestroyImmediate(spawners[i]);
-        }
+        //ItemWorldSpawner[] spawners = instance.GetComponentsInChildren<ItemWorldSpawner>(true);
+        //for (int i = 0; i < spawners.Length; i++)
+        //{
+        //    if (spawners[i] != null)
+        //        Object.DestroyImmediate(spawners[i]);
+        //}
     }
 
     private static void NormalizeSpawnedVisuals(GameObject instance)
@@ -917,29 +956,49 @@ public static class RoomPrefabStaticPlacer
     }
 
     private static GameObject SpawnConfiguredPrefab(
-        GameObject prefab,
-        Vector3 position,
-        Quaternion rotation,
-        Transform parent,
-        Transform roomRoot,
-        bool makePushableProp = false,
-        bool skipShoppingListPickup = false)
+    GameObject prefab,
+    Vector3 position,
+    Quaternion rotation,
+    Transform parent,
+    Transform roomRoot,
+    bool makePushableProp = false,
+    bool skipShoppingListPickup = false)
     {
         if (prefab == null)
             return null;
 
-        GameObject instance = Object.Instantiate(prefab, position, rotation, parent);
+        RoomSpawnPrefabDefinition def = GetRoomSpawnDefinition(prefab);
+
+        Transform targetContainer = ResolveContainerForSpawnCategory(roomRoot, def);
+        Transform instantiateParent =
+            def != null && def.spawnCategory == RoomSpawnCategory.Decoration
+                ? (parent != null ? parent : targetContainer)
+                : (targetContainer != null ? targetContainer : parent);
+
+        if (instantiateParent == null)
+            instantiateParent = roomRoot;
+
+        GameObject instance = Object.Instantiate(prefab, position, rotation, instantiateParent);
         instance.SetActive(false);
+
         StripLegacySpawnerPath(instance);
         NormalizeSpawnedVisuals(instance);
         ClampInstanceInsideRoom(instance, roomRoot);
+
+        // Critical: if this prefab contains ItemWorldSpawner, force its real spawned ItemWorld
+        // into the correct room-local container instead of scene root.
+        AssignSpawnParentToAnyItemWorldSpawner(
+            instance,
+            targetContainer != null ? targetContainer : instantiateParent);
+
         if (makePushableProp)
             ConfigurePushablePropPhysics(instance);
+
         if (!skipShoppingListPickup)
         {
-            RoomSpawnPrefabDefinition def = GetRoomSpawnDefinition(prefab);
             EnsureShoppingListPickupComponent(instance, def);
         }
+
         instance.SetActive(true);
         return instance;
     }
@@ -1011,5 +1070,82 @@ public static class RoomPrefabStaticPlacer
         RoomGeneratedPickup pickup = instance.GetComponent<RoomGeneratedPickup>();
         if (pickup != null)
             Object.DestroyImmediate(pickup);
+    }
+    //private static Transform ResolveRoomLootRoot(Transform roomRoot)
+    //{
+    //    if (roomRoot == null)
+    //        return null;
+
+    //    Transform root = roomRoot.Find("SpawnedLoots");
+    //    if (root != null)
+    //        return root;
+
+    //    //root = roomRoot.Find("SpawnedLoot");
+    //    //if (root != null)
+    //    //    return root;
+
+    //    GameObject created = new GameObject("SpawnedLoots");
+    //    created.transform.SetParent(roomRoot, false);
+    //    created.transform.localPosition = Vector3.zero;
+    //    created.transform.localRotation = Quaternion.identity;
+    //    created.transform.localScale = Vector3.one;
+    //    return created.transform;
+    //}
+
+    private static void AssignSpawnParentToAnyItemWorldSpawner(GameObject instance, Transform container)
+    {
+        if (instance == null)
+            return;
+
+        ItemWorldSpawner[] spawners = instance.GetComponentsInChildren<ItemWorldSpawner>(true);
+
+        foreach (var spawner in spawners)
+        {
+            if (spawner == null) continue;
+
+            Transform finalParent = container;
+
+            // 关键兜底（就算 container 传进来是 null）
+            if (finalParent == null)
+            {
+                Room room = spawner.GetComponentInParent<Room>();
+                if (room != null)
+                {
+                    finalParent =
+                        room.transform.Find("SpawnedLoots") ??
+                        room.transform.Find("SpawnedItems") ??
+                        room.transform.Find("SpawnedObjects") ??
+                        room.transform;
+                }
+            }
+
+            spawner.SetSpawnParent(finalParent);
+
+        }
+    }
+    private static Transform ResolveContainerForSpawnCategory(Transform roomRoot, RoomSpawnPrefabDefinition def)
+    {
+        if (roomRoot == null)
+            return null;
+
+        if (def == null)
+            return roomRoot.Find("SpawnedObjects") ?? roomRoot;
+
+        switch (def.spawnCategory)
+        {
+            case RoomSpawnCategory.Decoration:
+                return roomRoot.Find("SpawnedObjects") ?? roomRoot;
+
+            case RoomSpawnCategory.Weapon:
+                return roomRoot.Find("SpawnedItems") ?? roomRoot;
+
+            case RoomSpawnCategory.Item:
+                return roomRoot.Find("SpawnedLoots")
+                    ?? roomRoot.Find("SpawnedLoot")
+                    ?? roomRoot;
+
+            default:
+                return roomRoot.Find("SpawnedObjects") ?? roomRoot;
+        }
     }
 }

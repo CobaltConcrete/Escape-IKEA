@@ -667,6 +667,37 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 3.6907845, y: 3.6094794}
   m_EdgeRadius: 0
+--- !u!1 &2257192799019011859
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 6824568385215289502}
+  m_Layer: 0
+  m_Name: SpawnedLoots
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &6824568385215289502
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2257192799019011859}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5690085243751511401}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2469881608434325794
 GameObject:
   m_ObjectHideFlags: 0
@@ -801,6 +832,37 @@ BoxCollider2D:
   m_AutoTiling: 0
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!1 &2620834898450753727
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5748737308035016357}
+  m_Layer: 0
+  m_Name: SpawnedEnemies
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5748737308035016357
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2620834898450753727}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 5690085243751511401}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2886703549050865421
 GameObject:
   m_ObjectHideFlags: 0
@@ -952,6 +1014,8 @@ Transform:
   - {fileID: 3808492328657416598}
   - {fileID: 1866429743464000619}
   - {fileID: 4633053674356148854}
+  - {fileID: 5748737308035016357}
+  - {fileID: 6824568385215289502}
   - {fileID: 3983429941779877188}
   - {fileID: 8703965194552731203}
   - {fileID: 5659736495887071348}
@@ -981,6 +1045,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   explored: 0
   roomVisuals: {fileID: 3799256318316876202}
+  sportsBatHintRadius: 2.35
+  sportsBatHintCooldownSeconds: 7
 --- !u!61 &3605416168059060914
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1054,7 +1120,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   enemySpawnAreaCollider: {fileID: 2759245449868438247}
   enemyWanderAreaCollider: {fileID: 3127089043762824291}
-  spawnParent: {fileID: 4633053674356148854}
+  spawnParent: {fileID: 5748737308035016357}
   spawnGroups:
   - groupName: Employee
     prefab: {fileID: 6291527677918437734, guid: e473e2195ce4e41b6bfde2257fe2d519, type: 3}
@@ -1100,8 +1166,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   roomTrigger: {fileID: 3605416168059060914}
-  enemyContainer: {fileID: 4633053674356148854}
+  enemyContainer: {fileID: 5748737308035016357}
+  objectContainer: {fileID: 4633053674356148854}
   itemContainer: {fileID: 1866429743464000619}
+  lootContainer: {fileID: 6824568385215289502}
   ignoreRoomActivationInThisScene: 0
 --- !u!114 &2706225679265475400
 MonoBehaviour:
@@ -1115,7 +1183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0140c6c542f3296439a03f99e00c0aad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemyParent: {fileID: 4633053674356148854}
+  enemyParent: {fileID: 5748737308035016357}
   enemyPrefabs:
   - {fileID: 3464154710725457275, guid: 73a96bd0a680f8949861c27cf368dbe9, type: 3}
   - {fileID: 6291527677918437734, guid: e473e2195ce4e41b6bfde2257fe2d519, type: 3}
@@ -2363,7 +2431,7 @@ MonoBehaviour:
   roomType: 5
   maxSpawnCount: 4
   areaWeight: 1
-  spawnParent: {fileID: 1866429743464000619}
+  spawnParent: {fileID: 6824568385215289502}
 --- !u!1 &7007705651060375349
 GameObject:
   m_ObjectHideFlags: 0

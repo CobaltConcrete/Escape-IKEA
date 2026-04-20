@@ -10,9 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 9200853314134011360}
   - component: {fileID: 9205252766977592890}
+  - component: {fileID: -1900770363445998628}
   - component: {fileID: 9202117452878698467}
   - component: {fileID: 9207077252193120690}
-  - component: {fileID: -1900770363445998628}
   - component: {fileID: 5888453961114078487}
   m_Layer: 12
   m_Name: Bat
@@ -51,6 +51,20 @@ MonoBehaviour:
   itemDefinition: {fileID: 11400000, guid: 476398be52343184ab30426607c171b8, type: 2}
   amount: 1
   spawnedObjectName: SportsBatPickup
+--- !u!114 &-1900770363445998628
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9201813141723428332}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  spawnCategory: 2
+  isPickable: 0
 --- !u!212 &9202117452878698467
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -154,27 +168,6 @@ MonoBehaviour:
   m_ShapeLightFalloffSize: 0.5
   m_ShapeLightFalloffOffset: {x: 0, y: 0}
   m_ShapePath: []
---- !u!114 &-1900770363445998628
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 9201813141723428332}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8f489f986983e40ca82d11f006ed8a44, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  roomType: 6
-  spawnCategory: 2
-  shoppingListKey: 
-  pickupDisplayName: Bat
-  lootValue: 0
-  canAppearInShoppingList: 0
-  minRequiredAmount: 1
-  maxRequiredAmount: 1
-  spawnWeight: 1
 --- !u!61 &5888453961114078487
 BoxCollider2D:
   m_ObjectHideFlags: 0

@@ -26,8 +26,11 @@ public class ItemWorldSpawner : MonoBehaviour
             return;
         }
 
-        // Prefab transform scale is the authoritative world size for this spawner path.
-        // This allows designers to tune pickup size directly in prefab Transform.
+        if (spawnParent == null)
+        {
+            spawnParent = ResolveFallbackSpawnParent();
+        }
+
         Vector3 spawnScale = GetWorldSpawnScale(itemDefinition, transform);
 
         Item item = new Item
@@ -45,6 +48,7 @@ public class ItemWorldSpawner : MonoBehaviour
             spawnScale,
             item
         );
+
         if (spawned != null)
         {
             Room room = GetComponentInParent<Room>();
@@ -52,6 +56,7 @@ public class ItemWorldSpawner : MonoBehaviour
             {
                 spawned.SetRoom(room);
             }
+
             if (!string.IsNullOrWhiteSpace(spawnedObjectName))
                 spawned.name = spawnedObjectName;
         }
@@ -143,5 +148,60 @@ public class ItemWorldSpawner : MonoBehaviour
         {
             SetLayerRecursively(child.gameObject, layer);
         }
+    }
+    private Transform ResolveFallbackSpawnParent()
+    {
+        Room room = GetComponentInParent<Room>();
+        if (room == null)
+            return null;
+
+        RoomSpawnPrefabDefinition def = GetComponent<RoomSpawnPrefabDefinition>();
+        if (def == null)
+            def = GetComponentInChildren<RoomSpawnPrefabDefinition>(true);
+
+        if (def != null)
+        {
+            switch (def.spawnCategory)
+            {
+                case RoomSpawnCategory.Decoration:
+                    return room.transform.Find("SpawnedObjects") ?? room.transform;
+
+                case RoomSpawnCategory.Weapon:
+                    return room.transform.Find("SpawnedItems") ?? room.transform;
+
+                case RoomSpawnCategory.Item:
+                    return room.transform.Find("SpawnedLoots")
+                        ?? room.transform.Find("SpawnedLoot")
+                        ?? room.transform;
+
+                default:
+                    return room.transform.Find("SpawnedLoots")
+                        ?? room.transform.Find("SpawnedItems")
+                        ?? room.transform.Find("SpawnedObjects")
+                        ?? room.transform;
+            }
+        }
+
+        // If no RoomSpawnPrefabDefinition is found, infer from ItemDefinition.
+        if (itemDefinition != null)
+        {
+            if (itemDefinition.IsLoot())
+            {
+                return room.transform.Find("SpawnedLoots")
+                    ?? room.transform.Find("SpawnedLoot")
+                    ?? room.transform;
+            }
+
+            if (itemDefinition.itemCategory == ItemCategory.Normal &&
+                itemDefinition.equipTag == EquipmentEnum.EquipTag.Weapon)
+            {
+                return room.transform.Find("SpawnedItems") ?? room.transform;
+            }
+        }
+
+        return room.transform.Find("SpawnedLoots")
+            ?? room.transform.Find("SpawnedItems")
+            ?? room.transform.Find("SpawnedObjects")
+            ?? room.transform;
     }
 }
