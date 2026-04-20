@@ -457,6 +457,9 @@ public class MapManager : MonoBehaviour
     {
         for (int x = 0; x < maxCellCols; x++)
         {
+            if (!occupied[x, maxCellRows - 1] || !occupied[x, 0])
+                continue;
+
             Door top = SpawnDoor(horizontalBoundaryDoorPrefab,
                 MapToWorld(x, maxCellRows - 1) + new Vector3(0, unitCellSize.y / 2f, 0), true);
 
@@ -471,6 +474,9 @@ public class MapManager : MonoBehaviour
 
         for (int y = 0; y < maxCellRows; y++)
         {
+            if (!occupied[0, y] || !occupied[maxCellCols - 1, y])
+                continue;
+
             Door left = SpawnDoor(verticalBoundaryDoorPrefab,
                 MapToWorld(0, y) + new Vector3(-unitCellSize.x / 2f, 0, 0), false);
 

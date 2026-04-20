@@ -93,17 +93,25 @@ public class ItemWorldSpawner : MonoBehaviour
         if (sourceCollider is BoxCollider2D sourceBox)
         {
             BoxCollider2D box = target.AddComponent<BoxCollider2D>();
-            box.isTrigger = sourceBox.isTrigger;
+            box.isTrigger = itemDefinition == null || !itemDefinition.IsLoot()
+                ? sourceBox.isTrigger
+                : false;
             box.offset = sourceBox.offset;
-            box.size = sourceBox.size;
+            box.size = itemDefinition != null && itemDefinition.IsLoot()
+                ? new Vector2(Mathf.Max(0.1f, sourceBox.size.x * 0.42f), Mathf.Max(0.1f, sourceBox.size.y * 0.34f))
+                : sourceBox.size;
             box.edgeRadius = sourceBox.edgeRadius;
         }
         else if (sourceCollider is CircleCollider2D sourceCircle)
         {
             CircleCollider2D circle = target.AddComponent<CircleCollider2D>();
-            circle.isTrigger = sourceCircle.isTrigger;
+            circle.isTrigger = itemDefinition == null || !itemDefinition.IsLoot()
+                ? sourceCircle.isTrigger
+                : false;
             circle.offset = sourceCircle.offset;
-            circle.radius = sourceCircle.radius;
+            circle.radius = itemDefinition != null && itemDefinition.IsLoot()
+                ? Mathf.Max(0.08f, sourceCircle.radius * 0.38f)
+                : sourceCircle.radius;
         }
     }
 

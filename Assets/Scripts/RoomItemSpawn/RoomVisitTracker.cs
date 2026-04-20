@@ -32,17 +32,7 @@ public class RoomVisitTracker : MonoBehaviour
         currentRoomKey = roomKey;
         distinctRoomHistory.Add(roomKey);
 
-        //Debug.Log($"[RoomVisitTracker] Visit: {roomKey}");
-
-        string history = "";
-        for (int i = 0; i < distinctRoomHistory.Count; i++)
-        {
-            history += distinctRoomHistory[i];
-            if (i < distinctRoomHistory.Count - 1)
-                history += " -> ";
-        }
-
-        Debug.Log($"[RoomVisitTracker] History: {history}");
+        // Keep history for respawn logic, but do not spam the console every frame.
     }
 
     public int CountDistinctRoomsAfter(string roomKey)

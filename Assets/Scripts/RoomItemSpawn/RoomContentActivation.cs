@@ -187,6 +187,9 @@ public class RoomContentActivation : MonoBehaviour
         if (playerTransform == null)
             return;
 
+        if (playerRooms.Count == 0)
+            RebuildPlayerRoomsFromCurrentPosition();
+
         RoomContentActivation bestRoom = null;
         float bestDistance = float.MaxValue;
 
@@ -209,7 +212,11 @@ public class RoomContentActivation : MonoBehaviour
         }
 
         if (bestRoom == currentActiveRoom)
+        {
+            if (currentActiveRoom != null)
+                currentActiveRoom.SetRoomContentActive(true);
             return;
+        }
 
         if (currentActiveRoom != null)
         {
@@ -223,6 +230,46 @@ public class RoomContentActivation : MonoBehaviour
             currentActiveRoom.OnPlayerEnteredThisRoom();
             currentActiveRoom.SetRoomContentActive(true);
         }
+    }
+
+    private static void RebuildPlayerRoomsFromCurrentPosition()
+    {
+        if (playerTransform == null)
+            return;
+
+        RoomContentActivation[] rooms = Object.FindObjectsByType<RoomContentActivation>(
+            FindObjectsInactive.Exclude,
+            FindObjectsSortMode.None);
+
+        RoomContentActivation nearestRoom = null;
+        float nearestDistance = float.MaxValue;
+        Vector2 playerPos = playerTransform.position;
+
+        foreach (RoomContentActivation room in rooms)
+        {
+            if (room == null || room.roomTrigger == null || room.ignoreRoomActivationInThisScene)
+                continue;
+
+            Collider2D trigger = room.roomTrigger;
+            if (trigger.OverlapPoint(playerPos))
+            {
+                playerRooms.Add(room);
+                continue;
+            }
+
+            Vector2 closest = trigger.ClosestPoint(playerPos);
+            float distance = (playerPos - closest).sqrMagnitude;
+            if (distance < nearestDistance)
+            {
+                nearestDistance = distance;
+                nearestRoom = room;
+            }
+        }
+
+        // Door seams can briefly put the player outside every room trigger. Keep the closest
+        // room alive instead of dropping to a fully black view.
+        if (playerRooms.Count == 0 && nearestRoom != null && nearestDistance <= 4f)
+            playerRooms.Add(nearestRoom);
     }
 
     private void OnPlayerEnteredThisRoom()

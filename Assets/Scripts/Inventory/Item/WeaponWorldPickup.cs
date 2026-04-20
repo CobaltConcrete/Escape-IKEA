@@ -7,13 +7,19 @@ using UnityEngine;
 public class WeaponWorldPickup : MonoBehaviour, IInteractable
 {
     private const float BatColliderScale = 1.15f;
-    private const string GlowChildName = "_BatGlow";
 
     [SerializeField] private ItemDefinition weaponDefinition;
     [SerializeField] private int amount = 1;
     [SerializeField] private bool roomVisible = true;
 
     public ItemDefinition WeaponDefinition => weaponDefinition;
+
+    public void Configure(ItemDefinition definition, int pickupAmount)
+    {
+        weaponDefinition = definition;
+        amount = Mathf.Max(1, pickupAmount);
+        ConfigureBatPickup();
+    }
 
     private void Reset()
     {
@@ -44,10 +50,7 @@ public class WeaponWorldPickup : MonoBehaviour, IInteractable
 
     public string GetInteractionText()
     {
-        if (!CanPickup())
-            return "";
-
-        return "[F] Pick up the bat to defend yourself";
+        return "";
     }
 
     public Vector3 GetInteractionPosition()
@@ -76,6 +79,7 @@ public class WeaponWorldPickup : MonoBehaviour, IInteractable
             if (cols[i] != null)
                 cols[i].enabled = visible;
         }
+
     }
 
     private void ShrinkBlockingColliderFootprint()
@@ -137,7 +141,6 @@ public class WeaponWorldPickup : MonoBehaviour, IInteractable
 
         EnsureWeaponCollider2D();
         ShrinkBlockingColliderFootprint();
-        EnsureBatGlow();
     }
 
     private bool CanPickup()
@@ -149,36 +152,6 @@ public class WeaponWorldPickup : MonoBehaviour, IInteractable
             return false;
 
         return string.Equals(weaponDefinition.itemName, BatWeapon.ItemName, System.StringComparison.OrdinalIgnoreCase);
-    }
-
-    private void EnsureBatGlow()
-    {
-        if (weaponDefinition == null)
-            return;
-
-        SpriteRenderer source = GetComponentInChildren<SpriteRenderer>(true);
-        if (source == null || source.sprite == null)
-            return;
-
-        Transform glowTransform = transform.Find(GlowChildName);
-        SpriteRenderer glow = glowTransform != null ? glowTransform.GetComponent<SpriteRenderer>() : null;
-        if (glow == null)
-        {
-            GameObject glowObject = new GameObject(GlowChildName);
-            glowObject.transform.SetParent(transform, false);
-            glowObject.transform.localPosition = new Vector3(0f, 0f, 0.02f);
-            glowObject.transform.localRotation = Quaternion.identity;
-            glow = glowObject.AddComponent<SpriteRenderer>();
-        }
-
-        glow.transform.localScale = new Vector3(1.75f, 1.75f, 1f);
-        glow.sprite = source.sprite;
-        glow.sortingLayerID = source.sortingLayerID;
-        glow.sortingOrder = source.sortingOrder - 1;
-        glow.drawMode = source.drawMode;
-        glow.maskInteraction = SpriteMaskInteraction.None;
-        glow.color = new Color(0.35f, 0.72f, 1f, 0.55f);
-        glow.enabled = roomVisible;
     }
 
 }

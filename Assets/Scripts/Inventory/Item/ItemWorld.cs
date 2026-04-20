@@ -234,6 +234,40 @@ public class ItemWorld : MonoBehaviour, IInteractable
         ConfigureContrastBackdrop();
     }
 
+    private void ConfigureColliderForCurrentItem()
+    {
+        if (item == null || item.definition == null)
+            return;
+
+        if (boxCollider2D == null)
+            boxCollider2D = GetComponent<BoxCollider2D>();
+        if (boxCollider2D == null)
+            boxCollider2D = gameObject.AddComponent<BoxCollider2D>();
+
+        ItemDefinition def = item.definition;
+        if (def.worldColliderType == WorldColliderType.Box)
+        {
+            boxCollider2D.offset = def.boxOffset;
+            boxCollider2D.size = new Vector2(
+                Mathf.Max(0.1f, def.boxSize.x * 0.42f),
+                Mathf.Max(0.1f, def.boxSize.y * 0.34f));
+            boxCollider2D.edgeRadius = def.boxEdgeRadius;
+        }
+        else if (spriteRenderer != null && spriteRenderer.sprite != null)
+        {
+            Vector2 spriteSize = spriteRenderer.sprite.bounds.size;
+            boxCollider2D.offset = Vector2.zero;
+            boxCollider2D.size = new Vector2(
+                Mathf.Max(0.1f, spriteSize.x * 0.36f),
+                Mathf.Max(0.1f, spriteSize.y * 0.3f));
+            boxCollider2D.edgeRadius = 0f;
+        }
+
+        // Loot props are room furniture now: interact by range, but physically block walking.
+        // Non-loot drops stay triggers so their auto-pickup trigger flow still works.
+        boxCollider2D.isTrigger = !item.IsLoot();
+    }
+
     private static Sprite GetUnitWhiteSprite()
     {
         if (s_unitWhiteSprite != null)

@@ -22,6 +22,7 @@ public class RoomPresentation : MonoBehaviour
     [SerializeField] private string floorBackdropSortingLayerName = "Default";
     [Tooltip("Room fill (legacy stretched sprite). Keeps tiles visually above this layer.")]
     [SerializeField] private int floorBackdropSortingOrder = -500;
+    [SerializeField] private Color floorFallbackColor = new Color(0.72f, 0.58f, 0.38f, 1f);
     [SerializeField] private string floorSortingLayerName = "Floor";
     [SerializeField] private int floorTileSortingOrder = 0;
     [Tooltip("SpriteMask sorting on Floor layer; tiles use mask range between back and front orders.")]
@@ -56,6 +57,9 @@ public class RoomPresentation : MonoBehaviour
 
         Bounds coverage = ComputeFloorCoverageBounds(transform);
         Transform floorRoot = FindLegacyFloor(transform);
+
+        if (floorRoot != null)
+            ConfigureFloorFallback(floorRoot, coverage);
 
         if (floorTileSprite != null && floorRoot != null)
             BuildFloorWithMaskAndTiles(floorRoot, floorTileSprite, coverage, referencePixelsPerUnit);
@@ -150,18 +154,7 @@ public class RoomPresentation : MonoBehaviour
 
         int floorLayerId = SortingLayer.NameToID(floorSortingLayerName);
 
-        // Match the tiled floor art so the stretched backdrop fills any masked-edge seams.
-        legacySr.sprite = tile;
-        legacySr.color = Color.white;
-        legacySr.drawMode = SpriteDrawMode.Tiled;
-        Vector3 floorScale = floorTransform.lossyScale;
-        legacySr.size = new Vector2(
-            floorWorldBounds.size.x / Mathf.Max(0.0001f, Mathf.Abs(floorScale.x)),
-            floorWorldBounds.size.y / Mathf.Max(0.0001f, Mathf.Abs(floorScale.y)));
-        legacySr.enabled = true;
-        legacySr.sortingLayerName = floorSortingLayerName;
-        legacySr.sortingOrder = floorBackdropSortingOrder;
-        legacySr.maskInteraction = SpriteMaskInteraction.None;
+        ConfigureFloorFallback(floorTransform, floorWorldBounds);
 
         GameObject clipRoot = new GameObject(FloorClipRootName);
         clipRoot.transform.SetParent(transform, false);
@@ -242,6 +235,28 @@ public class RoomPresentation : MonoBehaviour
                 sr.motionVectorGenerationMode = MotionVectorGenerationMode.ForceNoMotion;
             }
         }
+    }
+
+    private void ConfigureFloorFallback(Transform floorTransform, Bounds floorWorldBounds)
+    {
+        if (floorTransform == null)
+            return;
+
+        SpriteRenderer legacySr = floorTransform.GetComponent<SpriteRenderer>();
+        if (legacySr == null)
+            return;
+
+        legacySr.sprite = GetWhiteRectMaskSprite();
+        legacySr.color = floorFallbackColor;
+        legacySr.drawMode = SpriteDrawMode.Tiled;
+        Vector3 floorScale = floorTransform.lossyScale;
+        legacySr.size = new Vector2(
+            floorWorldBounds.size.x / Mathf.Max(0.0001f, Mathf.Abs(floorScale.x)),
+            floorWorldBounds.size.y / Mathf.Max(0.0001f, Mathf.Abs(floorScale.y)));
+        legacySr.enabled = true;
+        legacySr.sortingLayerName = floorBackdropSortingLayerName;
+        legacySr.sortingOrder = floorBackdropSortingOrder;
+        legacySr.maskInteraction = SpriteMaskInteraction.None;
     }
 
     private void DestroyPreviousFloorClipHierarchy()
