@@ -153,9 +153,13 @@ public class RoomPresentation : MonoBehaviour
         // Match the tiled floor art so the stretched backdrop fills any masked-edge seams.
         legacySr.sprite = tile;
         legacySr.color = Color.white;
-        legacySr.drawMode = SpriteDrawMode.Simple;
+        legacySr.drawMode = SpriteDrawMode.Tiled;
+        Vector3 floorScale = floorTransform.lossyScale;
+        legacySr.size = new Vector2(
+            floorWorldBounds.size.x / Mathf.Max(0.0001f, Mathf.Abs(floorScale.x)),
+            floorWorldBounds.size.y / Mathf.Max(0.0001f, Mathf.Abs(floorScale.y)));
         legacySr.enabled = true;
-        legacySr.sortingLayerName = floorBackdropSortingLayerName;
+        legacySr.sortingLayerName = floorSortingLayerName;
         legacySr.sortingOrder = floorBackdropSortingOrder;
         legacySr.maskInteraction = SpriteMaskInteraction.None;
 

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Cherry Bed
   m_EditorClassIdentifier: 
   itemName: Cherry Bed
-  icon: {fileID: -4266958613824459029, guid: 86b11c561b1ee4d9e82658ad00e11742, type: 3}
+  icon: {fileID: 4855168555884740677, guid: ac08da5c24d22447bbb841e16c994877, type: 3}
   stackable: 0
   uiScale: 0.7
   glowColor: {r: 0.33730364, g: 0, b: 1, a: 1}
@@ -31,7 +31,7 @@ MonoBehaviour:
   canAppearInShoppingList: 1
   minRequiredAmount: 1
   maxRequiredAmount: 3
-  shoppingListKey: Bed
+  shoppingListKey: Cherry Bed
   allowedRoomTypes: 02000000
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.37, y: 0.37, z: 0.37}

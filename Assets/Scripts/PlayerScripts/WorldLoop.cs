@@ -59,6 +59,9 @@ public class WorldLoop : MonoBehaviour
 
             if (cameraTransform != null)
                 cameraTransform.position += delta;
+
+            Room.ApplyVisibleRoomAtPosition(transform.position);
+            RoomContentActivation.RefreshPlayerRoomsAfterMapSetup();
         }
     }
 

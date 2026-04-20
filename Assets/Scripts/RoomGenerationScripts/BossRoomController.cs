@@ -6,6 +6,11 @@ public class BossRoomController : MonoBehaviour
     [SerializeField] private string bossNameHint = "CafeteriaEmployee";
     [SerializeField] private string clearMessage = "Boss defeated! Leave the store.";
     [SerializeField] private float winDoorDistance = 1.1f;
+    [Header("Exit Signs")]
+    [SerializeField] private Sprite exitSignSprite;
+    [SerializeField] private Vector2 exitSignScale = new Vector2(1.8f, 1.8f);
+    [SerializeField] private float exitSignDoorOffset = 0.72f;
+    [SerializeField] private int exitSignSortingOrder = 220;
 
     private EnemyCombat bossCombat;
     private Collider2D roomTrigger;
@@ -14,6 +19,7 @@ public class BossRoomController : MonoBehaviour
     private Transform player;
     private Door[] bossRoomDoors;
     private bool winTriggered;
+    private bool exitSignsShown;
     private static int activeBossRoomPlayerCount;
 
     private void Awake()
@@ -44,7 +50,11 @@ public class BossRoomController : MonoBehaviour
         }
 
         if (bossDefeated)
+        {
+            EnsureBossRoomDoorsCached();
+            ShowExitSigns();
             TryTriggerWinAtDoor();
+        }
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -123,6 +133,59 @@ public class BossRoomController : MonoBehaviour
                 connected.Add(d);
         }
         bossRoomDoors = connected.ToArray();
+    }
+
+    private void EnsureBossRoomDoorsCached()
+    {
+        if (bossRoomDoors == null || bossRoomDoors.Length == 0)
+            CacheBossRoomDoors();
+    }
+
+    private void ShowExitSigns()
+    {
+        if (exitSignsShown || exitSignSprite == null || bossRoomDoors == null || bossRoomDoors.Length == 0)
+            return;
+
+        Transform parent = transform.Find("Decorations");
+        if (parent == null)
+        {
+            GameObject root = new GameObject("BossExitSigns");
+            root.transform.SetParent(transform, false);
+            parent = root.transform;
+        }
+
+        Vector3 roomCenter = roomTrigger != null ? roomTrigger.bounds.center : transform.position;
+        for (int i = 0; i < bossRoomDoors.Length; i++)
+        {
+            Door door = bossRoomDoors[i];
+            if (door == null)
+                continue;
+
+            Vector3 outward = GetDoorOutwardDirection(door.transform.position, roomCenter);
+            GameObject sign = new GameObject("BossExitSign");
+            sign.transform.SetParent(parent, true);
+            sign.transform.position = door.transform.position + outward * exitSignDoorOffset;
+            sign.transform.localScale = new Vector3(exitSignScale.x, exitSignScale.y, 1f);
+            sign.transform.rotation = Quaternion.Euler(0f, 0f, Mathf.Atan2(outward.y, outward.x) * Mathf.Rad2Deg);
+
+            SpriteRenderer renderer = sign.AddComponent<SpriteRenderer>();
+            renderer.sprite = exitSignSprite;
+            renderer.sortingLayerName = "Item";
+            renderer.sortingOrder = exitSignSortingOrder;
+        }
+
+        exitSignsShown = true;
+        Room room = GetComponent<Room>();
+        room?.RefreshRendererRegistry();
+    }
+
+    private static Vector3 GetDoorOutwardDirection(Vector3 doorPosition, Vector3 roomCenter)
+    {
+        Vector3 delta = doorPosition - roomCenter;
+        if (Mathf.Abs(delta.x) >= Mathf.Abs(delta.y))
+            return delta.x >= 0f ? Vector3.right : Vector3.left;
+
+        return delta.y >= 0f ? Vector3.up : Vector3.down;
     }
 
     private void TryTriggerWinAtDoor()

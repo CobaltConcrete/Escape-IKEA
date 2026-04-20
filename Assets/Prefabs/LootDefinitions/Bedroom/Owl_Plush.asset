@@ -10,9 +10,9 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a735814c985e7c48bde2bdca9fc5a74, type: 3}
-  m_Name: Owl_Plush
+  m_Name: Owl Plush
   m_EditorClassIdentifier: 
-  itemName: Owl_Plush
+  itemName: Owl Plush
   icon: {fileID: 5989268677575712824, guid: bde4184a7389a4e8db52992b045ef3c0, type: 3}
   stackable: 0
   uiScale: 0.7
@@ -26,7 +26,7 @@ MonoBehaviour:
   canAppearInShoppingList: 1
   minRequiredAmount: 1
   maxRequiredAmount: 2
-  shoppingListKey: Owl_Plush
+  shoppingListKey: Owl Plush
   allowedRoomTypes: 02000000
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.8, y: 0.8, z: 0.8}

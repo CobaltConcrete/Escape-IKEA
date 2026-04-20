@@ -52,6 +52,37 @@ public class Room : MonoBehaviour
         }
     }
 
+    public static void ApplyVisibleRoomAtPosition(Vector3 worldPosition)
+    {
+        Room bestRoom = null;
+        float bestArea = 0f;
+
+        for (int i = 0; i < s_AllRooms.Count; i++)
+        {
+            Room room = s_AllRooms[i];
+            if (room == null)
+                continue;
+
+            Collider2D[] colliders = room.GetComponentsInChildren<Collider2D>(true);
+            for (int c = 0; c < colliders.Length; c++)
+            {
+                Collider2D col = colliders[c];
+                if (col == null || !col.isTrigger || !col.OverlapPoint(worldPosition))
+                    continue;
+
+                float area = col.bounds.size.x * col.bounds.size.y;
+                if (area > bestArea)
+                {
+                    bestArea = area;
+                    bestRoom = room;
+                }
+            }
+        }
+
+        if (bestRoom != null)
+            bestRoom.ApplyAsCurrentVisibleRoom();
+    }
+
     public void Explore()
     {
         if (explored)
@@ -118,6 +149,18 @@ public class Room : MonoBehaviour
             {
                 if (decorColliders[i] != null)
                     decorColliders[i].enabled = visible;
+            }
+        }
+
+        // Runtime floor tiles live outside roomVisuals, so include them in room visibility toggles.
+        Transform floorClipRoot = transform.Find("FloorClipRoot");
+        if (floorClipRoot != null)
+        {
+            Renderer[] floorRenderers = floorClipRoot.GetComponentsInChildren<Renderer>(true);
+            for (int i = 0; i < floorRenderers.Length; i++)
+            {
+                if (floorRenderers[i] != null)
+                    floorRenderers[i].enabled = visible;
             }
         }
     }

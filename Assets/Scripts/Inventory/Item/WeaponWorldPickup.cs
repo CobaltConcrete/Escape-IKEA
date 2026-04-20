@@ -168,16 +168,16 @@ public class WeaponWorldPickup : MonoBehaviour, IInteractable
             glowObject.transform.SetParent(transform, false);
             glowObject.transform.localPosition = new Vector3(0f, 0f, 0.02f);
             glowObject.transform.localRotation = Quaternion.identity;
-            glowObject.transform.localScale = new Vector3(1.2f, 1.2f, 1f);
             glow = glowObject.AddComponent<SpriteRenderer>();
         }
 
+        glow.transform.localScale = new Vector3(1.75f, 1.75f, 1f);
         glow.sprite = source.sprite;
         glow.sortingLayerID = source.sortingLayerID;
         glow.sortingOrder = source.sortingOrder - 1;
         glow.drawMode = source.drawMode;
         glow.maskInteraction = SpriteMaskInteraction.None;
-        glow.color = new Color(1f, 0.92f, 0.35f, 0.42f);
+        glow.color = new Color(0.35f, 0.72f, 1f, 0.55f);
         glow.enabled = roomVisible;
     }
 

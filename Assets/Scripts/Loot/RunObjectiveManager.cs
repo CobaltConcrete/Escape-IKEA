@@ -107,6 +107,7 @@ public class RunObjectiveManager : MonoBehaviour
 
         if (TryGenerateShoppingListFromPrefabMetadata())
         {
+            ClampCurrentShoppingListToGeneratedPickupCounts();
             GenerateGoalValue();
             OnObjectiveProgressChanged?.Invoke();
             return;
@@ -227,6 +228,14 @@ public class RunObjectiveManager : MonoBehaviour
         if (currentShoppingList.Count == 0)
         {
             Debug.LogWarning("RunObjectiveManager: Shopping list has zero entries after generation.");
+            OnObjectiveProgressChanged?.Invoke();
+            return;
+        }
+
+        ClampCurrentShoppingListToGeneratedPickupCounts();
+        if (currentShoppingList.Count == 0)
+        {
+            Debug.LogWarning("RunObjectiveManager: Shopping list has zero entries after map-capacity clamping.");
             OnObjectiveProgressChanged?.Invoke();
             return;
         }
@@ -701,7 +710,28 @@ public class RunObjectiveManager : MonoBehaviour
         if (uniqueByKey.Count == 0)
             return false;
 
+        Dictionary<string, int> availablePickupCounts = CountAvailableShoppingListPickupsInGeneratedMap();
         List<ShoppingListEntry> poolDefs = new List<ShoppingListEntry>(uniqueByKey.Values);
+        for (int i = poolDefs.Count - 1; i >= 0; i--)
+        {
+            ShoppingListEntry seed = poolDefs[i];
+            string key = seed?.itemDefinition != null
+                ? NormalizeShoppingListKey(seed.itemDefinition.GetShoppingListKey())
+                : string.Empty;
+
+            if (string.IsNullOrWhiteSpace(key) ||
+                !availablePickupCounts.TryGetValue(key, out int available) ||
+                available < 1)
+            {
+                poolDefs.RemoveAt(i);
+            }
+        }
+
+        if (poolDefs.Count == 0)
+        {
+            Debug.LogWarning("RunObjectiveManager: No shopping-list loot has pickups in the generated map.");
+            return false;
+        }
 
         for (int i = poolDefs.Count - 1; i > 0; i--)
         {
@@ -723,9 +753,17 @@ public class RunObjectiveManager : MonoBehaviour
                 continue;
 
             ItemDefinition itemDef = seed.itemDefinition;
+            string key = NormalizeShoppingListKey(itemDef.GetShoppingListKey());
+            int available = availablePickupCounts.TryGetValue(key, out int count)
+                ? count
+                : 0;
+            if (available < 1)
+                continue;
 
             int minAmount = Mathf.Max(1, itemDef.minRequiredAmount);
             int maxAmount = Mathf.Max(minAmount, itemDef.maxRequiredAmount);
+            maxAmount = Mathf.Min(maxAmount, available);
+            minAmount = Mathf.Min(minAmount, maxAmount);
 
             ShoppingListEntry entry = new ShoppingListEntry
             {
@@ -738,6 +776,115 @@ public class RunObjectiveManager : MonoBehaviour
         }
 
         return currentShoppingList.Count > 0;
+    }
+
+    private static Dictionary<string, int> CountAvailableShoppingListPickupsInGeneratedMap()
+    {
+        Dictionary<string, int> counts = new Dictionary<string, int>(StringComparer.Ordinal);
+
+        RoomGeneratedPickup[] generatedPickups = UnityEngine.Object.FindObjectsByType<RoomGeneratedPickup>(
+            FindObjectsInactive.Include,
+            FindObjectsSortMode.None);
+
+        for (int i = 0; i < generatedPickups.Length; i++)
+        {
+            RoomGeneratedPickup pickup = generatedPickups[i];
+            if (pickup == null)
+                continue;
+
+            ItemWorldSpawner spawner = pickup.GetComponent<ItemWorldSpawner>();
+            if (spawner == null)
+                spawner = pickup.GetComponentInChildren<ItemWorldSpawner>(true);
+            if (spawner == null || spawner.ItemDefinition == null)
+                continue;
+
+            AddPickupCount(counts, spawner.ItemDefinition, 1);
+        }
+
+        ItemWorldSpawner[] itemSpawners = UnityEngine.Object.FindObjectsByType<ItemWorldSpawner>(
+            FindObjectsInactive.Include,
+            FindObjectsSortMode.None);
+
+        HashSet<ItemWorldSpawner> countedSpawners = new HashSet<ItemWorldSpawner>();
+        for (int i = 0; i < generatedPickups.Length; i++)
+        {
+            RoomGeneratedPickup pickup = generatedPickups[i];
+            if (pickup == null)
+                continue;
+
+            ItemWorldSpawner spawner = pickup.GetComponent<ItemWorldSpawner>();
+            if (spawner == null)
+                spawner = pickup.GetComponentInChildren<ItemWorldSpawner>(true);
+            if (spawner != null)
+                countedSpawners.Add(spawner);
+        }
+
+        for (int i = 0; i < itemSpawners.Length; i++)
+        {
+            ItemWorldSpawner spawner = itemSpawners[i];
+            if (spawner == null || countedSpawners.Contains(spawner))
+                continue;
+
+            AddPickupCount(counts, spawner.ItemDefinition, 1);
+        }
+
+        ItemWorld[] itemWorlds = UnityEngine.Object.FindObjectsByType<ItemWorld>(
+            FindObjectsInactive.Include,
+            FindObjectsSortMode.None);
+
+        for (int i = 0; i < itemWorlds.Length; i++)
+        {
+            ItemWorld itemWorld = itemWorlds[i];
+            if (itemWorld == null)
+                continue;
+
+            Item item = itemWorld.GetItem();
+            if (item == null || item.definition == null)
+                continue;
+
+            AddPickupCount(counts, item.definition, Mathf.Max(1, item.amount));
+        }
+
+        return counts;
+    }
+
+    private static void AddPickupCount(Dictionary<string, int> counts, ItemDefinition itemDef, int amount)
+    {
+        if (counts == null || itemDef == null || amount <= 0)
+            return;
+        if (!itemDef.IsLoot() || !itemDef.canAppearInShoppingList || itemDef.lootValue <= 0)
+            return;
+
+        string key = NormalizeShoppingListKey(itemDef.GetShoppingListKey());
+        if (string.IsNullOrWhiteSpace(key))
+            return;
+
+        if (!counts.ContainsKey(key))
+            counts[key] = 0;
+        counts[key] += amount;
+    }
+
+    private void ClampCurrentShoppingListToGeneratedPickupCounts()
+    {
+        Dictionary<string, int> availablePickupCounts = CountAvailableShoppingListPickupsInGeneratedMap();
+
+        for (int i = currentShoppingList.Count - 1; i >= 0; i--)
+        {
+            ShoppingListEntry entry = currentShoppingList[i];
+            string key = entry?.itemDefinition != null
+                ? NormalizeShoppingListKey(entry.itemDefinition.GetShoppingListKey())
+                : NormalizeShoppingListKey(entry?.GetShoppingListKey());
+
+            if (string.IsNullOrWhiteSpace(key) ||
+                !availablePickupCounts.TryGetValue(key, out int available) ||
+                available < 1)
+            {
+                currentShoppingList.RemoveAt(i);
+                continue;
+            }
+
+            entry.requiredAmount = Mathf.Min(Mathf.Max(1, entry.requiredAmount), available);
+        }
     }
     private static void ShuffleShoppingListEntries(List<ShoppingListEntry> list)
     {

@@ -355,8 +355,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   bulletPrefab: {fileID: 5573476143328688710, guid: 7180c99457c77e041a061f4ca7371c35, type: 3}
   firePoint: {fileID: 8404959905782314400}
-  moveRadius: 2
-  angularSpeed: 1.2
+  walkSpeed: 2.4
+  waypointReachDistance: 0.18
+  minWalkDuration: 0.8
+  maxWalkDuration: 1.8
+  minPauseBetweenWalks: 0.15
+  maxPauseBetweenWalks: 0.45
+  boundsPadding: 0.65
   bulletsPerVolley: 3
   volleySpread: 24
   shotInterval: 0.6
