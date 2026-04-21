@@ -12,7 +12,7 @@ public class PageManager : MonoBehaviour
     [SerializeField] public GameObject blackOutScreen;
     [SerializeField] public GameObject blackOutText;
     private Image image;
-    private float increment = -0.005f;
+    private float increment = -0.001f;
 
     #region Unity_functions
     
