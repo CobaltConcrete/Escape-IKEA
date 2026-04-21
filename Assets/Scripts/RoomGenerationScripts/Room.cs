@@ -36,7 +36,6 @@ public class Room : MonoBehaviour
             SetRenderersVisible(false);
     }
 
-    /// <summary>Hides every other room and shows only this one (called when the player enters this room).</summary>
     public void ApplyAsCurrentVisibleRoom()
     {
         for (int i = 0; i < s_AllRooms.Count; i++)
@@ -101,8 +100,7 @@ public class Room : MonoBehaviour
     {
         if (roomVisuals != null)
         {
-            // Loot / pickups spawn after Awake; re-scan so hidden rooms do not leave new renderers enabled
-            // (fixes seeing adjacent rooms through doors and "invisible" items).
+
             renderers = roomVisuals.GetComponentsInChildren<Renderer>(true);
             if (renderers != null)
             {
@@ -114,7 +112,6 @@ public class Room : MonoBehaviour
             }
         }
 
-        // Spawned room pickups (including bat weapon pickup) may live outside roomVisuals hierarchy.
         Transform spawnedItems = transform.Find("SpawnedItems");
         if (spawnedItems != null)
         {
@@ -133,7 +130,6 @@ public class Room : MonoBehaviour
             }
         }
 
-        // Prefab-only room content lives under Decorations root; keep it room-gated too.
         Transform decorations = transform.Find("Decorations");
         if (decorations != null)
         {
@@ -152,7 +148,6 @@ public class Room : MonoBehaviour
             }
         }
 
-        // Runtime floor tiles live outside roomVisuals, so include them in room visibility toggles.
         Transform floorClipRoot = transform.Find("FloorClipRoot");
         if (floorClipRoot != null)
         {
@@ -165,7 +160,6 @@ public class Room : MonoBehaviour
         }
     }
 
-    /// <summary>Re-scan renderers after <see cref="RoomPresentation"/> adds floor tiles.</summary>
     public void RefreshRendererRegistry()
     {
         if (roomVisuals == null)
@@ -177,6 +171,14 @@ public class Room : MonoBehaviour
     }
 
     private void OnTriggerEnter2D(Collider2D other)
+    {
+        if (other.CompareTag("Player"))
+        {
+            ApplyAsCurrentVisibleRoom();
+        }
+    }
+
+    private void OnTriggerStay2D(Collider2D other)
     {
         if (other.CompareTag("Player"))
         {
