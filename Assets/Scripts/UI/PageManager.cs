@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 
 public class PageManager : MonoBehaviour
@@ -10,6 +11,8 @@ public class PageManager : MonoBehaviour
     private float blackOutTimer = 0;
     [SerializeField] public GameObject blackOutScreen;
     [SerializeField] public GameObject blackOutText;
+    private Image image;
+    private float increment = -0.001f;
 
     #region Unity_functions
     
@@ -30,6 +33,8 @@ public class PageManager : MonoBehaviour
             blackOutTimer = 0f;
             blackOutScreen = GameObject.Find("BlackoutScreen");
             blackOutText = GameObject.Find("BlackoutText");
+            image = blackOutScreen.GetComponent<Image>();
+            image.color = new Color(image.color.r, image.color.g, image.color.b, 1f);
         }
     }
 
@@ -63,12 +68,14 @@ public class PageManager : MonoBehaviour
         {
             ResumeGame();
         }
-
+        
         if ((blackOutTimer > 75.0f && blackOutTimer < 85.0f) || (blackOutTimer > 150.0f && blackOutTimer < 160.0f)){
-            if (blackOutScreen != null)
-                blackOutScreen.SetActive(true);
-            if (blackOutText != null)
-                blackOutText.SetActive(true);
+            blackOutScreen.SetActive(true);
+            blackOutText.SetActive(true);
+            if (image.color.a < 0.75 || image.color.a > 1){
+                increment *= -1;
+            }
+            image.color = new Color(image.color.r, image.color.g, image.color.b, image.color.a+increment);
         }
         else{
             if (blackOutScreen != null)
