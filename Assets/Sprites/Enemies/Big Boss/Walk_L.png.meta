@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: b3e04aac124534b108a6169ca45048ed
+guid: bc397378febcb4d76b10a954613411b7
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 5234158871693162790
-    second: Lunchlady_0
+      213: 628557050079033904
+    second: Walk_L_0
+  - first:
+      213: 470812627433903393
+    second: Walk_L_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +40,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 1
+    filterMode: 0
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -75,7 +78,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,11 +103,11 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Lunchlady_0
+      name: Walk_L_0
       rect:
         serializedVersion: 2
-        x: 199
-        y: 169
+        x: 175
+        y: 171
         width: 138
         height: 168
       alignment: 0
@@ -115,8 +118,30 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 629fa3513c773a840800000000000000
-      internalID: 5234158871693162790
+      spriteID: 03a370b8e4519b800800000000000000
+      internalID: 628557050079033904
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Walk_L_1
+      rect:
+        serializedVersion: 2
+        x: 703
+        y: 171
+        width: 114
+        height: 168
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 12557f51799a88600800000000000000
+      internalID: 470812627433903393
       vertices: []
       indices: 
       edges: []
@@ -135,7 +160,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Lunchlady_0: 5234158871693162790
+      Walk_L_0: 628557050079033904
+      Walk_L_1: 470812627433903393
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

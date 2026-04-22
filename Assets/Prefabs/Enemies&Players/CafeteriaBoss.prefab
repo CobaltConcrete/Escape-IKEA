@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 3081837168203019117}
   - component: {fileID: 2618402277444551181}
   - component: {fileID: 2153638254944649856}
+  - component: {fileID: 8237657027217483895}
   m_Layer: 10
   m_Name: CafeteriaBoss
   m_TagString: Enemy
@@ -91,7 +92,7 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.38, y: 1.68}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -394,6 +395,28 @@ MonoBehaviour:
   staggerDistance: 0.9
   staggerDuration: 0.14
   sidewaysOffsetStrength: 0.35
+--- !u!95 &8237657027217483895
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1626777669089237922}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: c197ff1e15eac452c88baa87c1cacb0f, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &6020604292169883429
 GameObject:
   m_ObjectHideFlags: 0
