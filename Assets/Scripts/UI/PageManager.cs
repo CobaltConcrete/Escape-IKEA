@@ -11,9 +11,16 @@ public class PageManager : MonoBehaviour
     private float blackOutTimer = 0;
     [SerializeField] public GameObject blackOutScreen;
     [SerializeField] public GameObject blackOutText;
+    [SerializeField] public GameObject gameTimer;
     private Image image;
     private float increment = -0.001f;
+    private int numBlackouts;
+    private bool isBlackout = false;
 
+    private float nextBlackoutTime = 0f;
+    private float blackoutEndTime = 0f;
+    private float minInterval = 10f;
+    private float maxInterval;
     #region Unity_functions
     
     private void OnEnable()
@@ -35,6 +42,9 @@ public class PageManager : MonoBehaviour
             blackOutText = GameObject.Find("BlackoutText");
             image = blackOutScreen.GetComponent<Image>();
             image.color = new Color(image.color.r, image.color.g, image.color.b, 1f);
+            numBlackouts = gameTimer.GetComponent<GameRunTimer>().maxNumBlackout;
+            maxInterval = (gameTimer.GetComponent<GameRunTimer>().runTimeLimitSeconds - 10*numBlackouts)/numBlackouts;
+            ScheduleNextBlackout();
         }
     }
 
@@ -53,6 +63,13 @@ public class PageManager : MonoBehaviour
 
     private void Start() { }
 
+    private void ScheduleNextBlackout()
+    {
+        if (numBlackouts <= 0) return;
+        float interval = Random.Range(minInterval, maxInterval);
+        nextBlackoutTime = blackOutTimer + interval;
+    }
+
     private void Update() {
         blackOutTimer += Time.deltaTime;
         if (Input.GetKeyDown(KeyCode.P) && SceneManager.GetActiveScene().name == "IKEAscene" && !SceneManager.GetSceneByName("Pause").isLoaded)
@@ -68,20 +85,34 @@ public class PageManager : MonoBehaviour
         {
             ResumeGame();
         }
-        
-        if ((blackOutTimer > 75.0f && blackOutTimer < 85.0f) || (blackOutTimer > 150.0f && blackOutTimer < 160.0f)){
+
+        if (!isBlackout && numBlackouts > 0 && blackOutTimer >= nextBlackoutTime)
+        {
+            isBlackout = true;
+            blackoutEndTime = blackOutTimer + 10f;
+            numBlackouts--;
+        }
+
+        if (isBlackout)
+        {
             blackOutScreen.SetActive(true);
             blackOutText.SetActive(true);
-            if (image.color.a < 0.75 || image.color.a > 1){
+
+            if (image.color.a < 0.75f || image.color.a > 1f)
                 increment *= -1;
+
+            image.color = new Color(image.color.r, image.color.g, image.color.b, image.color.a + increment);
+
+            if (blackOutTimer >= blackoutEndTime)
+            {
+                isBlackout = false;
+                ScheduleNextBlackout();
             }
-            image.color = new Color(image.color.r, image.color.g, image.color.b, image.color.a+increment);
         }
-        else{
-            if (blackOutScreen != null)
-                blackOutScreen.SetActive(false);
-            if (blackOutText != null)
-                blackOutText.SetActive(false);
+        else
+        {
+            if (blackOutScreen != null) blackOutScreen.SetActive(false);
+            if (blackOutText != null) blackOutText.SetActive(false);
         }
     }
     #endregion
@@ -92,6 +123,13 @@ public class PageManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         SceneManager.LoadScene("IKEAscene");
+    }
+
+    public void SelectLevel()
+    {
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+        SceneManager.LoadScene("LevelSelection");
     }
 
 
