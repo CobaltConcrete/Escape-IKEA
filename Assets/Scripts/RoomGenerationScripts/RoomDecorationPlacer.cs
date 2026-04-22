@@ -213,7 +213,7 @@ public static class RoomDecorationPlacer
         Vector3 curtainPos = wideRoom ? new Vector3(midX, top - 0.1f, 0f) : new Vector3(midX, top - 0.2f, 0f);
         Vector3 plantPos = wideRoom ? new Vector3(left + 2.85f, bottom + 0.75f, 0f) : new Vector3(left + 0.95f, midY + 0.25f, 0f);
         Vector3 lampPos = wideRoom ? new Vector3(right - 3.35f, bottom + 0.75f, 0f) : new Vector3(right - 0.95f, midY + 0.25f, 0f);
-        Vector3 cartPos = wideRoom ? new Vector3(left + 1.25f, bottom + 0.72f, 0f) : new Vector3(left + 0.72f, bottom + 1.35f, 0f);
+        Vector3 cartPos = wideRoom ? new Vector3(midX, bottom + 0.3f, 0f) : new Vector3(midX, bottom + 0.8f, 0f);
         Vector3 leftMonsteraPos = wideRoom ? new Vector3(left + 2.35f, bottom + 0.78f, 0f) : new Vector3(left + 0.82f, bottom + 2.35f, 0f);
         Vector3 rightMonsteraPos = wideRoom ? new Vector3(right - 2.35f, bottom + 0.78f, 0f) : new Vector3(right - 0.82f, bottom + 2.35f, 0f);
 
@@ -522,12 +522,14 @@ public static class RoomDecorationPlacer
         Sprite toiletSpr = FindSpriteByName(catalog, "Toilet");
         Sprite towel = FindSpriteByName(catalog, "Towel_Basket");
         Sprite tray = FindSpriteByName(catalog, "Bathroom_Tray");
+        Sprite curtain = FindSpriteByName(catalog, "Curtain");
         Sprite monstera = FindSpriteByName(catalog, "Monstera");
         Sprite cart = FindSpriteByName(catalog, "Tiered_Cart");
         GameObject counterPrefab = FindPrefabByName(catalog, "Counter_Sink");
         GameObject toiletPrefab = FindPrefabByName(catalog, "Toilet");
         GameObject towelPrefab = FindPrefabByName(catalog, "Towel_Basket");
         GameObject trayPrefab = FindPrefabByName(catalog, "Bathroom_Tray");
+        GameObject curtainPrefab = FindPrefabByName(catalog, "Curtain");
         GameObject monsteraPrefab = FindPrefabByName(catalog, "Monstera");
         GameObject cartPrefab = FindPrefabByName(catalog, "Tiered_Cart");
 
@@ -572,6 +574,10 @@ public static class RoomDecorationPlacer
         BathroomTryPlaceDecor(
             decorRoot, occupied, minL, maxL, "Bath_Tray", trayPrefab, tray, new Vector3(midX + 0.22f, cartY, 0f),
             BathroomUniformScaleForSprite(tray, bathroomTargetSpan));
+
+        BathroomTryPlaceDecor(
+            decorRoot, occupied, minL, maxL, "Bath_Curtain", curtainPrefab, curtain, new Vector3(right - 0.72f, top - 0.72f, 0f),
+            BathroomUniformScaleForSprite(curtain, bathroomTargetSpan));
 
         float plantInset = Mathf.Clamp(spanX * 0.075f, 0.58f, 0.95f);
         BathroomTryPlaceDecor(
