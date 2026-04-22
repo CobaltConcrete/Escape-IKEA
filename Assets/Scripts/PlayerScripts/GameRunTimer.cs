@@ -8,6 +8,7 @@ public class GameRunTimer : MonoBehaviour
 
     [Tooltip("Run time in seconds. When greater than zero, the HUD shows time remaining and the player loses if it hits zero before winning. At zero, the clock counts up with no time limit.")]
     [HideInInspector] public float runTimeLimitSeconds = 300f;
+    [HideInInspector] public int maxNumBlackout = 2;
     [SerializeField] private int runTimeMinutes = 5;
     [SerializeField] private int runTimeSeconds = 0;
 
@@ -42,9 +43,21 @@ public class GameRunTimer : MonoBehaviour
         int seconds = Mathf.FloorToInt(displaySeconds % 60f);
         timerText.text = $"{minutes}:{seconds:00}";
     }
+
     private void RecalculateTotalSeconds()
     {
         runTimeLimitSeconds = Mathf.Max(0f, runTimeMinutes * 60f + runTimeSeconds);
+    }
+
+    public void SetTimerLimit(float limit)
+    {
+        runTimeLimitSeconds = limit;
+        runTimeMinutes = (int)(runTimeLimitSeconds/60);
+    }
+
+    public void SetMaxBlackoutLimit(int limit)
+    {
+        maxNumBlackout = limit;
     }
 
     private void TryLoseFromTimeout()
