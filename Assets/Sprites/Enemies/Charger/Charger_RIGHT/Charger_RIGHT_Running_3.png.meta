@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 97e8bd0f649844be59fb202f3b1a1d27
+guid: 7edf651340ecb4364996988c596fbce3
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -1497322602041033979
-    second: Charger_RIGHT_Idle_2_0
+      213: 9117595759498481995
+    second: Charger_RIGHT_Running_3_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Charger_RIGHT_Idle_2_0
+      name: Charger_RIGHT_Running_3_0
       rect:
         serializedVersion: 2
-        x: 14
+        x: 13
         y: 13
-        width: 40
-        height: 37
+        width: 41
+        height: 39
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 50b3e2fc601783be0800000000000000
-      internalID: -1497322602041033979
+      spriteID: b41d3824905388e70800000000000000
+      internalID: 9117595759498481995
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      Charger_RIGHT_Idle_2_0: -1497322602041033979
+      Charger_RIGHT_Running_3_0: 9117595759498481995
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
