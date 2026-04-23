@@ -284,9 +284,9 @@ public static class RoomPrefabStaticPlacer
         GameObject sinkPrefab = FindByToken(bathroomPrefabs, "sink");
         GameObject towelBasketPrefab = FindByToken(bathroomPrefabs, "towel_basket") ?? FindByToken(bathroomPrefabs, "towel basket");
         GameObject trayPrefab = FindByToken(bathroomPrefabs, "tray");
-        GameObject cupboardPrefab = FindByToken(bathroomPrefabs, "cupboard") ?? FindByToken(bathroomPrefabs, "cabinet");
+        GameObject curtainPrefab = FindByToken(bathroomPrefabs, "curtain");
+        GameObject cabinetPrefab = FindByToken(bathroomPrefabs, "cabinet") ?? FindByToken(bathroomPrefabs, "cupboard");
         GameObject monsteraPrefab = FindByToken(bathroomPrefabs, "monstera");
-        GameObject tieredCartPrefab = FindByToken(bathroomPrefabs, "tiered") ?? FindByToken(bathroomPrefabs, "cart");
         bool spawnedAny = false;
 
         if (sinkPrefab != null)
@@ -331,6 +331,20 @@ public static class RoomPrefabStaticPlacer
             }
         }
 
+        if (curtainPrefab != null)
+        {
+            Vector3 curtainPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
+                roomRoot,
+                RoomDecorInteriorAnchor.InteriorTopRight,
+                new Vector3(-0.72f, -0.72f, 0f));
+            GameObject curtain = SpawnConfiguredPrefab(curtainPrefab, curtainPos, parent, roomRoot);
+            if (curtain != null)
+            {
+                used.Add(curtain.transform.position);
+                spawnedAny = true;
+            }
+        }
+
         if (monsteraPrefab != null)
         {
             Vector3 monsteraPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
@@ -345,21 +359,20 @@ public static class RoomPrefabStaticPlacer
             }
         }
 
-        if (cupboardPrefab != null)
+        if (cabinetPrefab != null)
         {
-            Vector3[] cupboardSlots =
+            Vector3[] cabinetSlots =
             {
                 RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorBottomLeft, new Vector3(0.85f, 0.62f, 0f)),
                 RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorBottomRight, new Vector3(-0.85f, 0.62f, 0f)),
             };
 
-            for (int i = 0; i < cupboardSlots.Length; i++)
+            for (int i = 0; i < cabinetSlots.Length; i++)
             {
-                GameObject bathroomStoragePrefab = (i == 1 && tieredCartPrefab != null) ? tieredCartPrefab : cupboardPrefab;
-                GameObject cupboard = SpawnConfiguredPrefab(bathroomStoragePrefab, cupboardSlots[i], parent, roomRoot);
-                if (cupboard == null)
+                GameObject cabinet = SpawnConfiguredPrefab(cabinetPrefab, cabinetSlots[i], parent, roomRoot);
+                if (cabinet == null)
                     continue;
-                used.Add(cupboard.transform.position);
+                used.Add(cabinet.transform.position);
                 spawnedAny = true;
             }
         }
@@ -573,8 +586,8 @@ public static class RoomPrefabStaticPlacer
         {
             Vector3 cartPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
                 roomRoot,
-                RoomDecorInteriorAnchor.InteriorBottomLeft,
-                wideRoom ? new Vector3(1.25f, 0.72f, 0f) : new Vector3(0.72f, 1.35f, 0f));
+                RoomDecorInteriorAnchor.InteriorBottomCenter,
+                wideRoom ? new Vector3(0f, 0.3f, 0f) : new Vector3(0f, 0.8f, 0f));
             GameObject cart = SpawnConfiguredPrefab(tieredCartPrefab, cartPos, parent, roomRoot);
             if (cart != null)
             {
@@ -1050,6 +1063,7 @@ public static class RoomPrefabStaticPlacer
         return HasToken(prefab.name, "sink") ||
                HasToken(prefab.name, "towel_basket") ||
                HasToken(prefab.name, "towel basket") ||
+               HasToken(prefab.name, "curtain") ||
                HasToken(prefab.name, "tray") ||
                HasToken(prefab.name, "monstera") ||
                HasToken(prefab.name, "tiered") ||
@@ -1076,6 +1090,7 @@ public static class RoomPrefabStaticPlacer
                HasToken(prefab.name, "coffeetable") ||
                HasToken(prefab.name, "remote") ||
                HasToken(prefab.name, "cabinet") ||
+               HasToken(prefab.name, "curtain") ||
                HasToken(prefab.name, "lamp") ||
                HasToken(prefab.name, "houseplant") ||
                HasToken(prefab.name, "plant") ||

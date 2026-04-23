@@ -641,6 +641,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 666557475202015360, guid: b7909d6493cd9ff4088ecc24e84e33a0, type: 3}
+      propertyPath: gameTimer
+      value: 
+      objectReference: {fileID: 3137569969338335562, guid: 6fd465c44e2fd664db170c8e75b2b452, type: 3}
+    - target: {fileID: 666557475202015360, guid: b7909d6493cd9ff4088ecc24e84e33a0, type: 3}
       propertyPath: blackOutText
       value: 
       objectReference: {fileID: 1841215785}
