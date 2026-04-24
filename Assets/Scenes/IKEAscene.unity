@@ -923,7 +923,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0.5, y: 0.7}
+  m_AnchoredPosition: {x: 0, y: 0.6}
   m_SizeDelta: {x: 2, y: 2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1178102159
@@ -2001,6 +2001,22 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 4164251329383022943, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: m_Size.x
+      value: 0.53470725
+      objectReference: {fileID: 0}
+    - target: {fileID: 4164251329383022943, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: m_Size.y
+      value: 0.5408087
+      objectReference: {fileID: 0}
+    - target: {fileID: 4164251329383022943, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: m_Offset.x
+      value: 0.0618124
+      objectReference: {fileID: 0}
+    - target: {fileID: 4164251329383022943, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: m_Offset.y
+      value: -0.1079559
+      objectReference: {fileID: 0}
     - target: {fileID: 6640193719736659874, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
       propertyPath: mapManagerGO
       value: 
@@ -2021,6 +2037,14 @@ PrefabInstance:
       propertyPath: equipmentData
       value: 
       objectReference: {fileID: 9108433767328902556}
+    - target: {fileID: 9086373605952938387, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9086373605952938387, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:

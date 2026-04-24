@@ -38,8 +38,6 @@ public class PageManager : MonoBehaviour
         if (scene.name == "IKEAscene")
         {
             blackOutTimer = 0f;
-            blackOutScreen = GameObject.Find("BlackoutScreen");
-            blackOutText = GameObject.Find("BlackoutText");
             image = blackOutScreen.GetComponent<Image>();
             image.color = new Color(image.color.r, image.color.g, image.color.b, 1f);
             numBlackouts = gameTimer.GetComponent<GameRunTimer>().maxNumBlackout;
