@@ -21,6 +21,7 @@ public class PlayerInventoryInteraction : MonoBehaviour
     [SerializeField] private UI_InteractionPrompt interactionPromptUI;
 
     private IInteractable currentInteractable;
+    private IInteractable lastInteractable;
 
     [Header("Auto Equip Settings")]
     [SerializeField] private bool autoEquipWhenSlotEmpty = false;
@@ -44,6 +45,12 @@ public class PlayerInventoryInteraction : MonoBehaviour
 
     [Header("Utility Priority")]
     [SerializeField] private List<ItemDefinition> utilityPriorityList;
+
+    [Header("Buffer picking up of items")]
+    [SerializeField] public float interactDuration = 1f;
+    private float interactTimer = 0f;
+    private bool isInteracting = false;
+    [SerializeField] public UnityEngine.UI.Image interactBar;
 
     private void Awake()
     {
@@ -80,14 +87,57 @@ public class PlayerInventoryInteraction : MonoBehaviour
 
         FindBestInteractable();
 
-        if (Input.GetKeyDown(KeyCode.F))
+        // Reset if target changed
+        if (currentInteractable != lastInteractable)
         {
-            if (currentInteractable != null)
+            ResetInteraction();
+        }
+        lastInteractable = currentInteractable;
+
+        if (currentInteractable != null)
+        {
+            if (Input.GetKey(KeyCode.F))
             {
-                currentInteractable.Interact(this);
+                isInteracting = true;
+                interactTimer += Time.deltaTime;
+
+                // Update progress bar
+                if (interactBar != null)
+                {
+                    interactBar.fillAmount = interactTimer / interactDuration;
+                }
+
+                // Completed interaction
+                if (interactTimer >= interactDuration)
+                {
+                    currentInteractable.Interact(this);
+                    ResetInteraction();
+                }
+            }
+
+            // Released early → cancel
+            if (Input.GetKeyUp(KeyCode.F))
+            {
+                ResetInteraction();
             }
         }
+        else
+        {
+            ResetInteraction();
+        }
     }
+
+    void ResetInteraction()
+    {
+        isInteracting = false;
+        interactTimer = 0f;
+
+        if (interactBar != null)
+        {
+            interactBar.fillAmount = 0f;
+        }
+    }
+
     public Vector3 GetPosition()
     {
         return transform.position;
