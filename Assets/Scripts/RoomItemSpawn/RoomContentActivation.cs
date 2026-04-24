@@ -313,6 +313,16 @@ public class RoomContentActivation : MonoBehaviour
                 content.SetActiveInRoom(active);
             }
         }
+
+        if (!active)
+            return;
+
+        Enemy[] enemies = enemyContainer.GetComponentsInChildren<Enemy>(true);
+        foreach (Enemy enemy in enemies)
+        {
+            if (enemy != null)
+                enemy.NotifyRoomActivated();
+        }
     }
 
     private void SetContainerItemsActive(Transform container, bool active)

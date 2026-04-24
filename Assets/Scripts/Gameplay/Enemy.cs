@@ -11,6 +11,11 @@ public class Enemy : MonoBehaviour
     [Header("Visual")]
     [SerializeField] private bool useEmployeeRedTint = true;
     [SerializeField] private Color employeeTint = new Color(0.9f, 0.2f, 0.15f, 1f);
+    [SerializeField] private Animator animator;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private bool playTransformIntroOnRoomEntry = false;
+    [SerializeField] private string transformAnimationState = "Transform";
+    [SerializeField] private float transformIntroDuration = 0.7f;
 
     [Header("Bounds")]
     [SerializeField] private bool useBounds = false;
@@ -47,6 +52,14 @@ public class Enemy : MonoBehaviour
     private Vector2 recoilDirection = Vector2.zero;
     [SerializeField] private float wallRecoverDuration = 0.4f;
     private float wallRecoverTimer = 0f;
+    private Vector2 lastMoveDirection = Vector2.right;
+    private int currentAnimationStateHash;
+    private bool hasPlayedTransformIntro = false;
+    private bool isPlayingTransformIntro = false;
+    private float transformIntroTimer = 0f;
+
+    private static readonly int WalkLeftHash = Animator.StringToHash("Base Layer.Walk_L");
+    private static readonly int WalkRightHash = Animator.StringToHash("Base Layer.Walk_R");
 
     private void Awake()
     {
@@ -55,6 +68,10 @@ public class Enemy : MonoBehaviour
         rb.gravityScale = 0f;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         rb.useFullKinematicContacts = true;
+        if (animator == null)
+            animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
 
         PickNewWanderDirection();
     }
@@ -82,6 +99,21 @@ public class Enemy : MonoBehaviour
     {
         Vector2 pos = rb.position;
 
+        if (isPlayingTransformIntro)
+        {
+            transformIntroTimer -= Time.fixedDeltaTime;
+            rb.MovePosition(pos);
+
+            if (transformIntroTimer <= 0f)
+            {
+                isPlayingTransformIntro = false;
+                currentAnimationStateHash = 0;
+                UpdateAnimationState();
+            }
+
+            return;
+        }
+
         // 1) stagger recoiling
         if (isRecoiling)
         {
@@ -101,6 +133,7 @@ public class Enemy : MonoBehaviour
                 stunTimer = stunDurationAfterHit;
             }
 
+            UpdateAnimationState();
             return;
         }
 
@@ -113,6 +146,7 @@ public class Enemy : MonoBehaviour
             if (stunTimer <= 0f)
                 isStunned = false;
 
+            UpdateAnimationState();
             return;
         }
 
@@ -172,11 +206,14 @@ public class Enemy : MonoBehaviour
         }
 
         Vector2 nextMove = pos + moveDir * (moveSpeed * Time.fixedDeltaTime);
+        if (moveDir.sqrMagnitude > 0.001f)
+            lastMoveDirection = moveDir.normalized;
 
         if (useBounds)
             nextMove = ClampToBounds(nextMove);
 
         rb.MovePosition(nextMove);
+        UpdateAnimationState();
     }
 
     private void BounceAwayFromWall(Vector2 wallNormal)
@@ -234,7 +271,7 @@ public class Enemy : MonoBehaviour
 
     public bool CanDealContactDamage()
     {
-        return !isRecoiling && !isStunned;
+        return !isRecoiling && !isStunned && !isPlayingTransformIntro;
     }
 
     public void OnSuccessfulHitPlayer()
@@ -288,5 +325,39 @@ public class Enemy : MonoBehaviour
         stunDurationAfterHit = dashStunDuration;
 
         SendMessage("TakeDamage", dashDamage, SendMessageOptions.DontRequireReceiver);
+    }
+
+    public void NotifyRoomActivated()
+    {
+        if (!playTransformIntroOnRoomEntry || hasPlayedTransformIntro)
+            return;
+
+        hasPlayedTransformIntro = true;
+        isPlayingTransformIntro = true;
+        transformIntroTimer = Mathf.Max(0.05f, transformIntroDuration);
+        currentAnimationStateHash = 0;
+
+        if (rb != null)
+            rb.linearVelocity = Vector2.zero;
+
+        if (animator != null)
+            animator.Play($"Base Layer.{transformAnimationState}", 0, 0f);
+    }
+
+    private void UpdateAnimationState()
+    {
+        if (animator == null || isPlayingTransformIntro)
+            return;
+
+        bool faceLeft = lastMoveDirection.x < -0.01f;
+        if (spriteRenderer != null)
+            spriteRenderer.flipX = faceLeft;
+
+        int nextHash = faceLeft ? WalkLeftHash : WalkRightHash;
+        if (currentAnimationStateHash == nextHash)
+            return;
+
+        animator.Play(nextHash, 0, 0f);
+        currentAnimationStateHash = nextHash;
     }
 }

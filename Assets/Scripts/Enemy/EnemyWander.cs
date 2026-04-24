@@ -14,17 +14,31 @@ public class EnemyWander : MonoBehaviour
 
     [Header("Bounce Behavior")]
     [SerializeField] private float playerBounceDistance = 0.7f;
+    [Header("Animation")]
+    [SerializeField] private Animator animator;
+    [SerializeField] private SpriteRenderer spriteRenderer;
 
     private Rigidbody2D rb;
     private Vector2 moveDirection;
     private float changeDirectionTimer;
     private Transform playerTransform;
+    private Vector2 lastFacingDirection = Vector2.right;
+    private int currentAnimationStateHash;
+
+    private static readonly int WalkLeftHash = Animator.StringToHash("Base Layer.Walk_L");
+    private static readonly int WalkRightHash = Animator.StringToHash("Base Layer.Walk_R");
+    private static readonly int WalkFrontHash = Animator.StringToHash("Base Layer.Front_WALKING");
+    private static readonly int WalkBackHash = Animator.StringToHash("Base Layer.Back_WALKING");
 
     public bool CanMove { get; set; } = true;
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        if (animator == null)
+            animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
     }
 
     private void Start()
@@ -73,6 +87,12 @@ public class EnemyWander : MonoBehaviour
 
         next = ClampToBounds(next);
         rb.linearVelocity = (next - pos) / Time.fixedDeltaTime;
+
+        Vector2 velocity = rb.linearVelocity;
+        if (velocity.sqrMagnitude > 0.0001f)
+            lastFacingDirection = velocity.normalized;
+
+        UpdateAnimationState();
     }
 
     public void SetBounds(Vector2 min, Vector2 max)
@@ -186,5 +206,35 @@ public class EnemyWander : MonoBehaviour
 
         moveDirection = wallNormal.normalized;
         changeDirectionTimer = changeDirectionInterval;
+    }
+
+    private void UpdateAnimationState()
+    {
+        if (animator == null)
+            return;
+
+        bool preferVertical = Mathf.Abs(lastFacingDirection.y) > Mathf.Abs(lastFacingDirection.x);
+        bool hasFrontBack = animator.HasState(0, WalkFrontHash) && animator.HasState(0, WalkBackHash);
+        int nextHash;
+
+        if (preferVertical && hasFrontBack)
+        {
+            nextHash = lastFacingDirection.y > 0f ? WalkBackHash : WalkFrontHash;
+            if (spriteRenderer != null)
+                spriteRenderer.flipX = false;
+        }
+        else
+        {
+            bool faceLeft = lastFacingDirection.x < -0.01f;
+            if (spriteRenderer != null)
+                spriteRenderer.flipX = faceLeft;
+            nextHash = faceLeft ? WalkLeftHash : WalkRightHash;
+        }
+
+        if (currentAnimationStateHash == nextHash)
+            return;
+
+        animator.Play(nextHash, 0, 0f);
+        currentAnimationStateHash = nextHash;
     }
 }

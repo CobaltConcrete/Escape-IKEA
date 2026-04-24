@@ -4,6 +4,7 @@ public class CafeteriaBossPattern : MonoBehaviour
 {
     [SerializeField] private GameObject bulletPrefab;
     [SerializeField] private Transform firePoint;
+    [SerializeField] private Animator animator;
 
     [Header("Movement")]
     [SerializeField] private float walkSpeed = 2.4f;
@@ -21,6 +22,7 @@ public class CafeteriaBossPattern : MonoBehaviour
     [SerializeField] private float pauseDuration = 2f;
     [SerializeField] private bool keepBulletsInBossRoom = true;
     [SerializeField] private bool bulletsBounceOnWalls = true;
+    [SerializeField] private float attackAnimationHoldTime = 0.18f;
 
     [Header("Flee when chased")]
     [SerializeField] private float fleeRadius = 4f;
@@ -38,9 +40,14 @@ public class CafeteriaBossPattern : MonoBehaviour
     private bool hasRoomBounds;
     private Bounds roomBounds;
     private Vector2 lastFacingDirection = Vector2.right;
+    private float attackAnimationTimer;
 
     private Transform playerTransform;
     private Rigidbody2D playerRb;
+    private static readonly int WalkLeftHash = Animator.StringToHash("Base Layer.Walk_L");
+    private static readonly int WalkRightHash = Animator.StringToHash("Base Layer.Walk_R");
+    private static readonly int AttackLeftHash = Animator.StringToHash("Base Layer.Attack_L");
+    private static readonly int AttackRightHash = Animator.StringToHash("Base Layer.Attack_R");
 
     private void Awake()
     {
@@ -73,6 +80,8 @@ public class CafeteriaBossPattern : MonoBehaviour
             bulletPrefab = shooter.GetBulletPrefab();
         if (firePoint == null && shooter != null)
             firePoint = shooter.GetFirePoint();
+        if (animator == null)
+            animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
     }
 
     public void SetRoomBounds(Bounds bounds)
@@ -84,7 +93,7 @@ public class CafeteriaBossPattern : MonoBehaviour
 
     private void Update()
     {
-        MoveLikePerson();
+        bool isMoving = MoveLikePerson();
 
         phaseTimer -= Time.deltaTime;
         if (phaseTimer <= 0f)
@@ -93,7 +102,14 @@ public class CafeteriaBossPattern : MonoBehaviour
             phaseTimer = attacking ? attackDuration : pauseDuration;
         }
 
-        if (!attacking) return;
+        if (attackAnimationTimer > 0f)
+            attackAnimationTimer -= Time.deltaTime;
+
+        if (!attacking)
+        {
+            UpdateAnimationState(isMoving, false);
+            return;
+        }
 
         shotTimer -= Time.deltaTime;
         if (shotTimer <= 0f)
@@ -101,9 +117,11 @@ public class CafeteriaBossPattern : MonoBehaviour
             shotTimer = shotInterval;
             ShootVolley();
         }
+
+        UpdateAnimationState(isMoving, attackAnimationTimer > 0f);
     }
 
-    private void MoveLikePerson()
+    private bool MoveLikePerson()
     {
         Vector2 current = transform.position;
         bool isFleeing = TryGetFleeDirection(current, out Vector2 fleeDirection);
@@ -117,7 +135,7 @@ public class CafeteriaBossPattern : MonoBehaviour
         if (walkPauseTimer > 0f)
         {
             walkPauseTimer -= Time.deltaTime;
-            return;
+            return false;
         }
 
         if (walkTimer <= 0f || Vector2.Distance(current, walkTarget) <= waypointReachDistance)
@@ -142,6 +160,8 @@ public class CafeteriaBossPattern : MonoBehaviour
             walkPauseTimer = Random.Range(Mathf.Min(minPauseBetweenWalks, maxPauseBetweenWalks), Mathf.Max(minPauseBetweenWalks, maxPauseBetweenWalks));
             walkTimer = 0f;
         }
+
+        return actualMove.sqrMagnitude > 0.0001f;
     }
 
     private bool TryGetFleeDirection(Vector2 bossPosition, out Vector2 fleeDirection)
@@ -247,6 +267,7 @@ public class CafeteriaBossPattern : MonoBehaviour
         Vector3 origin = firePoint != null ? firePoint.position : transform.position;
         int count = Mathf.Max(1, bulletsPerVolley);
         Vector2 facing = lastFacingDirection.sqrMagnitude > 0.0001f ? lastFacingDirection.normalized : Vector2.right;
+        attackAnimationTimer = Mathf.Max(attackAnimationTimer, attackAnimationHoldTime);
         float facingAngle = Mathf.Atan2(facing.y, facing.x) * Mathf.Rad2Deg;
         float halfSpread = volleySpread * 0.5f;
 
@@ -272,6 +293,23 @@ public class CafeteriaBossPattern : MonoBehaviour
                     bullet.SetBounds(roomBounds, bulletsBounceOnWalls);
             }
         }
+    }
+
+    private void UpdateAnimationState(bool isMoving, bool isAttackingNow)
+    {
+        if (animator == null)
+            return;
+
+        bool faceLeft = lastFacingDirection.x < -0.05f;
+        int stateHash = isAttackingNow
+            ? (faceLeft ? AttackLeftHash : AttackRightHash)
+            : (faceLeft ? WalkLeftHash : WalkRightHash);
+
+        AnimatorStateInfo currentState = animator.GetCurrentAnimatorStateInfo(0);
+        if (currentState.fullPathHash == stateHash)
+            return;
+
+        animator.Play(stateHash, 0, 0f);
     }
 
     private void CacheRoomBounds()
