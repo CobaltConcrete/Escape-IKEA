@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: -9025449423726534894}
   - component: {fileID: -5407095470068128593}
   - component: {fileID: 1938281404488083802}
+  - component: {fileID: 7992556980244143438}
   m_Layer: 10
   m_Name: DistortedShopper
   m_TagString: Enemy
@@ -288,6 +289,33 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 3072285298274155184}
+  enemy: {fileID: 0}
+  enemyCombat: {fileID: 0}
   enemyWander: {fileID: 8404082261452416212}
   enemyAimerShooter: {fileID: 0}
   enemyDashCharger: {fileID: 6259989672804943158}
+  staggerDistance: 0.9
+  staggerDuration: 0.14
+  sidewaysOffsetStrength: 0.35
+--- !u!95 &7992556980244143438
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3464154710725457275}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 51356f3cd984945848b3c17c5352352a, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
