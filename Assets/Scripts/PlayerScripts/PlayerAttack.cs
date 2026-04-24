@@ -10,16 +10,22 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private KeyCode attackKey = KeyCode.J;
     [SerializeField] private float bulletClearRadius = 1.6f;
     [SerializeField] private float attackCooldown = 0.4f;
+    [SerializeField] private float attackForwardOffsetFactor = 0.75f;
+    [SerializeField] private float attackFacingDotThreshold = 0.2f;
 
     private float cooldownRemaining;
     private PlayerInventoryInteraction inventoryInteraction;
     private BossRoomNoticeUI noWeaponNoticeUI;
+    private PlayerMovement playerMovement;
 
     private void Awake()
     {
         inventoryInteraction = GetComponent<PlayerInventoryInteraction>();
         if (inventoryInteraction == null)
             inventoryInteraction = GetComponentInParent<PlayerInventoryInteraction>();
+        playerMovement = GetComponent<PlayerMovement>();
+        if (playerMovement == null)
+            playerMovement = GetComponentInParent<PlayerMovement>();
     }
 
     private void Update()
@@ -38,9 +44,20 @@ public class PlayerAttack : MonoBehaviour
         if (cooldownRemaining > 0f)
             return;
 
-        cooldownRemaining = attackCooldown;
+        if (playerMovement != null && playerMovement.IsAttackAnimationPlaying())
+            return;
 
-        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, attackRadius);
+        cooldownRemaining = attackCooldown;
+        Vector2 facingDirection = playerMovement != null ? playerMovement.GetFacingDirection() : Vector2.down;
+        if (facingDirection.sqrMagnitude < 0.001f)
+            facingDirection = Vector2.down;
+        facingDirection.Normalize();
+
+        playerMovement?.PlayAttackAnimation(attackCooldown);
+
+        Vector2 attackCenter = (Vector2)transform.position + facingDirection * (attackRadius * attackForwardOffsetFactor);
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(attackCenter, attackRadius);
         HashSet<EnemyCombat> damagedEnemies = new HashSet<EnemyCombat>();
 
         foreach (Collider2D col in hits)
@@ -55,6 +72,11 @@ public class PlayerAttack : MonoBehaviour
                 col.GetComponent<EnemyCombat>() ??
                 col.GetComponentInParent<EnemyCombat>();
 
+            Vector2 toEnemy = ((Vector2)col.bounds.center - (Vector2)transform.position);
+            if (toEnemy.sqrMagnitude > 0.001f &&
+                Vector2.Dot(facingDirection, toEnemy.normalized) < attackFacingDotThreshold)
+                continue;
+
             if (enemyCombat != null && !damagedEnemies.Contains(enemyCombat))
             {
                 enemyCombat.TakeDamageFrom(transform.position, GetCurrentAttackDamage());
@@ -62,11 +84,15 @@ public class PlayerAttack : MonoBehaviour
             }
         }
 
-        Collider2D[] bulletHits = Physics2D.OverlapCircleAll(transform.position, bulletClearRadius);
+        Collider2D[] bulletHits = Physics2D.OverlapCircleAll(attackCenter, bulletClearRadius);
         for (int i = 0; i < bulletHits.Length; i++)
         {
             EnemyBullet bullet = bulletHits[i].GetComponent<EnemyBullet>();
             if (bullet == null) continue;
+            Vector2 toBullet = ((Vector2)bulletHits[i].bounds.center - (Vector2)transform.position);
+            if (toBullet.sqrMagnitude > 0.001f &&
+                Vector2.Dot(facingDirection, toBullet.normalized) < attackFacingDotThreshold)
+                continue;
             Destroy(bullet.gameObject);
         }
     }

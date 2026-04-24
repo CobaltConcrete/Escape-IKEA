@@ -6,6 +6,7 @@ public class EnemyDashCharger : MonoBehaviour
     [Header("References")]
     [SerializeField] private Transform player;
     [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private Animator animator;
 
     private EnemyWander wander;
     private Rigidbody2D rb;
@@ -33,20 +34,23 @@ public class EnemyDashCharger : MonoBehaviour
     private Coroutine activeRoutine;
 
     private Vector2 dashDirection = Vector2.right;
+    private int currentAnimationStateHash;
+
+    private static readonly int AttackLeftHash = Animator.StringToHash("Base Layer.Attack_L");
+    private static readonly int AttackRightHash = Animator.StringToHash("Base Layer.Attack_R");
+    private static readonly int AttackFrontHash = Animator.StringToHash("Base Layer.Front_ATTACK");
+    private static readonly int AttackBackHash = Animator.StringToHash("Base Layer.Back_ATTACK");
 
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         wander = GetComponent<EnemyWander>();
+        if (animator == null)
+            animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
 
-        if (player == null)
-        {
-            GameObject p = GameObject.FindGameObjectWithTag("Player");
-            if (p != null)
-            {
-                player = p.transform;
-            }
-        }
+        TryFindPlayer();
     }
 
     private void Start()
@@ -74,6 +78,8 @@ public class EnemyDashCharger : MonoBehaviour
     {
         if (!gameObject.activeInHierarchy) return;
         if (isBusy) return;
+
+        TryFindPlayer();
 
         attackTimer -= Time.deltaTime;
 
@@ -107,6 +113,14 @@ public class EnemyDashCharger : MonoBehaviour
 
     private IEnumerator AimThenDash()
     {
+        TryFindPlayer();
+        if (player == null)
+        {
+            attackTimer = GetRandomAttackInterval();
+            activeRoutine = null;
+            yield break;
+        }
+
         isBusy = true;
         isDashing = false;
 
@@ -125,18 +139,23 @@ public class EnemyDashCharger : MonoBehaviour
         {
             timer += Time.deltaTime;
             rb.linearVelocity = Vector2.zero;
+            TryFindPlayer();
 
             if (player != null)
             {
                 Vector2 raw = (Vector2)(player.position - transform.position);
                 if (raw.sqrMagnitude > 0.001f)
+                {
                     lockedDir = raw.normalized;
+                    UpdateAttackAnimation(lockedDir);
+                }
             }
 
             yield return null;
         }
 
         dashDirection = lockedDir;
+        UpdateAttackAnimation(dashDirection);
 
         if (spriteRenderer != null)
             spriteRenderer.color = Color.red;
@@ -241,6 +260,16 @@ public class EnemyDashCharger : MonoBehaviour
         isDashing = false;
     }
 
+    private void TryFindPlayer()
+    {
+        if (player != null)
+            return;
+
+        GameObject p = GameObject.FindGameObjectWithTag("Player");
+        if (p != null)
+            player = p.transform;
+    }
+
     private void ResetState()
     {
         if (rb != null)
@@ -269,5 +298,37 @@ public class EnemyDashCharger : MonoBehaviour
         float min = Mathf.Min(minAttackInterval, maxAttackInterval);
         float max = Mathf.Max(minAttackInterval, maxAttackInterval);
         return Random.Range(min, max);
+    }
+
+    public bool IsBusy => isBusy || isDashing;
+
+    private void UpdateAttackAnimation(Vector2 direction)
+    {
+        if (animator == null)
+            return;
+
+        bool preferVertical = Mathf.Abs(direction.y) > Mathf.Abs(direction.x);
+        bool hasFrontBack = animator.HasState(0, AttackFrontHash) && animator.HasState(0, AttackBackHash);
+        int nextHash;
+
+        if (preferVertical && hasFrontBack)
+        {
+            nextHash = direction.y > 0f ? AttackBackHash : AttackFrontHash;
+            if (spriteRenderer != null)
+                spriteRenderer.flipX = false;
+        }
+        else
+        {
+            bool faceLeft = direction.x < -0.01f;
+            if (spriteRenderer != null)
+                spriteRenderer.flipX = faceLeft;
+            nextHash = faceLeft ? AttackLeftHash : AttackRightHash;
+        }
+
+        if (currentAnimationStateHash == nextHash)
+            return;
+
+        animator.Play(nextHash, 0, 0f);
+        currentAnimationStateHash = nextHash;
     }
 }

@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7803539304128111116}
   - component: {fileID: 6720783509543979233}
+  - component: {fileID: 5512345678901234567}
   - component: {fileID: 6033468489796418918}
   - component: {fileID: 343528486065770031}
   - component: {fileID: 927898353477773973}
@@ -94,6 +95,28 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!95 &5512345678901234567
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6291527677918437734}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: c2b9b05463af4f96b84c215859c57736, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage:
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!50 &6033468489796418918
 Rigidbody2D:
   serializedVersion: 5
@@ -184,6 +207,11 @@ MonoBehaviour:
   wanderChangeInterval: 2
   useEmployeeRedTint: 1
   employeeTint: {r: 1, g: 1, b: 1, a: 1}
+  animator: {fileID: 5512345678901234567}
+  spriteRenderer: {fileID: 6720783509543979233}
+  playTransformIntroOnRoomEntry: 1
+  transformAnimationState: Transform
+  transformIntroDuration: 0.7
   useBounds: 0
   minBounds: {x: 0, y: 0}
   maxBounds: {x: 0, y: 0}

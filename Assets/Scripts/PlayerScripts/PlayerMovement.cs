@@ -16,8 +16,13 @@ public class PlayerMovement : MonoBehaviour
     [Header("Animation")]
     [SerializeField]
     private Animator animator;
+    [SerializeField]
+    private SpriteRenderer animatedSpriteRenderer;
 
     private string currentAnimationState;
+    private float attackAnimationRemaining;
+    private string pendingAttackState;
+    private bool pendingAttackFlipX;
 
     //Speed Pill Stuffs
     private float originalSpeed;
@@ -31,6 +36,8 @@ public class PlayerMovement : MonoBehaviour
 
         if (animator == null)
             animator = GetComponentInChildren<Animator>();
+        if (animatedSpriteRenderer == null && animator != null)
+            animatedSpriteRenderer = animator.GetComponent<SpriteRenderer>();
 
         UpdateAnimation();
     }
@@ -39,6 +46,9 @@ public class PlayerMovement : MonoBehaviour
     {
         move.x = Input.GetAxisRaw("Horizontal");
         move.y = Input.GetAxisRaw("Vertical");
+
+        if (attackAnimationRemaining > 0f)
+            attackAnimationRemaining -= Time.deltaTime;
 
         // Normalize to prevent faster diagonal movement
         move.Normalize();
@@ -60,9 +70,25 @@ public class PlayerMovement : MonoBehaviour
         if (animator == null)
             return;
 
+        if (attackAnimationRemaining > 0f && !string.IsNullOrEmpty(pendingAttackState))
+        {
+            if (animatedSpriteRenderer != null)
+                animatedSpriteRenderer.flipX = pendingAttackFlipX;
+
+            if (currentAnimationState != pendingAttackState)
+            {
+                animator.Play(pendingAttackState, 0, 0f);
+                currentAnimationState = pendingAttackState;
+            }
+            return;
+        }
+
         bool isMoving = move.sqrMagnitude > 0.001f;
         string direction = GetAnimationDirection(isMoving ? move : lastMoveDirection);
         string nextState = direction + (isMoving ? "_WALKING" : "_IDLE");
+
+        if (animatedSpriteRenderer != null)
+            animatedSpriteRenderer.flipX = false;
 
         if (currentAnimationState == nextState)
             return;
@@ -82,6 +108,44 @@ public class PlayerMovement : MonoBehaviour
     public void BoostSpeedFor10Seconds()
     {
         BoostSpeedForDuration(8f, 10f);
+    }
+
+    public Vector2 GetFacingDirection()
+    {
+        return lastMoveDirection.sqrMagnitude > 0.001f ? lastMoveDirection.normalized : Vector2.down;
+    }
+
+    public bool IsAttackAnimationPlaying()
+    {
+        return attackAnimationRemaining > 0f;
+    }
+
+    public void PlayAttackAnimation(float durationSeconds)
+    {
+        Vector2 facing = GetFacingDirection();
+        string direction = GetAnimationDirection(facing);
+        pendingAttackFlipX = false;
+
+        switch (direction)
+        {
+            case "Back":
+                pendingAttackState = "Back_ATTACK";
+                break;
+            case "Right":
+                pendingAttackState = "Right_ATTACK";
+                break;
+            case "Left":
+                pendingAttackState = "Left_ATTACK";
+                pendingAttackFlipX = true;
+                break;
+            default:
+                pendingAttackState = "Front_ATTACK";
+                break;
+        }
+
+        attackAnimationRemaining = Mathf.Max(0.01f, durationSeconds);
+        currentAnimationState = null;
+        UpdateAnimation();
     }
 
     public void BoostSpeedForDuration(float boostedSpeed, float durationSeconds)

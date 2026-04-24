@@ -407,8 +407,8 @@ public static class RoomPrefabStaticPlacer
         bool spawnedAny = false;
         Vector3[] trashSlots =
         {
-            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopLeft, new Vector3(3.65f, -0.55f, 0f)),
-            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopRight, new Vector3(-3.65f, -0.55f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopLeft, new Vector3(1.65f, -0.55f, 0f)),
+            RoomDecorationPlacer.GetAnchoredWorldPosition(roomRoot, RoomDecorInteriorAnchor.InteriorTopRight, new Vector3(-1.65f, -0.55f, 0f)),
         };
 
         for (int i = 0; i < Mathf.Min(trashSlots.Length, trashPrefabs.Count > 0 ? trashSlots.Length : 0); i++)

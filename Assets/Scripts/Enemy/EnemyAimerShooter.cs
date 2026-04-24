@@ -25,14 +25,26 @@ public class EnemyAimerShooter : MonoBehaviour
 
     [Header("Aim Line")]
     [SerializeField] private LineRenderer lineRenderer;
+    [Header("Animation")]
+    [SerializeField] private Animator animator;
+    [SerializeField] private SpriteRenderer spriteRenderer;
 
     private bool isAttacking = false;
     private EnemyWander wander;
     private Coroutine attackLoopRoutine;
+    private Vector2 lastFacingDirection = Vector2.right;
+    private int currentAnimationStateHash;
+
+    private static readonly int AttackLeftHash = Animator.StringToHash("Base Layer.Attack_L");
+    private static readonly int AttackRightHash = Animator.StringToHash("Base Layer.Attack_R");
 
     private void Awake()
     {
         wander = GetComponent<EnemyWander>();
+        if (animator == null)
+            animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
+        if (spriteRenderer == null)
+            spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
 
         if (player == null)
         {
@@ -249,6 +261,7 @@ public class EnemyAimerShooter : MonoBehaviour
                 {
                     // tracks normally
                     lockedTargetPosition = player.position;
+                    UpdateAttackAnimation((lockedTargetPosition - firePoint.position).normalized);
                 }
                 else
                 {
@@ -283,6 +296,7 @@ public class EnemyAimerShooter : MonoBehaviour
         UpdateAimLine(lockedTargetPosition);
 
         Vector2 dir = (lockedTargetPosition - firePoint.position).normalized;
+        UpdateAttackAnimation(dir);
         ShootBullet(dir);
 
         yield return new WaitForSeconds(0.15f);
@@ -341,5 +355,27 @@ public class EnemyAimerShooter : MonoBehaviour
     public Transform GetFirePoint()
     {
         return firePoint;
+    }
+
+    public bool IsAttacking => isAttacking;
+
+    private void UpdateAttackAnimation(Vector2 direction)
+    {
+        if (animator == null)
+            return;
+
+        if (direction.sqrMagnitude > 0.0001f)
+            lastFacingDirection = direction.normalized;
+
+        bool faceLeft = lastFacingDirection.x < -0.01f;
+        if (spriteRenderer != null)
+            spriteRenderer.flipX = faceLeft;
+
+        int nextHash = faceLeft ? AttackLeftHash : AttackRightHash;
+        if (currentAnimationStateHash == nextHash)
+            return;
+
+        animator.Play(nextHash, 0, 0f);
+        currentAnimationStateHash = nextHash;
     }
 }

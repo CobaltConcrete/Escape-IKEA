@@ -12,6 +12,14 @@ public class RoomPrefab
 
 public class MapManager : MonoBehaviour
 {
+    private enum RoomSide
+    {
+        Left,
+        Right,
+        Top,
+        Bottom
+    }
+
     [Header("Map Settings")]
     [SerializeField] public int maxCellRows = 5;
     [SerializeField] public int maxCellCols = 5;
@@ -30,6 +38,9 @@ public class MapManager : MonoBehaviour
     [SerializeField] private GameObject verticalDoorPrefab;
     [SerializeField] private GameObject horizontalBoundaryDoorPrefab;
     [SerializeField] private GameObject verticalBoundaryDoorPrefab;
+    [SerializeField] private Vector2 doorwaySealSizeHorizontal = new Vector2(2.2f, 0.45f);
+    [SerializeField] private Vector2 doorwaySealSizeVertical = new Vector2(0.45f, 2.2f);
+    [SerializeField] private float doorwaySealEdgeInset = 0.08f;
 
     [Header("Room presentation")]
     [Tooltip("UIArt/fixedtile (64px @ 100 PPU). Tiled in a grid; edge tiles are clipped to the room interior by a Sprite Mask.")]
@@ -58,6 +69,7 @@ public class MapManager : MonoBehaviour
 
         GenerateMap();
         GenerateDoors();
+        SealUnusedDoorways();
 
         if (player != null)
         {
@@ -408,6 +420,137 @@ public class MapManager : MonoBehaviour
     {
         GenerateInternalDoors();
         GenerateBoundaryDoors();
+    }
+
+    private void SealUnusedDoorways()
+    {
+        if (roomGrid == null)
+            return;
+
+        HashSet<GameObject> uniqueRooms = new HashSet<GameObject>();
+        for (int x = 0; x < maxCellCols; x++)
+        {
+            for (int y = 0; y < maxCellRows; y++)
+            {
+                GameObject room = roomGrid[x, y];
+                if (room != null)
+                    uniqueRooms.Add(room);
+            }
+        }
+
+        Door[] allDoors = Object.FindObjectsByType<Door>(FindObjectsInactive.Include, FindObjectsSortMode.None);
+        foreach (GameObject room in uniqueRooms)
+        {
+            if (room == null)
+                continue;
+
+            BoxCollider2D roomTrigger = room.GetComponent<BoxCollider2D>();
+            if (roomTrigger == null || !roomTrigger.isTrigger)
+                continue;
+
+            Transform existing = room.transform.Find("RuntimeDoorwaySeals");
+            if (existing != null)
+                Object.Destroy(existing.gameObject);
+
+            GameObject sealRoot = new GameObject("RuntimeDoorwaySeals");
+            sealRoot.transform.SetParent(room.transform, false);
+
+            foreach (RoomSide side in System.Enum.GetValues(typeof(RoomSide)))
+            {
+                if (RoomHasDoorOnSide(room, side, allDoors))
+                    continue;
+
+                CreateDoorwaySeal(roomTrigger, sealRoot.transform, side);
+            }
+        }
+    }
+
+    private static bool RoomHasDoorOnSide(GameObject room, RoomSide side, Door[] allDoors)
+    {
+        if (room == null || allDoors == null)
+            return false;
+
+        BoxCollider2D roomTrigger = room.GetComponent<BoxCollider2D>();
+        if (roomTrigger == null)
+            return false;
+
+        Bounds bounds = roomTrigger.bounds;
+        Vector3 center = bounds.center;
+
+        for (int i = 0; i < allDoors.Length; i++)
+        {
+            Door door = allDoors[i];
+            if (door == null || !door.IsConnectedToRoom(room))
+                continue;
+
+            Vector3 delta = door.transform.position - center;
+            RoomSide doorSide;
+            if (Mathf.Abs(delta.x) >= Mathf.Abs(delta.y))
+                doorSide = delta.x >= 0f ? RoomSide.Right : RoomSide.Left;
+            else
+                doorSide = delta.y >= 0f ? RoomSide.Top : RoomSide.Bottom;
+
+            if (doorSide == side)
+                return true;
+        }
+
+        return false;
+    }
+
+    private void CreateDoorwaySeal(BoxCollider2D roomTrigger, Transform parent, RoomSide side)
+    {
+        if (roomTrigger == null || parent == null)
+            return;
+
+        Bounds bounds = roomTrigger.bounds;
+        Vector3 position = bounds.center;
+        Vector2 size = doorwaySealSizeHorizontal;
+
+        switch (side)
+        {
+            case RoomSide.Top:
+                position.y = bounds.max.y + doorwaySealEdgeInset;
+                size = doorwaySealSizeHorizontal;
+                break;
+            case RoomSide.Bottom:
+                position.y = bounds.min.y - doorwaySealEdgeInset;
+                size = doorwaySealSizeHorizontal;
+                break;
+            case RoomSide.Left:
+                position.x = bounds.min.x - doorwaySealEdgeInset;
+                size = doorwaySealSizeVertical;
+                break;
+            case RoomSide.Right:
+                position.x = bounds.max.x + doorwaySealEdgeInset;
+                size = doorwaySealSizeVertical;
+                break;
+        }
+
+        GameObject blocker = new GameObject($"DoorwaySeal_{side}");
+        blocker.transform.SetParent(parent, true);
+        blocker.transform.position = position;
+        blocker.layer = GetWallLayerForRoom(roomTrigger.gameObject);
+        blocker.tag = "Wall";
+
+        BoxCollider2D collider = blocker.AddComponent<BoxCollider2D>();
+        collider.size = size;
+        collider.isTrigger = false;
+    }
+
+    private static int GetWallLayerForRoom(GameObject room)
+    {
+        if (room == null)
+            return 0;
+
+        Transform[] children = room.GetComponentsInChildren<Transform>(true);
+        for (int i = 0; i < children.Length; i++)
+        {
+            Transform child = children[i];
+            if (child != null && child.CompareTag("Wall"))
+                return child.gameObject.layer;
+        }
+
+        return room.layer;
     }
 
     void GenerateInternalDoors()
