@@ -867,19 +867,112 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 67cd19be64aad94439b97061abdc0ae6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  soundLibrary:
+  - key: ButtonClick
+    clip: {fileID: 8300000, guid: 2d18a29cea96b2948914590fbd282267, type: 3}
+    volume: 2
+    useUISource: 1
+    pitchRandomRange: 0
+  - key: OpenInventory
+    clip: {fileID: 8300000, guid: 2fd6e675e878707479070d76876c4bce, type: 3}
+    volume: 2
+    useUISource: 1
+    pitchRandomRange: 0
+  - key: CloseInventory
+    clip: {fileID: 8300000, guid: 72d4ec6467b485d469d8f7c90e1cf50e, type: 3}
+    volume: 2
+    useUISource: 1
+    pitchRandomRange: 0
+  - key: DistortedShopperDeath
+    clip: {fileID: 8300000, guid: 14a786c5f49f97d479208afe1fa539b3, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: DistortedShopper
+    clip: {fileID: 8300000, guid: 002f842a9e4ac4a44a2e8ac4e2804b9e, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: EmployeeFootstep
+    clip: {fileID: 8300000, guid: 045a664750b5de644b310e509456ca0c, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: GeneralAmbient
+    clip: {fileID: 8300000, guid: ddbc15ebf657fe948adf84325dde5f70, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: HitOneEnemy
+    clip: {fileID: 8300000, guid: 22184656b3f34f344beb2617fb8f9f97, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: Hit2OrMoreEnemies
+    clip: {fileID: 8300000, guid: 793c770048e8c984086a3548a977e5f7, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: LightBuzzing
+    clip: {fileID: 8300000, guid: ffd91f22954fcbb40b0a72bc9b759ec2, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: LightsOff
+    clip: {fileID: 8300000, guid: 954bd35d4e25a91429c52ae1daaa9894, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: LightsOn
+    clip: {fileID: 8300000, guid: 8292fa11b27812e469cf6df363a07b5c, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: PewPewAim
+    clip: {fileID: 8300000, guid: 876f37abdde9649419c0abdd3764984e, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: PewPewDeath
+    clip: {fileID: 8300000, guid: c567b6ee2be1f994aae88ac80c53eee1, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: PewPewFire
+    clip: {fileID: 8300000, guid: dc18f73f376fdb445b1501ed810181cc, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: PickupItem
+    clip: {fileID: 8300000, guid: a70be64ddb1400640b6cecc6176f47cc, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: PlayerAttack
+    clip: {fileID: 8300000, guid: e063b8cfd5498b3428984a28c0da0ae8, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: PlayerDeath
+    clip: {fileID: 8300000, guid: d009b537d76bd364aa6068f5550bdf8e, type: 3}
+    volume: 0.933
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: PlayerHurt
+    clip: {fileID: 8300000, guid: cb407acdd68a1ef418d8c4171d52d9ba, type: 3}
+    volume: 0.283
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: 
+    clip: {fileID: 0}
+    volume: 0
+    useUISource: 0
+    pitchRandomRange: 0
   audioMixer: {fileID: 0}
   musicSource: {fileID: 0}
   uiSource: {fileID: 0}
   sfxSource: {fileID: 0}
   ambientSource: {fileID: 0}
-  buttonClickClips:
-  - {fileID: 8300000, guid: 2d18a29cea96b2948914590fbd282267, type: 3}
-  playerHurtClip: {fileID: 8300000, guid: cb407acdd68a1ef418d8c4171d52d9ba, type: 3}
-  playerDeathClip: {fileID: 8300000, guid: d009b537d76bd364aa6068f5550bdf8e, type: 3}
-  itemPickupClip: {fileID: 8300000, guid: a70be64ddb1400640b6cecc6176f47cc, type: 3}
-  inventoryOpenClip: {fileID: 8300000, guid: 2fd6e675e878707479070d76876c4bce, type: 3}
-  inventoryCloseClip: {fileID: 8300000, guid: 72d4ec6467b485d469d8f7c90e1cf50e, type: 3}
-  generalAmbientClip: {fileID: 8300000, guid: ddbc15ebf657fe948adf84325dde5f70, type: 3}
   masterVolume: 1
   musicVolume: 1
   sfxVolume: 1
@@ -2037,6 +2130,14 @@ PrefabInstance:
       propertyPath: equipmentData
       value: 
       objectReference: {fileID: 9108433767328902556}
+    - target: {fileID: 8600148856383864679, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: attackKey
+      value: 323
+      objectReference: {fileID: 0}
+    - target: {fileID: 8600148856383864679, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: attackCooldown
+      value: 0.4
+      objectReference: {fileID: 0}
     - target: {fileID: 9086373605952938387, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -2202,7 +2303,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2610535552809118763, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: -0.000030517578
+      value: 0.000030517578
       objectReference: {fileID: 0}
     - target: {fileID: 3178300615298924659, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
       propertyPath: m_AnchorMax.y
@@ -2465,7 +2566,7 @@ PrefabInstance:
       objectReference: {fileID: 2870026492113798478, guid: c5692d816becb45e5bd4aaee83b6f00d, type: 3}
     - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: maxListEntries
-      value: 1
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3953837934740083215, guid: 14de5a9e534d99a4e97e78a42890f9d1, type: 3}
       propertyPath: minListEntries

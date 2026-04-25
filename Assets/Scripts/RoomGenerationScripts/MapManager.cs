@@ -90,7 +90,7 @@ public class MapManager : MonoBehaviour
             RunObjectiveManager.Instance.SpawnLootForCurrentObjective();
         }
 
-        //SpawnSportsRoomBatPickups();
+        SpawnSportsRoomBatPickups();
 
         RoomContentActivation.RefreshPlayerRoomsAfterMapSetup();
         StartCoroutine(CoRoomContentActivationAfterFirstFrame());

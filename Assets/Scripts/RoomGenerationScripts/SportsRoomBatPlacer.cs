@@ -38,12 +38,7 @@ public static class SportsRoomBatPlacer
 
         GameObject instance = Object.Instantiate(batSpawnerPrefab, parent);
         instance.name = BatInstanceName;
-        ItemWorldSpawner spawner = instance.GetComponent<ItemWorldSpawner>();
-        if (spawner != null)
-            Object.DestroyImmediate(spawner);
 
-        MonoBehaviour pickup = GetOrAddWeaponPickup(instance);
-        ConfigureWeaponPickup(pickup, batDefinition, 1);
 
         SportsRoomBatAutoPickup autoPickup = instance.GetComponent<SportsRoomBatAutoPickup>();
         if (autoPickup == null)

@@ -22,6 +22,8 @@ public class EnemyCombat : MonoBehaviour
     private Rigidbody2D rb;
     private Enemy enemy;
 
+    public System.Action OnDeath;
+
     private void Awake()
     {
         currentHealth = maxHealth;
@@ -108,6 +110,7 @@ public class EnemyCombat : MonoBehaviour
 
     private void Die()
     {
+        OnDeath?.Invoke();
         Destroy(gameObject);
     }
 

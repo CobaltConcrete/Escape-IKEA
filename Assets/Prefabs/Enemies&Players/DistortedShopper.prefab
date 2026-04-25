@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: -5407095470068128593}
   - component: {fileID: 1938281404488083802}
   - component: {fileID: 7992556980244143438}
+  - component: {fileID: -431514575860309357}
   m_Layer: 10
   m_Name: DistortedShopper
   m_TagString: Enemy
@@ -114,7 +115,7 @@ Animator:
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0
-  m_WarningMessage:
+  m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
@@ -206,6 +207,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   spriteRenderer: {fileID: 0}
+  animator: {fileID: 0}
   minAttackInterval: 1.2
   maxAttackInterval: 3.8
   aimDuration: 0.8
@@ -233,6 +235,8 @@ MonoBehaviour:
   maxBounds: {x: 8, y: 4}
   boundsPadding: 0.15
   playerBounceDistance: 0.7
+  animator: {fileID: 0}
+  spriteRenderer: {fileID: 0}
 --- !u!114 &-8047790109118790915
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -319,3 +323,22 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-431514575860309357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3464154710725457275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d2e508db566b56458252ef5b53a7e3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  loopSoundKey: DistortedShopper
+  playOnStart: 1
+  minDistance: 1.2
+  maxDistance: 8
+  spatialBlend: 1
+  baseVolumeMultiplier: 0.35
+  maxLoopingShoppers: 4

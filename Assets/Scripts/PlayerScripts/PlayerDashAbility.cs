@@ -71,7 +71,7 @@ public class PlayerDashAbility : MonoBehaviour
 
     private bool IsKeyPressed()
     {
-        return Input.GetKeyDown(KeyCode.L) || Input.GetKeyDown(KeyCode.RightShift);
+        return Input.GetKeyDown(KeyCode.RightShift);
     }
 
     private bool HasDashArmorEquipped()
