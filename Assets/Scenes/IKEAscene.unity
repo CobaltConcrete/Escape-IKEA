@@ -275,6 +275,7 @@ GameObject:
   - component: {fileID: 519420031}
   - component: {fileID: 519420030}
   - component: {fileID: 519420033}
+  - component: {fileID: 519420035}
   - component: {fileID: 519420034}
   m_Layer: 0
   m_Name: Main Camera
@@ -386,8 +387,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.9033391, y: -0.8581635, z: -10}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 30.74084, y: 12.411518, z: -10.202472}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -423,6 +424,18 @@ AudioListener:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 519420028}
   m_Enabled: 1
+--- !u!114 &519420035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83fe652a255b9064a9a61c2e7deffef1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &619394800
 GameObject:
   m_ObjectHideFlags: 0
@@ -917,7 +930,7 @@ MonoBehaviour:
     pitchRandomRange: 0
   - key: Hit2OrMoreEnemies
     clip: {fileID: 8300000, guid: 793c770048e8c984086a3548a977e5f7, type: 3}
-    volume: 2
+    volume: 0.984
     useUISource: 0
     pitchRandomRange: 0
   - key: LightBuzzing
@@ -973,6 +986,26 @@ MonoBehaviour:
   - key: PlayerHurt
     clip: {fileID: 8300000, guid: cb407acdd68a1ef418d8c4171d52d9ba, type: 3}
     volume: 0.283
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: Boss
+    clip: {fileID: 8300000, guid: 1208d2a4805b14a4ba7801880be1d8e4, type: 3}
+    volume: 1.576
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: BossDeath
+    clip: {fileID: 8300000, guid: dd55aab9753031142ac540724f60082b, type: 3}
+    volume: 1.455
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: BossHit
+    clip: {fileID: 8300000, guid: 3f9c14407ae0c6049ba57eb3c1b86297, type: 3}
+    volume: 0.927
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: BossThrow
+    clip: {fileID: 8300000, guid: c2a28a06ffb2508479c3b0d665856390, type: 3}
+    volume: 0.417
     useUISource: 0
     pitchRandomRange: 0
   audioMixer: {fileID: 0}
@@ -1964,6 +1997,22 @@ PrefabInstance:
       propertyPath: equipmentData
       value: 
       objectReference: {fileID: 9108433767328902556}
+    - target: {fileID: 8600148856383864679, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: enemyKnockbackDistance
+      value: 1.1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8600148856383864679, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: enemyKnockbackDuration
+      value: 0.08
+      objectReference: {fileID: 0}
+    - target: {fileID: 8600148856383864679, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: multiHitScreenShakeDuration
+      value: 0.18
+      objectReference: {fileID: 0}
+    - target: {fileID: 8600148856383864679, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: multiHitScreenShakeStrength
+      value: 0.18
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

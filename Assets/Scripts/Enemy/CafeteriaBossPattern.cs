@@ -41,6 +41,9 @@ public class CafeteriaBossPattern : MonoBehaviour
     private Bounds roomBounds;
     private Vector2 lastFacingDirection = Vector2.right;
     private float attackAnimationTimer;
+    private BossAudio bossAudio;
+    private float throwSoundCooldown = 0f;
+    [SerializeField] private float throwSoundInterval = 0.6f;
 
     private Transform playerTransform;
     private Rigidbody2D playerRb;
@@ -52,6 +55,7 @@ public class CafeteriaBossPattern : MonoBehaviour
     private void Awake()
     {
         EnsureReferences();
+        bossAudio = GetComponent<BossAudio>();
         homePosition = transform.position;
         phaseTimer = attackDuration;
         shotTimer = 0f;
@@ -93,6 +97,9 @@ public class CafeteriaBossPattern : MonoBehaviour
 
     private void Update()
     {
+        if (throwSoundCooldown > 0f)
+            throwSoundCooldown -= Time.deltaTime;
+
         bool isMoving = MoveLikePerson();
 
         phaseTimer -= Time.deltaTime;
@@ -263,6 +270,12 @@ public class CafeteriaBossPattern : MonoBehaviour
 
     private void ShootVolley()
     {
+        if(bossAudio != null && throwSoundCooldown <= 0f)
+    {
+            bossAudio.PlayThrow();
+            throwSoundCooldown = throwSoundInterval;
+        }
+
         if (bulletPrefab == null) return;
         Vector3 origin = firePoint != null ? firePoint.position : transform.position;
         int count = Mathf.Max(1, bulletsPerVolley);

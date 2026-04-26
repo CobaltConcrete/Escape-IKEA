@@ -13,6 +13,16 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private float attackForwardOffsetFactor = 0.75f;
     [SerializeField] private float attackFacingDotThreshold = 0.2f;
 
+    [Header("Hit Audio")]
+    [SerializeField] private string hitOneEnemySoundKey = "HitOneEnemy";
+    [SerializeField] private string hitMultipleEnemiesSoundKey = "Hit2OrMoreEnemies";
+
+    [Header("Enemy Knockback")]
+    [SerializeField] private float enemyKnockbackDistance = 0.45f;
+    [SerializeField] private float enemyKnockbackDuration = 0.12f;
+    [SerializeField] private float multiHitScreenShakeDuration = 0.12f;
+    [SerializeField] private float multiHitScreenShakeStrength = 0.08f;
+
     private float cooldownRemaining;
     private PlayerInventoryInteraction inventoryInteraction;
     private BossRoomNoticeUI noWeaponNoticeUI;
@@ -60,6 +70,7 @@ public class PlayerAttack : MonoBehaviour
         Collider2D[] hits = Physics2D.OverlapCircleAll(attackCenter, attackRadius);
         HashSet<EnemyCombat> damagedEnemies = new HashSet<EnemyCombat>();
 
+
         foreach (Collider2D col in hits)
         {
             bool isEnemy =
@@ -80,8 +91,32 @@ public class PlayerAttack : MonoBehaviour
             if (enemyCombat != null && !damagedEnemies.Contains(enemyCombat))
             {
                 enemyCombat.TakeDamageFrom(transform.position, GetCurrentAttackDamage());
+                KnockbackEnemy(enemyCombat);
                 damagedEnemies.Add(enemyCombat);
             }
+        }
+        int enemyHitCount = damagedEnemies.Count;
+
+        if (enemyHitCount > 0)
+        {
+            float shakeStrength = Mathf.Clamp(
+                0.08f + Mathf.Pow(enemyHitCount, 1.3f) * 0.04f,
+                0f,
+                0.35f
+            );
+
+            float shakeDuration = Mathf.Clamp(
+                0.08f + enemyHitCount * 0.03f,
+                0f,
+                0.25f
+            );
+
+            ScreenShake.Instance?.Shake(shakeDuration, shakeStrength);
+
+            if (enemyHitCount == 1)
+                SoundManager.Instance?.PlaySound(hitOneEnemySoundKey, 1f);
+            else
+                SoundManager.Instance?.PlaySound(hitMultipleEnemiesSoundKey, 1f);
         }
 
         Collider2D[] bulletHits = Physics2D.OverlapCircleAll(attackCenter, bulletClearRadius);
@@ -138,5 +173,28 @@ public class PlayerAttack : MonoBehaviour
 
         if (noWeaponNoticeUI != null)
             noWeaponNoticeUI.ShowMessage("I have no weapon");
+    }
+    private void KnockbackEnemy(EnemyCombat enemyCombat)
+    {
+        if (enemyCombat == null)
+            return;
+
+        Vector2 dir = (enemyCombat.transform.position - transform.position).normalized;
+
+        if (dir.sqrMagnitude < 0.001f)
+            dir = playerMovement != null ? playerMovement.GetFacingDirection() : Vector2.down;
+
+        Enemy enemy = enemyCombat.GetComponent<Enemy>() ?? enemyCombat.GetComponentInParent<Enemy>();
+        if (enemy != null)
+        {
+            enemy.HitByDash(dir, enemyKnockbackDistance, enemyKnockbackDuration);
+            return;
+        }
+
+        Rigidbody2D rb = enemyCombat.GetComponent<Rigidbody2D>() ?? enemyCombat.GetComponentInParent<Rigidbody2D>();
+        if (rb != null)
+        {
+            rb.MovePosition(rb.position + dir * enemyKnockbackDistance);
+        }
     }
 }

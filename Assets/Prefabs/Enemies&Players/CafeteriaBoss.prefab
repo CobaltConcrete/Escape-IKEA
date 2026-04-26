@@ -20,6 +20,7 @@ GameObject:
   - component: {fileID: 2618402277444551181}
   - component: {fileID: 2153638254944649856}
   - component: {fileID: 8237657027217483895}
+  - component: {fileID: -4922713053927908327}
   m_Layer: 10
   m_Name: CafeteriaBoss
   m_TagString: Enemy
@@ -315,6 +316,9 @@ MonoBehaviour:
   lineRenderer: {fileID: 8565077771825249216}
   animator: {fileID: 0}
   spriteRenderer: {fileID: 0}
+  blackoutVisionLight: {fileID: 0}
+  visibleLineRadius: 3
+  hideAimLineOutsideVision: 1
 --- !u!114 &-7194297125487669818
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -423,6 +427,31 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-4922713053927908327
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1626777669089237922}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76d1ff1f3ad7dac4994e17c0e21ac217, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveLoopKey: Boss
+  hitKey: BossHit
+  deathKey: BossDeath
+  throwKey: BossThrow
+  minDistance: 1.5
+  maxDistance: 18
+  spatialBlend: 1
+  moveVolumeMultiplier: 0.45
+  hitVolumeMultiplier: 1
+  deathVolumeMultiplier: 1.2
+  throwVolumeMultiplier: 0.8
+  throwCooldown: 0.6
+  hitCooldown: 0.08
 --- !u!1 &6020604292169883429
 GameObject:
   m_ObjectHideFlags: 0
