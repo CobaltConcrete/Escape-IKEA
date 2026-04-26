@@ -20,6 +20,8 @@ GameObject:
   - component: {fileID: -5407095470068128593}
   - component: {fileID: 1938281404488083802}
   - component: {fileID: 7992556980244143438}
+  - component: {fileID: -431514575860309357}
+  - component: {fileID: 6680246449431828133}
   m_Layer: 10
   m_Name: DistortedShopper
   m_TagString: Enemy
@@ -36,7 +38,7 @@ Transform:
   m_GameObject: {fileID: 3464154710725457275}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -2.02, y: -1.48, z: 1.4024451}
+  m_LocalPosition: {x: -2.02, y: -1.48, z: -10}
   m_LocalScale: {x: 3, y: 3, z: 3}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -65,7 +67,7 @@ SpriteRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9dfc825aed78fcd4ba02077103263b40, type: 2}
+  - {fileID: 2100000, guid: a97c105638bdf8b4a8650670310a4cd3, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -84,7 +86,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1295074419
-  m_SortingLayer: 5
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_Sprite: {fileID: 7329125327377544488, guid: f259183d4261e4ed4ae50da71f4c768d, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -114,7 +116,7 @@ Animator:
   m_LinearVelocityBlending: 0
   m_StabilizeFeet: 0
   m_AnimatePhysics: 0
-  m_WarningMessage:
+  m_WarningMessage: 
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
@@ -206,6 +208,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   spriteRenderer: {fileID: 0}
+  animator: {fileID: 0}
   minAttackInterval: 1.2
   maxAttackInterval: 3.8
   aimDuration: 0.8
@@ -215,6 +218,10 @@ MonoBehaviour:
   bouncePauseDuration: 0.12
   recoilDistance: 1.5
   recoilDuration: 0.12
+  ignoreDuringDashLayers:
+  - Furniture
+  - Loot
+  - Item
 --- !u!114 &8404082261452416212
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -233,6 +240,8 @@ MonoBehaviour:
   maxBounds: {x: 8, y: 4}
   boundsPadding: 0.15
   playerBounceDistance: 0.7
+  animator: {fileID: 0}
+  spriteRenderer: {fileID: 0}
 --- !u!114 &-8047790109118790915
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -319,3 +328,54 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
+--- !u!114 &-431514575860309357
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3464154710725457275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5d2e508db566b56458252ef5b53a7e3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  loopSoundKey: DistortedShopper
+  deathSoundKey: DistortedShopperDeath
+  playOnStart: 0
+  minDistance: 1.2
+  maxDistance: 15
+  spatialBlend: 1
+  baseVolumeMultiplier: 0.35
+  maxLoopingShoppers: 4
+  listenerTarget: {fileID: 0}
+  startDistance: 10
+  stopDistance: 15
+  checkInterval: 0.25
+--- !u!114 &6680246449431828133
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3464154710725457275}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e27ee885b6e753541a0aa20e98e65451, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  player: {fileID: 0}
+  spriteRenderer: {fileID: 0}
+  animator: {fileID: 0}
+  minAttackInterval: 2.5
+  maxAttackInterval: 8
+  aimDuration: 0.8
+  dashForce: 12
+  dashDuration: 0.5
+  stunDuration: 1.2
+  bouncePauseDuration: 0.12
+  recoilDistance: 1.5
+  recoilDuration: 0.12
+  ignoreDuringDashLayers:
+  - Item
+  - Loot

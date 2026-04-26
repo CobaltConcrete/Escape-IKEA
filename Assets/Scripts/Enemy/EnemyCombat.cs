@@ -16,11 +16,15 @@ public class EnemyCombat : MonoBehaviour
     [SerializeField] private bool onlyTakeDamageFromBehind = false;
     [SerializeField] private float behindDotThreshold = 0f;
 
+
     private float currentHealth;
     private float lastDamageTime = -999f;
 
     private Rigidbody2D rb;
     private Enemy enemy;
+
+    public System.Action OnDeath;
+    public System.Action OnDamaged;
 
     private void Awake()
     {
@@ -90,7 +94,10 @@ public class EnemyCombat : MonoBehaviour
         if (currentHealth <= 0f)
         {
             Die();
+            return;
         }
+
+        OnDamaged?.Invoke();
     }
 
     public void TakeDamageFrom(Vector2 attackerPosition, float amount)
@@ -108,6 +115,7 @@ public class EnemyCombat : MonoBehaviour
 
     private void Die()
     {
+        OnDeath?.Invoke();
         Destroy(gameObject);
     }
 

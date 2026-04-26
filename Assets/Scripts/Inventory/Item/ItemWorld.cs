@@ -27,13 +27,15 @@ public class ItemWorld : MonoBehaviour, IInteractable
             return null;
         }
 
-        if (itemAssets.pfItemWorld == null)
+        Transform prefab = itemAssets.GetPfItemWorld(item);
+
+        if (prefab == null)
         {
-            Debug.LogError("pfItemWorld is not assigned on ItemAssets!");
+            Debug.LogError("ItemWorld prefab missing!");
             return null;
         }
 
-        Transform spawnedTransform = Instantiate(itemAssets.pfItemWorld, position, rotation);
+        Transform spawnedTransform = Instantiate(prefab, position, rotation);
         spawnedTransform.localScale = scale;
 
         ItemWorld itemWorld = spawnedTransform.GetComponent<ItemWorld>();
@@ -161,9 +163,9 @@ public class ItemWorld : MonoBehaviour, IInteractable
         }
 
         // Loot ?????????????? item ????????????
-        if (light2D != null && item != null && !item.IsLoot())
+        if (light2D != null && item != null && item.definition != null)
         {
-            light2D.enabled = visible;
+            light2D.enabled = visible && item.definition.worldGlowEnabled;
         }
     }
 
@@ -197,16 +199,15 @@ public class ItemWorld : MonoBehaviour, IInteractable
 
         if (light2D != null)
         {
-            if (item.IsLoot())
+            bool shouldGlow = item.definition.worldGlowEnabled;
+
+            light2D.enabled = shouldGlow;
+
+            if (shouldGlow)
             {
-                light2D.enabled = false;
-            }
-            else
-            {
-                light2D.enabled = true;
                 light2D.color = item.GetColor();
-                light2D.intensity = 1f;
-                light2D.pointLightOuterRadius = 1f;
+                light2D.intensity = item.definition.worldGlowIntensity;
+                light2D.pointLightOuterRadius = item.definition.worldGlowRadius;
             }
         }
 
@@ -226,9 +227,17 @@ public class ItemWorld : MonoBehaviour, IInteractable
 
         if (spriteRenderer != null)
         {
-            spriteRenderer.sortingLayerName = "Item";
-            spriteRenderer.sortingOrder =
-                item.definition.equipTag == EquipTag.Weapon ? 18 : 2;
+            if (item.IsLoot())
+            {
+                spriteRenderer.sortingLayerName = "Loot";
+                spriteRenderer.sortingOrder = 0;
+            }
+            else
+            {
+                spriteRenderer.sortingLayerName = "Item";
+                spriteRenderer.sortingOrder =
+                    item.definition.equipTag == EquipTag.Weapon ? 18 : 2;
+            }
         }
 
         ConfigureContrastBackdrop();
@@ -327,49 +336,7 @@ public class ItemWorld : MonoBehaviour, IInteractable
         plateSr.sortingOrder = spriteRenderer != null ? spriteRenderer.sortingOrder - 1 : 1;
     }
 
-    //private void ApplyColliderFromDefinition()
-    //{
-    //    if (item == null || item.definition == null)
-    //        return;
-
-    //    var def = item.definition;
-
-    //    // 先全部删掉旧的 collider
-    //    Collider2D[] colliders = GetComponents<Collider2D>();
-    //    foreach (var c in colliders)
-    //    {
-    //        Destroy(c);
-    //    }
-
-    //    // 如果是 None → 不创建新 collider（就是“无碰撞”）
-    //    if (def.worldColliderType == WorldColliderType.None)
-    //    {
-    //        return;
-    //    }
-
-    //    // 再创建新的 collider
-    //    switch (def.worldColliderType)
-    //    {
-    //        case WorldColliderType.Box:
-    //            {
-    //                BoxCollider2D box = gameObject.AddComponent<BoxCollider2D>();
-    //                box.isTrigger = true;
-    //                box.offset = def.boxOffset;
-    //                box.size = def.boxSize * WorldPickupColliderScale;
-    //                box.edgeRadius = def.boxEdgeRadius;
-    //                break;
-    //            }
-
-    //        case WorldColliderType.Circle:
-    //            {
-    //                CircleCollider2D circle = gameObject.AddComponent<CircleCollider2D>();
-    //                circle.isTrigger = true;
-    //                circle.offset = def.circleOffset;
-    //                circle.radius = def.circleRadius * WorldPickupColliderScale;
-    //                break;
-    //            }
-    //    }
-    //}
+    
 
     public Item GetItem()
     {

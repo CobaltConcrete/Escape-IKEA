@@ -114,6 +114,13 @@ public class CameraFollowPlayer : MonoBehaviour
 
         ApplyPositionSnapping(ref nextPosition);
 
-        transform.position = nextPosition;
+        Vector3 finalPosition = nextPosition;
+
+        if (ScreenShake.Instance != null)
+        {
+            finalPosition += ScreenShake.Instance.GetShakeOffset();
+        }
+
+        transform.position = finalPosition;
     }
 }

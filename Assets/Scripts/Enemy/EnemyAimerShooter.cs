@@ -29,11 +29,18 @@ public class EnemyAimerShooter : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private SpriteRenderer spriteRenderer;
 
+    [Header("Blackout Aim Line Visibility")]
+    [SerializeField] private Transform blackoutVisionLight;
+    [SerializeField] private float visibleLineRadius = 3f;
+    [SerializeField] private bool hideAimLineOutsideVision = true;
+
     private bool isAttacking = false;
+    private bool aimLineActive = false;
     private EnemyWander wander;
     private Coroutine attackLoopRoutine;
     private Vector2 lastFacingDirection = Vector2.right;
     private int currentAnimationStateHash;
+    private PewPewGuyAudio pewPewAudio;
 
     private static readonly int AttackLeftHash = Animator.StringToHash("Base Layer.Attack_L");
     private static readonly int AttackRightHash = Animator.StringToHash("Base Layer.Attack_R");
@@ -45,6 +52,7 @@ public class EnemyAimerShooter : MonoBehaviour
             animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
         if (spriteRenderer == null)
             spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
+        pewPewAudio = GetComponent<PewPewGuyAudio>();
 
         if (player == null)
         {
@@ -80,7 +88,7 @@ public class EnemyAimerShooter : MonoBehaviour
 
         if (lineRenderer != null)
         {
-            lineRenderer.enabled = false;
+            HideAimLine();
         }
 
         if (wander != null)
@@ -95,7 +103,7 @@ public class EnemyAimerShooter : MonoBehaviour
 
         if (lineRenderer != null)
         {
-            lineRenderer.enabled = false;
+            HideAimLine();
             lineRenderer.positionCount = 2;
         }
 
@@ -216,7 +224,7 @@ public class EnemyAimerShooter : MonoBehaviour
     //    yield return new WaitForSeconds(0.15f);
 
     //    if (lineRenderer != null)
-    //        lineRenderer.enabled = false;
+    //        HideAimLine();
 
     //    if (wander != null)
     //        wander.CanMove = true;
@@ -241,6 +249,13 @@ public class EnemyAimerShooter : MonoBehaviour
 
         float timer = 0f;
         Vector3 lockedTargetPosition = player.position;
+
+        aimLineActive = true;
+
+        if (pewPewAudio != null)
+        {
+            pewPewAudio.PlayAimSound();
+        }
 
         if (lineRenderer != null)
             lineRenderer.enabled = true;
@@ -283,7 +298,7 @@ public class EnemyAimerShooter : MonoBehaviour
         if (shouldCancel)
         {
             if (lineRenderer != null)
-                lineRenderer.enabled = false;
+                HideAimLine();
 
             if (wander != null)
                 wander.CanMove = true;
@@ -299,23 +314,132 @@ public class EnemyAimerShooter : MonoBehaviour
         UpdateAttackAnimation(dir);
         ShootBullet(dir);
 
+        if (pewPewAudio != null)
+        {
+            pewPewAudio.PlayFireSound();
+        }
+
         yield return new WaitForSeconds(0.15f);
 
         if (lineRenderer != null)
-            lineRenderer.enabled = false;
+            HideAimLine();
 
         if (wander != null)
             wander.CanMove = true;
 
         isAttacking = false;
     }
+    private void ResolveBlackoutVisionLight()
+    {
+        if (blackoutVisionLight != null)
+            return;
+
+        GameObject lightObj = GameObject.Find("BlackoutVisionLight");
+        if (lightObj != null)
+            blackoutVisionLight = lightObj.transform;
+    }
 
     private void UpdateAimLine(Vector3 targetPosition)
     {
-        if (lineRenderer == null || firePoint == null) return;
+        if (!aimLineActive)
+            return;
 
-        lineRenderer.SetPosition(0, firePoint.position);
-        lineRenderer.SetPosition(1, targetPosition);
+        if (lineRenderer == null || firePoint == null)
+            return;
+
+        if (PageManager.Instance != null && PageManager.Instance.IsPureBlackoutActive())
+        {
+            lineRenderer.enabled = false;
+            return;
+        }
+
+        Vector3 start = firePoint.position;
+        Vector3 end = targetPosition;
+
+        bool shouldClipToPlayerLight =
+            hideAimLineOutsideVision &&
+            PageManager.Instance != null &&
+            PageManager.Instance.IsPlayerVisionBlackoutActive();
+
+        if (shouldClipToPlayerLight)
+        {
+            ResolveBlackoutVisionLight();
+
+            if (blackoutVisionLight != null)
+            {
+                if (!TryClipLineToCircle(
+                        start,
+                        end,
+                        blackoutVisionLight.position,
+                        visibleLineRadius,
+                        out Vector3 clippedStart,
+                        out Vector3 clippedEnd))
+                {
+                    lineRenderer.enabled = false;
+                    return;
+                }
+
+                start = clippedStart;
+                end = clippedEnd;
+            }
+        }
+
+        lineRenderer.enabled = true;
+        lineRenderer.positionCount = 2;
+        lineRenderer.SetPosition(0, start);
+        lineRenderer.SetPosition(1, end);
+    }
+    private bool TryClipLineToCircle(
+    Vector3 start,
+    Vector3 end,
+    Vector3 circleCenter,
+    float radius,
+    out Vector3 clippedStart,
+    out Vector3 clippedEnd)
+    {
+        clippedStart = start;
+        clippedEnd = end;
+
+        Vector2 s = start;
+        Vector2 e = end;
+        Vector2 c = circleCenter;
+
+        Vector2 d = e - s;
+        Vector2 f = s - c;
+
+        float a = Vector2.Dot(d, d);
+        float b = 2f * Vector2.Dot(f, d);
+        float cc = Vector2.Dot(f, f) - radius * radius;
+
+        float discriminant = b * b - 4f * a * cc;
+
+        bool startInside = Vector2.Distance(s, c) <= radius;
+        bool endInside = Vector2.Distance(e, c) <= radius;
+
+        if (startInside && endInside)
+            return true;
+
+        if (discriminant < 0f)
+            return false;
+
+        discriminant = Mathf.Sqrt(discriminant);
+
+        float t1 = (-b - discriminant) / (2f * a);
+        float t2 = (-b + discriminant) / (2f * a);
+
+        float enter = Mathf.Clamp01(Mathf.Min(t1, t2));
+        float exit = Mathf.Clamp01(Mathf.Max(t1, t2));
+
+        if (exit < 0f || enter > 1f || enter > exit)
+            return false;
+
+        if (!startInside)
+            clippedStart = Vector3.Lerp(start, end, enter);
+
+        if (!endInside)
+            clippedEnd = Vector3.Lerp(start, end, exit);
+
+        return true;
     }
 
     private void ShootBullet(Vector2 direction)
@@ -377,5 +501,15 @@ public class EnemyAimerShooter : MonoBehaviour
 
         animator.Play(nextHash, 0, 0f);
         currentAnimationStateHash = nextHash;
+    }
+    private void HideAimLine()
+    {
+        aimLineActive = false;
+
+        if (lineRenderer != null)
+        {
+            lineRenderer.enabled = false;
+            lineRenderer.positionCount = 0;
+        }
     }
 }

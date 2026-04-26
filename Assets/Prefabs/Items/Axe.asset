@@ -23,6 +23,10 @@ MonoBehaviour:
   useEffect: 0
   effectValue: 0
   effectDuration: 0
+  armorMaxDurability: 100
+  armorDamageReduction: 0
+  armorSpecialAbility: 0
+  armorDurabilityLossMultiplier: 1
   lootValue: 0
   canAppearInShoppingList: 1
   minRequiredAmount: 1
@@ -32,6 +36,10 @@ MonoBehaviour:
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.11000001, y: 0.11000001, z: 0.11000001}
   spawnFootprint: {x: 1, y: 1}
+  worldGlowEnabled: 1
+  worldGlowIntensity: 0.2
+  worldGlowRadius: 1.2
+  worldContrastBackdrop: 0
   worldColliderType: 0
   boxOffset: {x: 0, y: 0}
   boxSize: {x: 1, y: 1}

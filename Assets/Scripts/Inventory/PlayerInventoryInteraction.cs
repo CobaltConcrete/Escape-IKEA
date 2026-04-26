@@ -23,6 +23,8 @@ public class PlayerInventoryInteraction : MonoBehaviour
     private IInteractable currentInteractable;
     private IInteractable lastInteractable;
 
+    [SerializeField] private KeyCode UtilityKey = KeyCode.Q;
+
     [Header("Auto Equip Settings")]
     [SerializeField] private bool autoEquipWhenSlotEmpty = false;
     [SerializeField] private bool autoRefillUtilityWhenConsumed = false;
@@ -80,7 +82,7 @@ public class PlayerInventoryInteraction : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.K))
+        if (Input.GetKeyDown(UtilityKey))
         {
             UseEquippedUtility();
         }

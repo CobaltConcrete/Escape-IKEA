@@ -13,15 +13,20 @@ public class ItemAssets : MonoBehaviour
         return Instance;
     }
 
-    public Transform pfItemWorld;
+    public Transform pfItemWorld_Normal;
+    public Transform pfItemWorld_Loot;
 
     private void Awake()
     {
         Instance = this;
     }
 
-    public Transform GetPfItemWorld()
+    public Transform GetPfItemWorld(Item item)
     {
-        return pfItemWorld;
+        if (item != null && item.IsLoot())
+        {
+            return pfItemWorld_Loot;
+        }
+        return pfItemWorld_Normal;
     }
 }

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio;
 
@@ -6,7 +7,22 @@ public class SoundManager : MonoBehaviour
 {
     public static SoundManager Instance { get; private set; }
 
-    [Header("Mixer (Optional)")]
+    [System.Serializable]
+    public class NamedSound
+    {
+        public string key;
+        public AudioClip clip;
+        [Range(0f, 2f)] public float volume = 1f;
+        public bool useUISource = false;
+
+        [Header("Optional Random Pitch")]
+        [Range(0f, 0.5f)] public float pitchRandomRange = 0f;
+    }
+
+    [Header("Sound Library")]
+    [SerializeField] private NamedSound[] soundLibrary;
+
+    [Header("Mixer Optional")]
     [SerializeField] private AudioMixer audioMixer;
 
     [Header("Audio Sources")]
@@ -14,15 +30,6 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioSource uiSource;
     [SerializeField] private AudioSource sfxSource;
     [SerializeField] private AudioSource ambientSource;
-
-    [Header("Common Clips")]
-    [SerializeField] private AudioClip[] buttonClickClips;
-    [SerializeField] private AudioClip playerHurtClip;
-    [SerializeField] private AudioClip playerDeathClip;
-    [SerializeField] private AudioClip itemPickupClip;
-    [SerializeField] private AudioClip inventoryOpenClip;
-    [SerializeField] private AudioClip inventoryCloseClip;
-    [SerializeField] private AudioClip generalAmbientClip;
 
     [Header("Default Volumes")]
     [Range(0f, 1f)][SerializeField] private float masterVolume = 1f;
@@ -34,9 +41,10 @@ public class SoundManager : MonoBehaviour
     [Header("Fade Settings")]
     [SerializeField] private float defaultMusicFadeDuration = 1f;
 
-    [Header("Player Hurt")]
+    [Header("Cooldowns")]
     [SerializeField] private float playerHurtSoundCooldown = 0.12f;
 
+    private Dictionary<string, NamedSound> soundMap;
     private Coroutine musicFadeCoroutine;
     private Coroutine ambientLoadCoroutine;
     private float lastPlayerHurtSoundTime = -999f;
@@ -47,6 +55,16 @@ public class SoundManager : MonoBehaviour
     private const string UI_PREF_KEY = "Audio_UIVolume";
     private const string AMBIENT_PREF_KEY = "Audio_AmbientVolume";
 
+    public const string BUTTON_CLICK = "ButtonClick";
+    public const string PLAYER_HURT = "PlayerHurt";
+    public const string PLAYER_DEATH = "PlayerDeath";
+    public const string ITEM_PICKUP = "PickupItem";
+    public const string INVENTORY_OPEN = "OpenInventory";
+    public const string INVENTORY_CLOSE = "CloseInventory";
+    public const string GENERAL_AMBIENT = "GeneralAmbient";
+
+    public const string DISTORTED_SHOPPER_LOOP = "DistortedShopper";
+    public const string DISTORTED_SHOPPER_DEATH = "DistortedShopperDeath";
     private void Awake()
     {
         if (Instance != null && Instance != this)
@@ -59,6 +77,7 @@ public class SoundManager : MonoBehaviour
         DontDestroyOnLoad(gameObject);
 
         EnsureAudioSources();
+        BuildSoundMap();
         LoadVolumes();
         ApplyVolumes();
     }
@@ -67,19 +86,67 @@ public class SoundManager : MonoBehaviour
     {
         AudioListener listener = FindObjectOfType<AudioListener>();
         if (listener == null)
-        {
             Debug.LogError("SoundManager: No AudioListener found in scene.");
-        }
 
-        if (generalAmbientClip != null)
+        if (HasSound(GENERAL_AMBIENT))
+            PlayAmbientSound(GENERAL_AMBIENT, true);
+    }
+
+    private void BuildSoundMap()
+    {
+        soundMap = new Dictionary<string, NamedSound>();
+
+        if (soundLibrary == null)
+            return;
+
+        foreach (NamedSound sound in soundLibrary)
         {
-            if (ambientLoadCoroutine != null)
-            {
-                StopCoroutine(ambientLoadCoroutine);
-            }
+            if (sound == null || string.IsNullOrWhiteSpace(sound.key) || sound.clip == null)
+                continue;
 
-            ambientLoadCoroutine = StartCoroutine(PlayAmbientWhenReady(generalAmbientClip, true));
+            soundMap[sound.key.Trim()] = sound;
         }
+    }
+
+    private NamedSound GetNamedSound(string key)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+            return null;
+
+        if (soundMap == null)
+            BuildSoundMap();
+
+        string cleanKey = key.Trim();
+
+        if (!soundMap.TryGetValue(cleanKey, out NamedSound sound))
+        {
+            Debug.LogWarning($"SoundManager: Sound key not found: {cleanKey}");
+            return null;
+        }
+
+        return sound;
+    }
+    public AudioClip GetClip(string key)
+    {
+        NamedSound sound = GetNamedSound(key);
+        return sound != null ? sound.clip : null;
+    }
+
+    public float GetSoundVolume(string key)
+    {
+        NamedSound sound = GetNamedSound(key);
+        return sound != null ? sound.volume : 1f;
+    }
+
+    public bool HasSound(string key)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+            return false;
+
+        if (soundMap == null)
+            BuildSoundMap();
+
+        return soundMap.ContainsKey(key.Trim());
     }
 
     private void EnsureAudioSources()
@@ -88,28 +155,24 @@ public class SoundManager : MonoBehaviour
         {
             musicSource = CreateChildSource("MusicSource");
             musicSource.loop = true;
-            musicSource.playOnAwake = false;
         }
 
         if (uiSource == null)
         {
             uiSource = CreateChildSource("UISource");
             uiSource.loop = false;
-            uiSource.playOnAwake = false;
         }
 
         if (sfxSource == null)
         {
             sfxSource = CreateChildSource("SFXSource");
             sfxSource.loop = false;
-            sfxSource.playOnAwake = false;
         }
 
         if (ambientSource == null)
         {
             ambientSource = CreateChildSource("AmbientSource");
             ambientSource.loop = true;
-            ambientSource.playOnAwake = false;
         }
     }
 
@@ -200,6 +263,93 @@ public class SoundManager : MonoBehaviour
     public float GetUIVolume() => uiVolume;
     public float GetAmbientVolume() => ambientVolume;
 
+    public void PlaySound(string key)
+    {
+        PlaySound(key, 1f);
+    }
+
+    public void PlaySound(string key, float volumeMultiplier)
+    {
+        NamedSound sound = GetNamedSound(key);
+        if (sound == null)
+            return;
+
+        float finalVolume = sound.volume * volumeMultiplier;
+
+        if (sound.useUISource)
+            PlayUI(sound.clip, finalVolume);
+        else
+            PlaySFX(sound.clip, finalVolume);
+    }
+
+    public void PlaySoundAtPosition(string key, Vector3 position)
+    {
+        PlaySoundAtPosition(key, position, 1f);
+    }
+
+    public void PlaySoundAtPosition(
+    string key,
+    Vector3 position,
+    float volumeMultiplier = 1f,
+    float minDistance = 1.5f,
+    float maxDistance = 12f
+)
+    {
+        NamedSound sound = GetNamedSound(key);
+        if (sound == null || sound.clip == null)
+            return;
+
+        GameObject audioObj = new GameObject("OneShotAudio_" + key);
+        audioObj.transform.position = position;
+
+        AudioSource source = audioObj.AddComponent<AudioSource>();
+        source.clip = sound.clip;
+        source.volume = masterVolume * sfxVolume * sound.volume * volumeMultiplier;
+        source.spatialBlend = 1f;
+        source.rolloffMode = AudioRolloffMode.Linear;
+        source.minDistance = minDistance;
+        source.maxDistance = maxDistance;
+        source.playOnAwake = false;
+
+        if (sound.pitchRandomRange > 0f)
+        {
+            source.pitch = Random.Range(
+                1f - sound.pitchRandomRange,
+                1f + sound.pitchRandomRange
+            );
+        }
+
+        source.Play();
+        Destroy(audioObj, sound.clip.length / Mathf.Max(0.01f, source.pitch) + 0.1f);
+    }
+
+    public void PlayMusicSound(string key, bool loop = true)
+    {
+        NamedSound sound = GetNamedSound(key);
+        if (sound == null)
+            return;
+
+        PlayMusic(sound.clip, loop);
+    }
+
+    public void PlayMusicSoundWithFade(string key, float fadeDuration = -1f, bool loop = true)
+    {
+        NamedSound sound = GetNamedSound(key);
+        if (sound == null)
+            return;
+
+        PlayMusicWithFade(sound.clip, fadeDuration, loop);
+    }
+
+    public void PlayAmbientSound(string key, bool loop = true)
+    {
+        NamedSound sound = GetNamedSound(key);
+        if (sound == null)
+            return;
+
+        PlayAmbient(sound.clip, loop);
+    }
+
     public void PlayMusic(AudioClip clip, bool loop = true)
     {
         if (clip == null || musicSource == null)
@@ -226,9 +376,7 @@ public class SoundManager : MonoBehaviour
             fadeDuration = defaultMusicFadeDuration;
 
         if (musicFadeCoroutine != null)
-        {
             StopCoroutine(musicFadeCoroutine);
-        }
 
         musicFadeCoroutine = StartCoroutine(FadeToNewMusicCoroutine(clip, fadeDuration, loop));
     }
@@ -257,16 +405,14 @@ public class SoundManager : MonoBehaviour
             fadeDuration = defaultMusicFadeDuration;
 
         if (musicFadeCoroutine != null)
-        {
             StopCoroutine(musicFadeCoroutine);
-        }
 
         musicFadeCoroutine = StartCoroutine(FadeOutMusicCoroutine(fadeDuration));
     }
 
     private IEnumerator FadeToNewMusicCoroutine(AudioClip newClip, float duration, bool loop)
     {
-        float originalTargetVolume = masterVolume * musicVolume;
+        float targetVolume = masterVolume * musicVolume;
 
         if (musicSource.isPlaying)
         {
@@ -276,8 +422,7 @@ public class SoundManager : MonoBehaviour
             while (timer < duration)
             {
                 timer += Time.deltaTime;
-                float t = timer / duration;
-                musicSource.volume = Mathf.Lerp(startVolume, 0f, t);
+                musicSource.volume = Mathf.Lerp(startVolume, 0f, timer / duration);
                 yield return null;
             }
 
@@ -293,12 +438,11 @@ public class SoundManager : MonoBehaviour
         while (fadeInTimer < duration)
         {
             fadeInTimer += Time.deltaTime;
-            float t = fadeInTimer / duration;
-            musicSource.volume = Mathf.Lerp(0f, originalTargetVolume, t);
+            musicSource.volume = Mathf.Lerp(0f, targetVolume, fadeInTimer / duration);
             yield return null;
         }
 
-        musicSource.volume = originalTargetVolume;
+        musicSource.volume = targetVolume;
         musicFadeCoroutine = null;
     }
 
@@ -310,8 +454,7 @@ public class SoundManager : MonoBehaviour
         while (timer < duration)
         {
             timer += Time.deltaTime;
-            float t = timer / duration;
-            musicSource.volume = Mathf.Lerp(startVolume, 0f, t);
+            musicSource.volume = Mathf.Lerp(startVolume, 0f, timer / duration);
             yield return null;
         }
 
@@ -329,30 +472,12 @@ public class SoundManager : MonoBehaviour
         sfxSource.PlayOneShot(clip, volumeScale);
     }
 
-    public void PlaySFX(AudioClip[] clips, float volumeScale = 1f)
-    {
-        if (clips == null || clips.Length == 0)
-            return;
-
-        AudioClip chosenClip = clips[Random.Range(0, clips.Length)];
-        PlaySFX(chosenClip, volumeScale);
-    }
-
     public void PlaySFXAtPosition(AudioClip clip, Vector3 position, float volume = 1f)
     {
         if (clip == null)
             return;
 
-        AudioSource.PlayClipAtPoint(clip, position, volume);
-    }
-
-    public void PlaySFXAtPosition(AudioClip[] clips, Vector3 position, float volume = 1f)
-    {
-        if (clips == null || clips.Length == 0)
-            return;
-
-        AudioClip chosenClip = clips[Random.Range(0, clips.Length)];
-        PlaySFXAtPosition(chosenClip, position, volume);
+        AudioSource.PlayClipAtPoint(clip, position, masterVolume * sfxVolume * volume);
     }
 
     public void PlayUI(AudioClip clip, float volumeScale = 1f)
@@ -369,9 +494,7 @@ public class SoundManager : MonoBehaviour
             return;
 
         if (ambientLoadCoroutine != null)
-        {
             StopCoroutine(ambientLoadCoroutine);
-        }
 
         ambientLoadCoroutine = StartCoroutine(PlayAmbientWhenReady(clip, loop));
     }
@@ -382,9 +505,7 @@ public class SoundManager : MonoBehaviour
             yield break;
 
         if (clip.loadState == AudioDataLoadState.Unloaded)
-        {
             clip.LoadAudioData();
-        }
 
         float timeout = 5f;
         float timer = 0f;
@@ -403,17 +524,7 @@ public class SoundManager : MonoBehaviour
 
         if (clip.loadState != AudioDataLoadState.Loaded)
         {
-            int extraFrames = 10;
-            while (extraFrames > 0 && clip.loadState != AudioDataLoadState.Loaded)
-            {
-                extraFrames--;
-                yield return null;
-            }
-        }
-
-        if (clip.loadState != AudioDataLoadState.Loaded)
-        {
-            Debug.LogError("SoundManager: Failed to load ambient clip: " + clip.name + " | Final state = " + clip.loadState);
+            Debug.LogError("SoundManager: Failed to load ambient clip: " + clip.name);
             yield break;
         }
 
@@ -443,19 +554,7 @@ public class SoundManager : MonoBehaviour
 
     public void PlayButtonClick()
     {
-        if (buttonClickClips == null || buttonClickClips.Length == 0)
-            return;
-
-        AudioClip clip = buttonClickClips[Random.Range(0, buttonClickClips.Length)];
-
-        if (uiSource == null) return;
-
-        float originalPitch = uiSource.pitch;
-        uiSource.pitch = Random.Range(0.95f, 1.05f);
-
-        uiSource.PlayOneShot(clip, 1.4f);
-
-        uiSource.pitch = originalPitch;
+        PlaySound(BUTTON_CLICK, 1.4f);
     }
 
     public void PlayPlayerHurt()
@@ -463,26 +562,67 @@ public class SoundManager : MonoBehaviour
         if (Time.time < lastPlayerHurtSoundTime + playerHurtSoundCooldown)
             return;
 
-        PlaySFX(playerHurtClip, 0.4f);
+        PlaySound(PLAYER_HURT);
         lastPlayerHurtSoundTime = Time.time;
     }
 
     public void PlayPlayerDeath()
     {
-        PlaySFX(playerDeathClip, 0.7f);
+        PlaySound(PLAYER_DEATH);
     }
 
     public void PlayInventoryOpen()
     {
-        PlayUI(inventoryOpenClip, 1.2f);
+        PlaySound(INVENTORY_OPEN);
     }
 
     public void PlayInventoryClose()
     {
-        PlayUI(inventoryCloseClip, 1.2f);
+        PlaySound(INVENTORY_CLOSE);
     }
+
     public void PlayItemPickup()
     {
-        PlaySFX(itemPickupClip, 1.1f);
+        PlaySound(ITEM_PICKUP);
+    }
+
+    public void PlayPlayerAttack()
+    {
+        PlaySound("PlayerAttack");
+    }
+
+    public void PlayEnemyHit(Vector3 position)
+    {
+        PlaySoundAtPosition("HitOneEnemy", position);
+    }
+
+    public void PlayLightsOn()
+    {
+        PlaySound("LightsOn");
+    }
+
+    public void PlayLightsOff()
+    {
+        PlaySound("LightsOff");
+    }
+    public void StopAllAudio()
+    {
+        StopMusic();
+        StopAmbient();
+
+        if (sfxSource != null)
+            sfxSource.Stop();
+
+        if (uiSource != null)
+            uiSource.Stop();
+    }
+    public void PauseAllAudio()
+    {
+        AudioListener.pause = true;
+    }
+
+    public void ResumeAllAudio()
+    {
+        AudioListener.pause = false;
     }
 }

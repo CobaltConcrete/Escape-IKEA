@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerDashAbility : MonoBehaviour
 {
@@ -13,6 +14,17 @@ public class PlayerDashAbility : MonoBehaviour
     [SerializeField] private float dashDistance = 3.5f;
     [SerializeField] private float dashDuration = 0.12f;
     [SerializeField] private float dashCooldown = 1.2f;
+
+    [Header("Dash Screen Shake")]
+    [SerializeField] private float dashStartShakeDuration = 0.06f;
+    [SerializeField] private float dashStartShakeStrength = 0.08f;
+    [SerializeField] private float dashHitShakeDuration = 0.10f;
+    [SerializeField] private float dashHitShakeStrength = 0.16f;
+
+    [Header("Dash Hit Audio")]
+    [SerializeField] private string hitOneEnemySoundKey = "HitOneEnemy";
+    [SerializeField] private string hitMultipleEnemiesSoundKey = "Hit2OrMoreEnemies";
+    private int dashHitCount;
 
     [Header("Dash Hit Settings")]
     [SerializeField] private LayerMask enemyLayerMask;
@@ -29,6 +41,8 @@ public class PlayerDashAbility : MonoBehaviour
     private Vector2 lastNonZeroMoveDirection = Vector2.right;
 
     private readonly HashSet<Collider2D> hitThisDash = new HashSet<Collider2D>();
+
+    public KeyCode dashKey = KeyCode.Mouse1;
 
     public bool IsDashing => isDashing;
     public bool IsDashOnCooldown => Time.time < lastDashTime + dashCooldown;
@@ -71,7 +85,7 @@ public class PlayerDashAbility : MonoBehaviour
 
     private bool IsKeyPressed()
     {
-        return Input.GetKeyDown(KeyCode.L) || Input.GetKeyDown(KeyCode.RightShift);
+        return Input.GetKeyDown(dashKey);
     }
 
     private bool HasDashArmorEquipped()
@@ -94,6 +108,9 @@ public class PlayerDashAbility : MonoBehaviour
         isDashing = true;
         lastDashTime = Time.time;
         hitThisDash.Clear();
+        dashHitCount = 0;
+
+        ScreenShake.Instance?.Shake(dashStartShakeDuration, dashStartShakeStrength);
 
         Vector2 dashDirection = lastNonZeroMoveDirection.normalized;
         float dashSpeed = dashDistance / dashDuration;
@@ -129,6 +146,15 @@ public class PlayerDashAbility : MonoBehaviour
             playerMovementScript.enabled = true;
         }
 
+        if (dashHitCount == 1)
+        {
+            SoundManager.Instance?.PlaySound(hitOneEnemySoundKey, 1f);
+        }
+        else if (dashHitCount >= 2)
+        {
+            SoundManager.Instance?.PlaySound(hitMultipleEnemiesSoundKey, 1f);
+        }
+
         isDashing = false;
     }
 
@@ -142,6 +168,8 @@ public class PlayerDashAbility : MonoBehaviour
             if (hitThisDash.Contains(hit)) continue;
 
             hitThisDash.Add(hit);
+            dashHitCount++;
+            ScreenShake.Instance?.Shake(dashHitShakeDuration, dashHitShakeStrength);
 
             Enemy enemy = hit.GetComponent<Enemy>();
             if (enemy == null)

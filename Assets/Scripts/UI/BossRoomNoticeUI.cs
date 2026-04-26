@@ -38,6 +38,9 @@ public class BossRoomNoticeUI : MonoBehaviour
     {
         if (noticeText == null) return;
 
+        if (!gameObject.activeInHierarchy)
+            return;
+
         if (currentRoutine != null)
         {
             StopCoroutine(currentRoutine);
