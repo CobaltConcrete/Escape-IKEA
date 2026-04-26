@@ -513,6 +513,7 @@ public class PageManager : MonoBehaviour
         SceneManager.LoadSceneAsync("Pause", LoadSceneMode.Additive).completed += (op) =>
         {
             Time.timeScale = 0f;
+            SoundManager.Instance?.PauseAllAudio();
 
             var resumeButton = GameObject.Find("ResumeButton");
             if (resumeButton != null)
@@ -538,6 +539,7 @@ public class PageManager : MonoBehaviour
         }
 
         Time.timeScale = 1f;
+        SoundManager.Instance?.ResumeAllAudio();
         SceneManager.UnloadSceneAsync("Pause");
 
         if (gameUIObjects != null)
@@ -569,6 +571,7 @@ public class PageManager : MonoBehaviour
     public void MainMenu()
     {
         Time.timeScale = 1f;
+        SoundManager.Instance?.ResumeAllAudio();
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         SceneManager.LoadScene("MainMenu");

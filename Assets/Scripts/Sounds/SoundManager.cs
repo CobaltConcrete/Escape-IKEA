@@ -605,4 +605,24 @@ public class SoundManager : MonoBehaviour
     {
         PlaySound("LightsOff");
     }
+    public void StopAllAudio()
+    {
+        StopMusic();
+        StopAmbient();
+
+        if (sfxSource != null)
+            sfxSource.Stop();
+
+        if (uiSource != null)
+            uiSource.Stop();
+    }
+    public void PauseAllAudio()
+    {
+        AudioListener.pause = true;
+    }
+
+    public void ResumeAllAudio()
+    {
+        AudioListener.pause = false;
+    }
 }
