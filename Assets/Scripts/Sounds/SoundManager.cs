@@ -287,7 +287,13 @@ public class SoundManager : MonoBehaviour
         PlaySoundAtPosition(key, position, 1f);
     }
 
-    public void PlaySoundAtPosition(string key, Vector3 position, float volumeMultiplier = 1f)
+    public void PlaySoundAtPosition(
+    string key,
+    Vector3 position,
+    float volumeMultiplier = 1f,
+    float minDistance = 1.5f,
+    float maxDistance = 12f
+)
     {
         NamedSound sound = GetNamedSound(key);
         if (sound == null || sound.clip == null)
@@ -301,8 +307,8 @@ public class SoundManager : MonoBehaviour
         source.volume = masterVolume * sfxVolume * sound.volume * volumeMultiplier;
         source.spatialBlend = 1f;
         source.rolloffMode = AudioRolloffMode.Linear;
-        source.minDistance = 1.5f;
-        source.maxDistance = 12f;
+        source.minDistance = minDistance;
+        source.maxDistance = maxDistance;
         source.playOnAwake = false;
 
         if (sound.pitchRandomRange > 0f)

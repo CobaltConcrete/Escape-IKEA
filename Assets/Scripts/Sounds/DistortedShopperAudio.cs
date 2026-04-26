@@ -9,12 +9,20 @@ public class DistortedShopperAudio : MonoBehaviour
 
     [Header("3D Audio Settings")]
     [SerializeField] private float minDistance = 1.2f;
-    [SerializeField] private float maxDistance = 8f;
+    [SerializeField] private float maxDistance = 15f;
     [Range(0f, 1f)][SerializeField] private float spatialBlend = 1f;
     [Range(0f, 1f)][SerializeField] private float baseVolumeMultiplier = 0.35f;
 
     [Header("Anti Noise Spam")]
     [SerializeField] private int maxLoopingShoppers = 4;
+
+    [Header("Activation")]
+    [SerializeField] private Transform listenerTarget;
+    [SerializeField] private float startDistance = 10f;
+    [SerializeField] private float stopDistance = 15f;
+    [SerializeField] private float checkInterval = 0.25f;
+
+    private float nextCheckTime;
 
     private static int activeLoopCount = 0;
 
@@ -32,11 +40,32 @@ public class DistortedShopperAudio : MonoBehaviour
         }
     }
 
-    private void Start()
+    private void Update()
     {
-        if (playOnStart)
+        if (Time.time < nextCheckTime)
+            return;
+
+        nextCheckTime = Time.time + checkInterval;
+
+        if (listenerTarget == null)
+        {
+            GameObject player = GameObject.FindGameObjectWithTag("Player");
+            if (player != null)
+                listenerTarget = player.transform;
+        }
+
+        if (listenerTarget == null)
+            return;
+
+        float distance = Vector2.Distance(transform.position, listenerTarget.position);
+
+        if (distance <= startDistance)
         {
             StartLoop();
+        }
+        else if (distance >= stopDistance)
+        {
+            StopLoop();
         }
     }
 
@@ -123,10 +152,12 @@ public class DistortedShopperAudio : MonoBehaviour
         if (SoundManager.Instance != null)
         {
             SoundManager.Instance.PlaySoundAtPosition(
-                deathSoundKey,
-                deathPosition,
-                0.8f
-            );
+            deathSoundKey,
+            deathPosition,
+            1.2f,
+            minDistance,
+            maxDistance
+ );
         }
     }
 }

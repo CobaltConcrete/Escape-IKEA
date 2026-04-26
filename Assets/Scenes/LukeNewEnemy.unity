@@ -490,6 +490,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 8567453197189089786, guid: 7eb3db93aeedfd345b0ebbe5024af143, type: 3}
+      propertyPath: pfItemWorld_Loot
+      value: 
+      objectReference: {fileID: 3812046145358606943, guid: 0c4deb2c187d2c347b69738817514a94, type: 3}
+    - target: {fileID: 8567453197189089786, guid: 7eb3db93aeedfd345b0ebbe5024af143, type: 3}
+      propertyPath: pfItemWorld_Normal
+      value: 
+      objectReference: {fileID: 3812046145358606943, guid: 783dfd12eebff5940ac1614939b829ea, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []

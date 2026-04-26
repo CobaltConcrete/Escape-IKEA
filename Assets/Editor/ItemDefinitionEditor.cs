@@ -69,10 +69,16 @@ public class ItemDefinitionEditor : Editor
         EditorGUILayout.Space();
 
         // World Display Settings
-        EditorGUILayout.LabelField("World Display Settings", EditorStyles.boldLabel);
         EditorGUILayout.PropertyField(serializedObject.FindProperty("worldDropScale"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("spawnFootprint"));
         EditorGUILayout.PropertyField(serializedObject.FindProperty("worldContrastBackdrop"));
+
+        EditorGUILayout.Space();
+
+        // World Display Settings
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("worldGlowEnabled"));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("worldGlowIntensity"));
+        EditorGUILayout.PropertyField(serializedObject.FindProperty("worldGlowRadius"));
 
         EditorGUILayout.Space();
 

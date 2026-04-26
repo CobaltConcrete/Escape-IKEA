@@ -22,7 +22,7 @@ public class RoomPresentation : MonoBehaviour
     [SerializeField] private string floorBackdropSortingLayerName = "Default";
     [Tooltip("Room fill (legacy stretched sprite). Keeps tiles visually above this layer.")]
     [SerializeField] private int floorBackdropSortingOrder = -500;
-    [SerializeField] private Color floorFallbackColor = new Color(0.72f, 0.58f, 0.38f, 1f);
+    [SerializeField] private Color floorFallbackColor = Color.black;
     [SerializeField] private string floorSortingLayerName = "Floor";
     [SerializeField] private int floorTileSortingOrder = 0;
     [Tooltip("SpriteMask sorting on Floor layer; tiles use mask range between back and front orders.")]
@@ -248,7 +248,7 @@ public class RoomPresentation : MonoBehaviour
 
         legacySr.sprite = GetWhiteRectMaskSprite();
         legacySr.color = floorFallbackColor;
-        legacySr.drawMode = SpriteDrawMode.Tiled;
+        legacySr.drawMode = SpriteDrawMode.Simple;
         Vector3 floorScale = floorTransform.lossyScale;
         legacySr.size = new Vector2(
             floorWorldBounds.size.x / Mathf.Max(0.0001f, Mathf.Abs(floorScale.x)),

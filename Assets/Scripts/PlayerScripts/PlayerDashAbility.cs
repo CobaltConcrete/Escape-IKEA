@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class PlayerDashAbility : MonoBehaviour
 {
@@ -29,6 +30,8 @@ public class PlayerDashAbility : MonoBehaviour
     private Vector2 lastNonZeroMoveDirection = Vector2.right;
 
     private readonly HashSet<Collider2D> hitThisDash = new HashSet<Collider2D>();
+
+    public KeyCode dashKey = KeyCode.Mouse1;
 
     public bool IsDashing => isDashing;
     public bool IsDashOnCooldown => Time.time < lastDashTime + dashCooldown;
@@ -71,7 +74,7 @@ public class PlayerDashAbility : MonoBehaviour
 
     private bool IsKeyPressed()
     {
-        return Input.GetKeyDown(KeyCode.RightShift);
+        return Input.GetKeyDown(dashKey);
     }
 
     private bool HasDashArmorEquipped()

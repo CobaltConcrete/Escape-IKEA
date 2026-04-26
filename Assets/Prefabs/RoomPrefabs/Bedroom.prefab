@@ -306,8 +306,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   explored: 0
   roomVisuals: {fileID: 520739178390693697}
-  sportsBatHintRadius: 2.35
-  sportsBatHintCooldownSeconds: 7
 --- !u!114 &-1462229431368572948
 MonoBehaviour:
   m_ObjectHideFlags: 0

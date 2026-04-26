@@ -36,6 +36,9 @@ MonoBehaviour:
   bonusSpawnWeight: 1
   worldDropScale: {x: 1, y: 1, z: 1}
   spawnFootprint: {x: 1, y: 1}
+  worldGlowEnabled: 1
+  worldGlowIntensity: 0.1
+  worldGlowRadius: 1.2
   worldContrastBackdrop: 0
   worldColliderType: 0
   boxOffset: {x: 0, y: 0}

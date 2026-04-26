@@ -66,6 +66,11 @@ public class ItemDefinition : ScriptableObject
     public Vector3 worldDropScale = Vector3.one;
     public Vector2 spawnFootprint = new Vector2(1f, 1f);
 
+    [Header("World Glow Settings")]
+    public bool worldGlowEnabled = false;
+    public float worldGlowIntensity = 1f;
+    public float worldGlowRadius = 2.5f;
+
     [Tooltip("Adds a bright plate behind the world sprite so small props stay readable on busy floors.")]
     public bool worldContrastBackdrop;
 

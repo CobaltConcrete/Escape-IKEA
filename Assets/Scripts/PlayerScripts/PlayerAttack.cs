@@ -7,7 +7,7 @@ public class PlayerAttack : MonoBehaviour
     [SerializeField] private float attackDamage = 15f;
     [SerializeField] private float bonusDamagePerExtraBat = 7.5f;
     [SerializeField] private float attackRadius = 1.25f;
-    [SerializeField] private KeyCode attackKey = KeyCode.J;
+    [SerializeField] private KeyCode attackKey = KeyCode.Mouse0;
     [SerializeField] private float bulletClearRadius = 1.6f;
     [SerializeField] private float attackCooldown = 0.4f;
     [SerializeField] private float attackForwardOffsetFactor = 0.75f;

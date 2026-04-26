@@ -28,6 +28,10 @@ public class EnemyDashCharger : MonoBehaviour
     [SerializeField] private float recoilDistance = 1.5f;
     [SerializeField] private float recoilDuration = 0.12f;
 
+    private Collider2D[] ownColliders;
+    private readonly System.Collections.Generic.List<Collider2D> ignoredColliders =
+        new System.Collections.Generic.List<Collider2D>();
+
     private float attackTimer;
     private bool isBusy = false;
     private bool isDashing = false;
@@ -45,6 +49,7 @@ public class EnemyDashCharger : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         wander = GetComponent<EnemyWander>();
+        ownColliders = GetComponentsInChildren<Collider2D>();
         if (animator == null)
             animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
         if (spriteRenderer == null)
@@ -65,6 +70,7 @@ public class EnemyDashCharger : MonoBehaviour
 
     private void OnDisable()
     {
+        SetDashIgnoreCollisions(false);
         if (activeRoutine != null)
         {
             StopCoroutine(activeRoutine);
@@ -161,6 +167,7 @@ public class EnemyDashCharger : MonoBehaviour
             spriteRenderer.color = Color.red;
 
         isDashing = true;
+        SetDashIgnoreCollisions(true);
 
         rb.linearVelocity = Vector2.zero;
         rb.AddForce(dashDirection * dashForce, ForceMode2D.Impulse);
@@ -183,6 +190,7 @@ public class EnemyDashCharger : MonoBehaviour
     private IEnumerator StunThenRecover()
     {
         isDashing = false;
+        SetDashIgnoreCollisions(false);
         rb.linearVelocity = Vector2.zero;
 
         if (spriteRenderer != null)
@@ -200,7 +208,7 @@ public class EnemyDashCharger : MonoBehaviour
         if (!isDashing) return;
         if (collision.contactCount == 0) return;
 
-        if (collision.gameObject.CompareTag("Wall"))
+        if (collision.gameObject.CompareTag("Wall") || collision.gameObject.GetComponentInParent<Door>() != null)
         {
             isDashing = false;
 
@@ -246,6 +254,7 @@ public class EnemyDashCharger : MonoBehaviour
 
     private void RecoverToIdle()
     {
+        SetDashIgnoreCollisions(false);
         rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
 
@@ -272,6 +281,7 @@ public class EnemyDashCharger : MonoBehaviour
 
     private void ResetState()
     {
+        SetDashIgnoreCollisions(false);
         if (rb != null)
         {
             rb.linearVelocity = Vector2.zero;
@@ -330,5 +340,97 @@ public class EnemyDashCharger : MonoBehaviour
 
         animator.Play(nextHash, 0, 0f);
         currentAnimationStateHash = nextHash;
+    }
+    private void SetDashIgnoreCollisions(bool ignore)
+    {
+        if (ownColliders == null || ownColliders.Length == 0)
+            ownColliders = GetComponentsInChildren<Collider2D>();
+
+        if (!ignore)
+        {
+            for (int i = 0; i < ignoredColliders.Count; i++)
+            {
+                Collider2D other = ignoredColliders[i];
+                if (other == null) continue;
+
+                for (int j = 0; j < ownColliders.Length; j++)
+                {
+                    if (ownColliders[j] != null)
+                        Physics2D.IgnoreCollision(ownColliders[j], other, false);
+                }
+            }
+
+            ignoredColliders.Clear();
+            return;
+        }
+
+        ignoredColliders.Clear();
+
+        Collider2D[] allColliders = FindObjectsByType<Collider2D>(
+            FindObjectsInactive.Exclude,
+            FindObjectsSortMode.None
+        );
+
+        foreach (Collider2D other in allColliders)
+        {
+            if (other == null) continue;
+            if (other.isTrigger) continue;
+            if (IsOwnCollider(other)) continue;
+
+            if (!ShouldIgnoreColliderDuringDash(other))
+                continue;
+
+            for (int i = 0; i < ownColliders.Length; i++)
+            {
+                Collider2D own = ownColliders[i];
+                if (own == null) continue;
+
+                Physics2D.IgnoreCollision(own, other, true);
+            }
+
+            ignoredColliders.Add(other);
+        }
+    }
+
+    private bool IsOwnCollider(Collider2D col)
+    {
+        if (ownColliders == null)
+            return false;
+
+        for (int i = 0; i < ownColliders.Length; i++)
+        {
+            if (ownColliders[i] == col)
+                return true;
+        }
+
+        return false;
+    }
+
+    private bool ShouldIgnoreColliderDuringDash(Collider2D other)
+    {
+        if (other == null)
+            return false;
+
+        if (other.CompareTag("Wall") || other.GetComponentInParent<Door>() != null)
+            return false;
+
+        if (other.CompareTag("Player") || other.GetComponentInParent<PlayerHealth>() != null)
+            return false;
+
+        Transform t = other.transform;
+
+        while (t != null)
+        {
+            if (LayerMask.LayerToName(t.gameObject.layer) == "Loot" ||
+                LayerMask.LayerToName(t.gameObject.layer) == "Item" ||
+                LayerMask.LayerToName(t.gameObject.layer) == "Furniture")
+            {
+                return true;
+            }
+
+            t = t.parent;
+        }
+
+        return true;
     }
 }
