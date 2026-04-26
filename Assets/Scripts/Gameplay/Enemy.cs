@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -36,6 +37,14 @@ public class Enemy : MonoBehaviour
     [Header("Wall Bounce")]
     [SerializeField] private float wallBounceCooldown = 0.15f;
 
+    [Header("Stalker Audio Optional")]
+    [SerializeField] private StalkerAudio stalkerAudio;
+    [SerializeField] private float stalkerTransformSoundDelay = 0.4f;
+
+    private bool stalkerPlayerInRange = false;
+    private bool stalkerTransitioning = false;
+    private Coroutine stalkerAudioRoutine;
+
 
     private float lastWallBounceTime = -999f;
 
@@ -68,6 +77,8 @@ public class Enemy : MonoBehaviour
         rb.gravityScale = 0f;
         rb.constraints = RigidbodyConstraints2D.FreezeRotation;
         rb.useFullKinematicContacts = true;
+        if (stalkerAudio == null)
+            stalkerAudio = GetComponent<StalkerAudio>();
         if (animator == null)
             animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
         if (spriteRenderer == null)
@@ -92,6 +103,10 @@ public class Enemy : MonoBehaviour
         if (p != null)
         {
             playerTransform = p.transform;
+        }
+        if (stalkerAudio != null)
+        {
+            stalkerAudio.StartWalkerLoop();
         }
     }
 
@@ -151,6 +166,7 @@ public class Enemy : MonoBehaviour
         }
 
         Vector2 moveDir;
+        bool playerDetectedThisFrame = false;
 
         // 3) if on side, move more to the center first than chase the player
         if (useBounds && IsNearBounds(pos))
@@ -177,16 +193,7 @@ public class Enemy : MonoBehaviour
                 if (dist <= detectionRadius && dist > 0.05f)
                 {
                     moveDir = toPlayer.normalized;
-                }
-            }
-            if (playerTransform != null)
-            {
-                Vector2 toPlayer = (Vector2)playerTransform.position - pos;
-                float dist = toPlayer.magnitude;
-
-                if (dist <= detectionRadius && dist > 0.05f)
-                {
-                    moveDir = toPlayer.normalized;
+                    playerDetectedThisFrame = true;
                 }
             }
 
@@ -213,6 +220,7 @@ public class Enemy : MonoBehaviour
             nextMove = ClampToBounds(nextMove);
 
         rb.MovePosition(nextMove);
+        UpdateStalkerAudioState(playerDetectedThisFrame);
         UpdateAnimationState();
     }
 
@@ -359,5 +367,40 @@ public class Enemy : MonoBehaviour
 
         animator.Play(nextHash, 0, 0f);
         currentAnimationStateHash = nextHash;
+    }
+    private void UpdateStalkerAudioState(bool playerDetected)
+    {
+        if (stalkerAudio == null)
+            return;
+
+        if (stalkerTransitioning)
+            return;
+
+        if (playerDetected == stalkerPlayerInRange)
+            return;
+
+        stalkerPlayerInRange = playerDetected;
+
+        if (stalkerAudioRoutine != null)
+            StopCoroutine(stalkerAudioRoutine);
+
+        stalkerAudioRoutine = StartCoroutine(CoSwitchStalkerAudio(playerDetected));
+    }
+
+    private IEnumerator CoSwitchStalkerAudio(bool toSpider)
+    {
+        stalkerTransitioning = true;
+
+        stalkerAudio.PlayTransformSound();
+
+        yield return new WaitForSeconds(stalkerTransformSoundDelay);
+
+        if (toSpider)
+            stalkerAudio.StartSpiderLoop();
+        else
+            stalkerAudio.StartWalkerLoop();
+
+        stalkerTransitioning = false;
+        stalkerAudioRoutine = null;
     }
 }

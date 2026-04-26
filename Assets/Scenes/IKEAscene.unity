@@ -885,9 +885,24 @@ MonoBehaviour:
     volume: 2
     useUISource: 0
     pitchRandomRange: 0
-  - key: EmployeeFootstep
-    clip: {fileID: 8300000, guid: 045a664750b5de644b310e509456ca0c, type: 3}
+  - key: StalkerWalking
+    clip: {fileID: 8300000, guid: 4e8d2356a8472b74a86176d0ca2d96b6, type: 3}
     volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: StalkerTurnToSpider
+    clip: {fileID: 8300000, guid: 19a486a6ce067b3448c7b13104d23abc, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: SpiderCrawling
+    clip: {fileID: 8300000, guid: f63b0cc6e284df34b8257f769461664d, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: SpiderDeath
+    clip: {fileID: 8300000, guid: 69b18334e9c92604b8bb3908b5b6329f, type: 3}
+    volume: 0.283
     useUISource: 0
     pitchRandomRange: 0
   - key: GeneralAmbient
@@ -1433,7 +1448,7 @@ PrefabInstance:
   serializedVersion: 2
   m_Modification:
     serializedVersion: 3
-    m_TransformParent: {fileID: 0}
+    m_TransformParent: {fileID: 6909664513707299512}
     m_Modifications:
     - target: {fileID: 3497399480361236340, guid: 3d8ed47cfc1a0e748b0009d1a51f09ed, type: 3}
       propertyPath: m_Name
@@ -1501,7 +1516,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6405063978565751864, guid: 3d8ed47cfc1a0e748b0009d1a51f09ed, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 981.5
+      value: -18
       objectReference: {fileID: 0}
     - target: {fileID: 6405063978565751864, guid: 3d8ed47cfc1a0e748b0009d1a51f09ed, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -2520,6 +2535,11 @@ PrefabInstance:
       addedObject: {fileID: 3492875223107919435}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 9c39a5698320ab64fb9366beebe3f482, type: 3}
+--- !u!224 &6909664513707299512 stripped
+RectTransform:
+  m_CorrespondingSourceObject: {fileID: 792196242469595467, guid: 9c39a5698320ab64fb9366beebe3f482, type: 3}
+  m_PrefabInstance: {fileID: 6909664513707299511}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7379231341588617746
 PrefabInstance:
   m_ObjectHideFlags: 0

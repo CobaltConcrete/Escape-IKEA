@@ -18,8 +18,9 @@ GameObject:
   - component: {fileID: -5141088472471799213}
   - component: {fileID: 1695997259055853026}
   - component: {fileID: 86945060787307803}
+  - component: {fileID: 4920741548471981457}
   m_Layer: 10
-  m_Name: Employee
+  m_Name: Stalker
   m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -82,7 +83,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1295074419
-  m_SortingLayer: 5
+  m_SortingLayer: 6
   m_SortingOrder: 0
   m_Sprite: {fileID: -2834172931560493021, guid: a7c1083e26450482587bac59538adf64, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -223,6 +224,8 @@ MonoBehaviour:
   dashStaggerDuration: 0.14
   dashSideBias: 0.7
   wallBounceCooldown: 0.15
+  stalkerAudio: {fileID: 0}
+  stalkerTransformSoundDelay: 0.4
   wallRecoverDuration: 0.4
 --- !u!114 &7776932078797165444
 MonoBehaviour:
@@ -288,3 +291,23 @@ MonoBehaviour:
   staggerDistance: 0.9
   staggerDuration: 0.14
   sidewaysOffsetStrength: 0.35
+--- !u!114 &4920741548471981457
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6291527677918437734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 94b400b026ed40548a1b3a3710556601, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  walkerLoopKey: StalkerWalking
+  transformKey: StalkerTurnToSpider
+  spiderLoopKey: SpiderCrawling
+  deathKey: SpiderDeath
+  minDistance: 1.2
+  maxDistance: 15
+  spatialBlend: 1
+  loopVolumeMultiplier: 0.45
