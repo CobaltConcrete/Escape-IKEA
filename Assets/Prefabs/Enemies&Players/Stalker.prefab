@@ -213,6 +213,7 @@ MonoBehaviour:
   playTransformIntroOnRoomEntry: 1
   transformAnimationState: Transform
   transformIntroDuration: 0.7
+  transformedIdleSprite: {fileID: 1396590488265283886, guid: 024b1acf3b7b4af0baddc0ff9d4517b8, type: 3}
   useBounds: 0
   minBounds: {x: 0, y: 0}
   maxBounds: {x: 0, y: 0}

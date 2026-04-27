@@ -77,6 +77,10 @@ public class RoomContentVisibility : MonoBehaviour
         // Normal enemy chase script
         if (enemy != null)
         {
+            if (!active)
+            {
+                enemy.NotifyRoomDeactivated();
+            }
             enemy.enabled = active;
         }
 
