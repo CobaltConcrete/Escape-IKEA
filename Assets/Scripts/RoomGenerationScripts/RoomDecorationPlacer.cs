@@ -213,7 +213,7 @@ public static class RoomDecorationPlacer
         Vector3 curtainPos = wideRoom ? new Vector3(midX, top - 0.1f, 0f) : new Vector3(midX, top - 0.2f, 0f);
         Vector3 plantPos = wideRoom ? new Vector3(left + 2.85f, bottom + 0.75f, 0f) : new Vector3(left + 0.95f, midY + 0.25f, 0f);
         Vector3 lampPos = wideRoom ? new Vector3(right - 3.35f, bottom + 0.75f, 0f) : new Vector3(right - 0.95f, midY + 0.25f, 0f);
-        Vector3 cartPos = wideRoom ? new Vector3(midX, bottom + 0.3f, 0f) : new Vector3(midX, bottom + 0.8f, 0f);
+        Vector3 cartPos = new Vector3(midX, bottom + 0.8f, 0f);
         Vector3 leftMonsteraPos = wideRoom ? new Vector3(left + 2.35f, bottom + 0.78f, 0f) : new Vector3(left + 0.82f, bottom + 2.35f, 0f);
         Vector3 rightMonsteraPos = wideRoom ? new Vector3(right - 2.35f, bottom + 0.78f, 0f) : new Vector3(right - 0.82f, bottom + 2.35f, 0f);
 
@@ -270,8 +270,11 @@ public static class RoomDecorationPlacer
         SpawnLayoutObject(decorRoot, "Living_Houseplant", plantPrefab, plantSprite, plantPlaced, 8);
         Vector3 lampPlaced = PlaceLivingLocal("Living_Lamp", lampPrefab, lampSprite, lampPos);
         SpawnLayoutObject(decorRoot, "Living_Lamp", lampPrefab, lampSprite, lampPlaced, 8);
-        Vector3 cartPlaced = PlaceLivingLocal("Living_TieredCart", cartPrefab, cartSprite, cartPos);
-        SpawnLayoutObject(decorRoot, "Living_TieredCart", cartPrefab, cartSprite, cartPlaced, 8);
+        if (!wideRoom)
+        {
+            Vector3 cartPlaced = PlaceLivingLocal("Living_TieredCart", cartPrefab, cartSprite, cartPos);
+            SpawnLayoutObject(decorRoot, "Living_TieredCart", cartPrefab, cartSprite, cartPlaced, 8);
+        }
         Vector3 leftMonsteraPlaced = PlaceLivingLocal("Living_Monstera_Left", monsteraPrefab, monsteraSprite, leftMonsteraPos);
         SpawnLayoutObject(decorRoot, "Living_Monstera_Left", monsteraPrefab, monsteraSprite, leftMonsteraPlaced, 8);
         Vector3 rightMonsteraPlaced = PlaceLivingLocal("Living_Monstera_Right", monsteraPrefab, monsteraSprite, rightMonsteraPos);

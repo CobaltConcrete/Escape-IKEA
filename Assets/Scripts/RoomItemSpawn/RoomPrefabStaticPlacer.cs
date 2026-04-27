@@ -582,12 +582,12 @@ public static class RoomPrefabStaticPlacer
         }
 
 
-        if (tieredCartPrefab != null)
+        if (tieredCartPrefab != null && !wideRoom)
         {
             Vector3 cartPos = RoomDecorationPlacer.GetAnchoredWorldPosition(
                 roomRoot,
                 RoomDecorInteriorAnchor.InteriorBottomCenter,
-                wideRoom ? new Vector3(0f, 0.3f, 0f) : new Vector3(0f, 0.8f, 0f));
+                new Vector3(0f, 0.8f, 0f));
             GameObject cart = SpawnConfiguredPrefab(tieredCartPrefab, cartPos, parent, roomRoot);
             if (cart != null)
             {
