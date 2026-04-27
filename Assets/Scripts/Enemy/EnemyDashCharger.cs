@@ -135,9 +135,6 @@ public class EnemyDashCharger : MonoBehaviour
 
         rb.linearVelocity = Vector2.zero;
 
-        if (spriteRenderer != null)
-            spriteRenderer.color = Color.yellow;
-
         float timer = 0f;
         Vector2 lockedDir = dashDirection;
 
@@ -162,9 +159,6 @@ public class EnemyDashCharger : MonoBehaviour
 
         dashDirection = lockedDir;
         UpdateAttackAnimation(dashDirection);
-
-        if (spriteRenderer != null)
-            spriteRenderer.color = Color.red;
 
         isDashing = true;
         SetDashIgnoreCollisions(true);
@@ -192,9 +186,6 @@ public class EnemyDashCharger : MonoBehaviour
         isDashing = false;
         SetDashIgnoreCollisions(false);
         rb.linearVelocity = Vector2.zero;
-
-        if (spriteRenderer != null)
-            spriteRenderer.color = Color.cyan;
 
         yield return new WaitForSeconds(stunDuration);
 
@@ -242,9 +233,6 @@ public class EnemyDashCharger : MonoBehaviour
 
     private IEnumerator RecoilThenStun(Vector2 dir)
     {
-        if (spriteRenderer != null)
-            spriteRenderer.color = Color.cyan;
-
         yield return Recoil(dir);
 
         yield return new WaitForSeconds(bouncePauseDuration);
@@ -257,9 +245,6 @@ public class EnemyDashCharger : MonoBehaviour
         SetDashIgnoreCollisions(false);
         rb.linearVelocity = Vector2.zero;
         rb.angularVelocity = 0f;
-
-        if (spriteRenderer != null)
-            spriteRenderer.color = Color.white;
 
         if (wander != null)
             wander.CanMove = true;
@@ -291,11 +276,6 @@ public class EnemyDashCharger : MonoBehaviour
         if (wander != null)
         {
             wander.CanMove = true;
-        }
-
-        if (spriteRenderer != null)
-        {
-            spriteRenderer.color = Color.white;
         }
 
         attackTimer = GetRandomAttackInterval();

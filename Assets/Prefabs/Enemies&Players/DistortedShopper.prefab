@@ -207,8 +207,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   player: {fileID: 0}
-  spriteRenderer: {fileID: 0}
-  animator: {fileID: 0}
+  spriteRenderer: {fileID: 4368097409754222902}
+  animator: {fileID: 6612345678901234567}
   minAttackInterval: 1.2
   maxAttackInterval: 3.8
   aimDuration: 0.8
@@ -240,8 +240,8 @@ MonoBehaviour:
   maxBounds: {x: 8, y: 4}
   boundsPadding: 0.15
   playerBounceDistance: 0.7
-  animator: {fileID: 0}
-  spriteRenderer: {fileID: 0}
+  animator: {fileID: 6612345678901234567}
+  spriteRenderer: {fileID: 4368097409754222902}
 --- !u!114 &-8047790109118790915
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -314,7 +314,7 @@ Animator:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3464154710725457275}
-  m_Enabled: 1
+  m_Enabled: 0
   m_Avatar: {fileID: 0}
   m_Controller: {fileID: 9100000, guid: 51356f3cd984945848b3c17c5352352a, type: 2}
   m_CullingMode: 0

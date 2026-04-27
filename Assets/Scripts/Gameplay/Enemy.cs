@@ -17,6 +17,7 @@ public class Enemy : MonoBehaviour
     [SerializeField] private bool playTransformIntroOnRoomEntry = false;
     [SerializeField] private string transformAnimationState = "Transform";
     [SerializeField] private float transformIntroDuration = 0.7f;
+    [SerializeField] private Sprite transformedIdleSprite;
 
     [Header("Bounds")]
     [SerializeField] private bool useBounds = false;
@@ -66,6 +67,8 @@ public class Enemy : MonoBehaviour
     private bool hasPlayedTransformIntro = false;
     private bool isPlayingTransformIntro = false;
     private float transformIntroTimer = 0f;
+    private Sprite originalSprite;
+    private Sprite transformedSprite;
 
     private static readonly int WalkLeftHash = Animator.StringToHash("Base Layer.Walk_L");
     private static readonly int WalkRightHash = Animator.StringToHash("Base Layer.Walk_R");
@@ -83,6 +86,8 @@ public class Enemy : MonoBehaviour
             animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
         if (spriteRenderer == null)
             spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
+        if (spriteRenderer != null)
+            originalSprite = spriteRenderer.sprite;
 
         PickNewWanderDirection();
     }
@@ -122,6 +127,17 @@ public class Enemy : MonoBehaviour
             if (transformIntroTimer <= 0f)
             {
                 isPlayingTransformIntro = false;
+
+                if (playTransformIntroOnRoomEntry && spriteRenderer != null && spriteRenderer.sprite != null)
+                {
+                    transformedSprite = transformedIdleSprite != null ? transformedIdleSprite : spriteRenderer.sprite;
+
+                    if (animator != null)
+                        animator.enabled = false;
+
+                    spriteRenderer.sprite = transformedSprite;
+                }
+
                 currentAnimationStateHash = 0;
                 UpdateAnimationState();
             }
@@ -340,6 +356,12 @@ public class Enemy : MonoBehaviour
         if (!playTransformIntroOnRoomEntry || hasPlayedTransformIntro)
             return;
 
+        if (animator != null && !animator.enabled)
+            animator.enabled = true;
+
+        if (spriteRenderer != null && originalSprite != null)
+            spriteRenderer.sprite = originalSprite;
+
         hasPlayedTransformIntro = true;
         isPlayingTransformIntro = true;
         transformIntroTimer = Mathf.Max(0.05f, transformIntroDuration);
@@ -352,14 +374,48 @@ public class Enemy : MonoBehaviour
             animator.Play($"Base Layer.{transformAnimationState}", 0, 0f);
     }
 
+    public void NotifyRoomDeactivated()
+    {
+        if (!playTransformIntroOnRoomEntry)
+            return;
+
+        hasPlayedTransformIntro = false;
+        isPlayingTransformIntro = false;
+        transformIntroTimer = 0f;
+        currentAnimationStateHash = 0;
+        stalkerPlayerInRange = false;
+        stalkerTransitioning = false;
+
+        if (stalkerAudioRoutine != null)
+        {
+            StopCoroutine(stalkerAudioRoutine);
+            stalkerAudioRoutine = null;
+        }
+
+        if (stalkerAudio != null)
+            stalkerAudio.StartWalkerLoop();
+
+        if (spriteRenderer != null && originalSprite != null)
+        {
+            spriteRenderer.flipX = false;
+            spriteRenderer.sprite = originalSprite;
+        }
+
+        if (animator != null)
+            animator.enabled = false;
+    }
+
     private void UpdateAnimationState()
     {
-        if (animator == null || isPlayingTransformIntro)
+        if (isPlayingTransformIntro)
             return;
 
         bool faceLeft = lastMoveDirection.x < -0.01f;
         if (spriteRenderer != null)
             spriteRenderer.flipX = faceLeft;
+
+        if (animator == null || !animator.enabled)
+            return;
 
         int nextHash = faceLeft ? WalkLeftHash : WalkRightHash;
         if (currentAnimationStateHash == nextHash)
