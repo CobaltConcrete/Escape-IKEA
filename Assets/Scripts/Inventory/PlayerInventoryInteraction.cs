@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 using static EquipmentEnum;
 
 public class PlayerInventoryInteraction : MonoBehaviour
@@ -54,6 +55,11 @@ public class PlayerInventoryInteraction : MonoBehaviour
     private bool isInteracting = false;
     [SerializeField] public UnityEngine.UI.Image interactBar;
 
+    [Header("Loot Inventory Full UI")]
+    [SerializeField] private TextMeshProUGUI lootInventoryFullText;
+    [SerializeField] private float lootFullTextDuration = 1.5f;
+    private Coroutine lootFullTextCoroutine;
+
     private void Awake()
     {
         inventory = new Inventory(UseItem);
@@ -77,6 +83,14 @@ public class PlayerInventoryInteraction : MonoBehaviour
         {
             uiLootInventory.SetPlayer(this);
             uiLootInventory.SetInventory(inventory);
+        }
+        if (RunObjectiveManager.Instance != null)
+        {
+            RunObjectiveManager.Instance.SetInventory(inventory);
+        }
+        else
+        {
+            Debug.LogWarning("RunObjectiveManager.Instance is null, cannot set inventory.");
         }
     }
 
@@ -152,7 +166,11 @@ public class PlayerInventoryInteraction : MonoBehaviour
         if (pickedUpItem == null || pickedUpItem.definition == null) return;
         if (!pickedUpItem.IsLoot()) return;
 
-        inventory.AddLoot(pickedUpItem);
+        if (!inventory.TryAddLoot(pickedUpItem))
+        {
+            ShowLootInventoryFullText();
+            return;
+        }
 
         if (SoundManager.Instance != null)
         {
@@ -179,7 +197,11 @@ public class PlayerInventoryInteraction : MonoBehaviour
             worldScale = ws
         };
 
-        inventory.AddLoot(pickedUpItem);
+        if (!inventory.TryAddLoot(pickedUpItem))
+        {
+            ShowLootInventoryFullText();
+            return;
+        }
 
         if (SoundManager.Instance != null)
             SoundManager.Instance.PlayItemPickup();
@@ -1226,5 +1248,27 @@ public class PlayerInventoryInteraction : MonoBehaviour
     public void FlashPink()
     {
         StartFlash(new Color(1f, 0.4f, 0.8f));
+    }
+
+    private void ShowLootInventoryFullText()
+    {
+        if (lootInventoryFullText == null)
+            return;
+
+        if (lootFullTextCoroutine != null)
+            StopCoroutine(lootFullTextCoroutine);
+
+        lootFullTextCoroutine = StartCoroutine(CoShowLootInventoryFullText());
+    }
+
+    private IEnumerator CoShowLootInventoryFullText()
+    {
+        lootInventoryFullText.gameObject.SetActive(true);
+        lootInventoryFullText.text = "Loot Inventory Full";
+
+        yield return new WaitForSeconds(lootFullTextDuration);
+
+        lootInventoryFullText.gameObject.SetActive(false);
+        lootFullTextCoroutine = null;
     }
 }

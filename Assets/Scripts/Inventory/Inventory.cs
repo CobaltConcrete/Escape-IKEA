@@ -12,6 +12,16 @@ public class Inventory
 
     private Action<Item> useItemAction;
 
+    private int lootCapacity = 20;
+
+    public int LootCapacity => lootCapacity;
+
+    public void SetLootCapacity(int capacity)
+    {
+        lootCapacity = Mathf.Max(0, capacity);
+        OnLootListChanged?.Invoke(this, EventArgs.Empty);
+    }
+
     public Inventory(Action<Item> useItemAction)
     {
         this.useItemAction = useItemAction;
@@ -119,6 +129,14 @@ public class Inventory
         }
 
         OnLootListChanged?.Invoke(this, EventArgs.Empty);
+    }
+    public bool TryAddLoot(Item item)
+    {
+        if (!CanAddLoot(item))
+            return false;
+
+        AddLoot(item);
+        return true;
     }
 
     public int GetItemIndex(Item item)
@@ -243,5 +261,23 @@ public class Inventory
         }
 
         OnItemListChanged?.Invoke(this, EventArgs.Empty);
+    }
+    public int GetCurrentLootCount()
+    {
+        int total = 0;
+        foreach (Item item in lootList)
+        {
+            if (item != null)
+                total += Mathf.Max(1, item.amount);
+        }
+        return total;
+    }
+
+    public bool CanAddLoot(Item item)
+    {
+        if (item == null) return false;
+
+        int incoming = Mathf.Max(1, item.amount);
+        return GetCurrentLootCount() + incoming <= lootCapacity;
     }
 }
