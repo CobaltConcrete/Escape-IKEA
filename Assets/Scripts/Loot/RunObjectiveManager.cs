@@ -34,6 +34,9 @@ public class RunObjectiveManager : MonoBehaviour
     private int currentCollectedValue;
     private bool hasShownBossUnlockedNotice = false;
 
+    private bool lootCapacityGenerated = false;
+    private int generatedLootExtraSlots = 0;
+
     public IReadOnlyList<ShoppingListEntry> CurrentShoppingList => currentShoppingList;
     public int RequiredGoalValue => requiredGoalValue;
     public int CurrentCollectedValue => currentCollectedValue;
@@ -71,6 +74,8 @@ public class RunObjectiveManager : MonoBehaviour
         {
             this.inventory.OnLootListChanged += OnLootListChanged;
 
+            ApplyLootCapacityFromShoppingList();
+
             // Sync with inventory status
             RecalculateObjectiveProgressFromInventory(this.inventory);
         }
@@ -104,11 +109,14 @@ public class RunObjectiveManager : MonoBehaviour
         currentShoppingList.Clear();
         currentCollectedValue = 0;
         hasShownBossUnlockedNotice = false;
+        lootCapacityGenerated = false;
+        generatedLootExtraSlots = 0;
 
         if (TryGenerateShoppingListFromPrefabMetadata())
         {
             ClampCurrentShoppingListToGeneratedPickupCounts();
             GenerateGoalValue();
+            ApplyLootCapacityFromShoppingList();
             OnObjectiveProgressChanged?.Invoke();
             return;
         }
@@ -159,7 +167,6 @@ public class RunObjectiveManager : MonoBehaviour
             Debug.LogWarning(
                 $"RunObjectiveManager: Map only supports {generatablePool.Count} distinct winnable loot lines; list size will be {targetEntries} (wanted at least {minCap}). Add more room types or loot definitions.");
         }
-
         List<ItemDefinition> prioritized = BuildRoomCoveragePriorityList(generatablePool);
         int coverageCap = Mathf.Min(prioritized.Count, generatablePool.Count, maxCap);
         if (coverageCap > targetEntries)
@@ -241,6 +248,7 @@ public class RunObjectiveManager : MonoBehaviour
         }
 
         GenerateGoalValue();
+        ApplyLootCapacityFromShoppingList();
         OnObjectiveProgressChanged?.Invoke();
     }
 
@@ -493,6 +501,38 @@ public class RunObjectiveManager : MonoBehaviour
         if (requiredGoalValue <= shoppingListTotalValue)
         {
             requiredGoalValue = shoppingListTotalValue + 1;
+        }
+    }
+    private void ApplyLootCapacityFromShoppingList()
+    {
+        if (inventory == null)
+            return;
+
+        int requiredLootTotal = 0;
+
+        foreach (ShoppingListEntry entry in currentShoppingList)
+        {
+            if (entry == null)
+                continue;
+
+            requiredLootTotal += Mathf.Max(0, entry.requiredAmount);
+        }
+
+        bool firstTime = false;
+
+        if (!lootCapacityGenerated)
+        {
+            generatedLootExtraSlots = UnityEngine.Random.Range(2, 5);
+            lootCapacityGenerated = true;
+            firstTime = true;
+        }
+
+        int capacity = requiredLootTotal + generatedLootExtraSlots;
+        inventory.SetLootCapacity(capacity);
+
+        if (firstTime)
+        {
+            Debug.Log($"Loot capacity set to {capacity} = required {requiredLootTotal} + extra {generatedLootExtraSlots}");
         }
     }
 

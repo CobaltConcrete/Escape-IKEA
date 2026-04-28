@@ -150,7 +150,7 @@ SpriteRenderer:
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: -1086672445
-  m_SortingLayer: 6
+  m_SortingLayer: 7
   m_SortingOrder: 0
   m_Sprite: {fileID: 1058646045973419906, guid: 452f7322acb5a493e894fe8160f64a5b, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -364,6 +364,12 @@ MonoBehaviour:
   attackCooldown: 0.4
   attackForwardOffsetFactor: 0.75
   attackFacingDotThreshold: 0.2
+  hitOneEnemySoundKey: HitOneEnemy
+  hitMultipleEnemiesSoundKey: Hit2OrMoreEnemies
+  enemyKnockbackDistance: 1.1
+  enemyKnockbackDuration: 0.08
+  multiHitScreenShakeDuration: 0.18
+  multiHitScreenShakeStrength: 0.18
 --- !u!114 &107977642095276863
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -385,6 +391,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 6656
   interactionPromptUI: {fileID: 0}
+  UtilityKey: 113
   autoEquipWhenSlotEmpty: 1
   autoRefillUtilityWhenConsumed: 1
   autoReplaceWithHigherPriority: 0
@@ -402,6 +409,8 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 7db76ef5dc1369a4d93382e40f3c7caa, type: 2}
   interactDuration: 1
   interactBar: {fileID: 7708227303596013817}
+  lootInventoryFullText: {fileID: 0}
+  lootFullTextDuration: 1.5
 --- !u!114 &8431549004850888555
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -420,6 +429,12 @@ MonoBehaviour:
   dashDistance: 3.5
   dashDuration: 0.12
   dashCooldown: 1.2
+  dashStartShakeDuration: 0.06
+  dashStartShakeStrength: 0.08
+  dashHitShakeDuration: 0.1
+  dashHitShakeStrength: 0.16
+  hitOneEnemySoundKey: HitOneEnemy
+  hitMultipleEnemiesSoundKey: Hit2OrMoreEnemies
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 1088
@@ -428,6 +443,7 @@ MonoBehaviour:
   dashStunDuration: 1
   playerLayer: 8
   enemyLayer: 10
+  dashKey: 324
 --- !u!1 &4104191327506785582
 GameObject:
   m_ObjectHideFlags: 0
@@ -579,10 +595,10 @@ MonoBehaviour:
   m_BlendStyleIndex: 0
   m_FalloffIntensity: 0.5
   m_Color: {r: 1, g: 1, b: 1, a: 1}
-  m_Intensity: 0
+  m_Intensity: 0.6
   m_LightVolumeIntensity: 1
   m_LightVolumeEnabled: 0
-  m_ApplyToSortingLayers: 00000000032b2a549bf01f05ed989efcfd87490e8dbbceb2c3b13abf7ffb72da
+  m_ApplyToSortingLayers: 00000000032b2a549bf01f05ed989efcfd87490e4131e7468dbbceb2c3b13abf
   m_LightCookieSprite: {fileID: 0}
   m_DeprecatedPointLightCookieSprite: {fileID: 0}
   m_LightOrder: 0
@@ -603,7 +619,7 @@ MonoBehaviour:
   m_PointLightInnerAngle: 360
   m_PointLightOuterAngle: 360
   m_PointLightInnerRadius: 1
-  m_PointLightOuterRadius: 5
+  m_PointLightOuterRadius: 2.25
   m_ShapeLightParametricSides: 5
   m_ShapeLightParametricAngleOffset: 0
   m_ShapeLightParametricRadius: 1
