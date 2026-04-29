@@ -7,7 +7,7 @@ public class GameRunTimer : MonoBehaviour
     [SerializeField] private Text timerText;
 
     [Tooltip("Run time in seconds. When greater than zero, the HUD shows time remaining and the player loses if it hits zero before winning. At zero, the clock counts up with no time limit.")]
-    [HideInInspector] public float runTimeLimitSeconds = 300f;
+    [HideInInspector] public float runTimeLimitSeconds = 600f;
     [HideInInspector] public int maxNumBlackout = 2;
     [SerializeField] private int runTimeMinutes = 5;
     [SerializeField] private int runTimeSeconds = 0;
