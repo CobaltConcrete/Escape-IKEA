@@ -70,8 +70,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   explored: 0
   roomVisuals: {fileID: 520739178390693697}
-  sportsBatHintRadius: 2.35
-  sportsBatHintCooldownSeconds: 7
 --- !u!61 &2841542118079122019
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -1614,7 +1612,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Kitchen
+  m_text: 
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
   m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
