@@ -2537,6 +2537,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7805645262571492243, guid: 9c39a5698320ab64fb9366beebe3f482, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 8214929508174650769, guid: 9c39a5698320ab64fb9366beebe3f482, type: 3}
       propertyPath: m_Name
       value: HealthUI
