@@ -16,6 +16,9 @@ public class EnemyDashCharger : MonoBehaviour
     [SerializeField] private float maxAttackInterval = 8f;
     [SerializeField] private float aimDuration = 0.8f;
 
+    [Header("Detection")]
+    [SerializeField] private float detectRange = 6f;
+
     [Header("Dash")]
     [SerializeField] private float dashForce = 12f;
     [SerializeField] private float dashDuration = 0.5f;
@@ -36,6 +39,7 @@ public class EnemyDashCharger : MonoBehaviour
     private bool isBusy = false;
     private bool isDashing = false;
     private Coroutine activeRoutine;
+    [SerializeField] private bool debugDash = true;
 
     private Vector2 dashDirection = Vector2.right;
     private int currentAnimationStateHash;
@@ -83,9 +87,25 @@ public class EnemyDashCharger : MonoBehaviour
     private void Update()
     {
         if (!gameObject.activeInHierarchy) return;
-        if (isBusy) return;
 
         TryFindPlayer();
+
+        // 玩家不在范围内：继续游荡，不冲刺
+        if (!PlayerInRange())
+        {
+            if (!isBusy && !isDashing && wander != null)
+            {
+                wander.CanMove = true;
+            }
+
+            return;
+        }
+
+        // 玩家在范围内：开始冲刺循环
+        if (isBusy) return;
+
+        if (wander != null)
+            wander.CanMove = false;
 
         attackTimer -= Time.deltaTime;
 
@@ -119,8 +139,10 @@ public class EnemyDashCharger : MonoBehaviour
 
     private IEnumerator AimThenDash()
     {
+
         TryFindPlayer();
-        if (player == null)
+
+        if (player == null || !PlayerInRange())
         {
             attackTimer = GetRandomAttackInterval();
             activeRoutine = null;
@@ -147,6 +169,8 @@ public class EnemyDashCharger : MonoBehaviour
             if (player != null)
             {
                 Vector2 raw = (Vector2)(player.position - transform.position);
+
+
                 if (raw.sqrMagnitude > 0.001f)
                 {
                     lockedDir = raw.normalized;
@@ -163,8 +187,10 @@ public class EnemyDashCharger : MonoBehaviour
         isDashing = true;
         SetDashIgnoreCollisions(true);
 
+
+
         rb.linearVelocity = Vector2.zero;
-        rb.AddForce(dashDirection * dashForce, ForceMode2D.Impulse);
+        rb.AddForce(dashDirection.normalized * dashForce, ForceMode2D.Impulse);
 
         float dashTimer = 0f;
         while (dashTimer < dashDuration && isDashing)
@@ -391,19 +417,24 @@ public class EnemyDashCharger : MonoBehaviour
         if (other == null)
             return false;
 
+        // 不允许忽略：墙
         if (other.CompareTag("Wall") || other.GetComponentInParent<Door>() != null)
             return false;
 
+        // 不允许忽略：玩家
         if (other.CompareTag("Player") || other.GetComponentInParent<PlayerHealth>() != null)
             return false;
 
+        // 只忽略：家具 / loot
         Transform t = other.transform;
 
         while (t != null)
         {
-            if (LayerMask.LayerToName(t.gameObject.layer) == "Loot" ||
-                LayerMask.LayerToName(t.gameObject.layer) == "Item" ||
-                LayerMask.LayerToName(t.gameObject.layer) == "Furniture")
+            string layerName = LayerMask.LayerToName(t.gameObject.layer);
+
+            if (layerName == "Loot" ||
+                layerName == "Item" ||
+                layerName == "Furniture")
             {
                 return true;
             }
@@ -411,6 +442,19 @@ public class EnemyDashCharger : MonoBehaviour
             t = t.parent;
         }
 
-        return true;
+        // 默认不忽略
+        return false;
+    }
+    private bool PlayerInRange()
+    {
+        TryFindPlayer();
+
+        if (player == null)
+        {
+            return false;
+        }
+
+        float distance = Vector2.Distance(transform.position, player.position);
+        return distance <= detectRange;
     }
 }

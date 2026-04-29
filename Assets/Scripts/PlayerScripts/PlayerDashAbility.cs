@@ -14,6 +14,7 @@ public class PlayerDashAbility : MonoBehaviour
     [SerializeField] private float dashDistance = 3.5f;
     [SerializeField] private float dashDuration = 0.12f;
     [SerializeField] private float dashCooldown = 1.2f;
+    [SerializeField] private int dashDurabilityCost = 10;
 
     [Header("Dash Screen Shake")]
     [SerializeField] private float dashStartShakeDuration = 0.06f;
@@ -125,6 +126,9 @@ public class PlayerDashAbility : MonoBehaviour
 
         Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, true);
 
+        int lootLayer = LayerMask.NameToLayer("Loot");
+        Physics2D.IgnoreLayerCollision(playerLayer, lootLayer, true);
+
         while (elapsed < dashDuration)
         {
             float step = dashSpeed * Time.fixedDeltaTime;
@@ -138,6 +142,9 @@ public class PlayerDashAbility : MonoBehaviour
         }
 
         Physics2D.IgnoreLayerCollision(playerLayer, enemyLayer, false);
+
+        lootLayer = LayerMask.NameToLayer("Loot");
+        Physics2D.IgnoreLayerCollision(playerLayer, lootLayer, false);
 
         rb.linearVelocity = Vector2.zero;
 
@@ -154,8 +161,32 @@ public class PlayerDashAbility : MonoBehaviour
         {
             SoundManager.Instance?.PlaySound(hitMultipleEnemiesSoundKey, 1f);
         }
-
+        DamageDashBeltDurability();
         isDashing = false;
+    }
+    private void DamageDashBeltDurability()
+    {
+        if (equipmentData == null) return;
+
+        Item armor = equipmentData.GetEquippedArmor();
+        if (armor == null || armor.definition == null) return;
+
+        if (armor.GetArmorSpecialAbility() != ArmorSpecialAbility.Dash) return;
+
+        bool broken = armor.DamageArmor(dashDurabilityCost);
+
+        PlayerInventoryInteraction inventoryInteraction =
+            GetComponent<PlayerInventoryInteraction>();
+
+        if (inventoryInteraction != null)
+        {
+            inventoryInteraction.RefreshEquipmentAndInventoryUI();
+
+            if (broken)
+            {
+                inventoryInteraction.BreakEquippedArmor();
+            }
+        }
     }
 
     private void CheckDashHits(Vector2 dashDirection)
@@ -190,11 +221,5 @@ public class PlayerDashAbility : MonoBehaviour
                 hit.gameObject.SendMessage("TakeDamage", dashDamage, SendMessageOptions.DontRequireReceiver);
             }
         }
-    }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.cyan;
-        Gizmos.DrawWireSphere(transform.position, dashHitRadius);
     }
 }

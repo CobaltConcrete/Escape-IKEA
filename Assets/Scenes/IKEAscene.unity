@@ -1548,6 +1548,22 @@ PrefabInstance:
       propertyPath: player
       value: 
       objectReference: {fileID: 1296703288}
+    - target: {fileID: 1800450506676520150, guid: 3d993ac18d4153449ac46caedef0bccf, type: 3}
+      propertyPath: maxCellCols
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1800450506676520150, guid: 3d993ac18d4153449ac46caedef0bccf, type: 3}
+      propertyPath: maxCellRows
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1800450506676520150, guid: 3d993ac18d4153449ac46caedef0bccf, type: 3}
+      propertyPath: unitCellSize.x
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 1800450506676520150, guid: 3d993ac18d4153449ac46caedef0bccf, type: 3}
+      propertyPath: unitCellSize.y
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 2393752445699727749, guid: 3d993ac18d4153449ac46caedef0bccf, type: 3}
       propertyPath: m_LocalPosition.x
       value: -53.162315

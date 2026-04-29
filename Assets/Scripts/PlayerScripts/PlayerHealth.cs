@@ -64,6 +64,11 @@ public class PlayerHealth : MonoBehaviour
         Item equippedArmor = playerInventoryInteraction.GetEquippedArmorItem();
         if (equippedArmor == null || !equippedArmor.IsArmor())
             return;
+        if (equippedArmor.GetArmorSpecialAbility() == ArmorSpecialAbility.Dash)
+        {
+            // DashBelt：不参与减伤、不掉耐久
+            return;
+        }
 
         equippedArmor.InitializeRuntimeDataIfNeeded();
 

@@ -464,12 +464,12 @@ public class EnemyAimerShooter : MonoBehaviour
             bullet.SetDirection(direction);
         }
     }
-    private void OnDrawGizmosSelected()
-    {
-        Transform origin = firePoint != null ? firePoint : transform;
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(origin.position, trackingRange);
-    }
+    //private void OnDrawGizmosSelected()
+    //{
+    //    Transform origin = firePoint != null ? firePoint : transform;
+    //    Gizmos.color = Color.red;
+    //    Gizmos.DrawWireSphere(origin.position, trackingRange);
+    //}
 
     public GameObject GetBulletPrefab()
     {

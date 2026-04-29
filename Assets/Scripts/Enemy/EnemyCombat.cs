@@ -143,10 +143,4 @@ public class EnemyCombat : MonoBehaviour
         onlyTakeDamageFromBehind = requireBehind;
         behindDotThreshold = dotThreshold;
     }
-
-    private void OnDrawGizmosSelected()
-    {
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(transform.position, contactDamageRadius);
-    }
 }
