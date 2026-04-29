@@ -265,20 +265,20 @@ public class EnemySpawnController : MonoBehaviour
         }
     }
 
-    private void OnDrawGizmosSelected()
-    {
-        if (enemySpawnAreaCollider != null)
-        {
-            Gizmos.color = Color.red;
-            Bounds b = enemySpawnAreaCollider.bounds;
-            Gizmos.DrawWireCube(b.center, b.size);
-        }
+    //private void OnDrawGizmosSelected()
+    //{
+    //    if (enemySpawnAreaCollider != null)
+    //    {
+    //        Gizmos.color = Color.red;
+    //        Bounds b = enemySpawnAreaCollider.bounds;
+    //        Gizmos.DrawWireCube(b.center, b.size);
+    //    }
 
-        if (enemyWanderAreaCollider != null)
-        {
-            Gizmos.color = Color.green;
-            Bounds b = enemyWanderAreaCollider.bounds;
-            Gizmos.DrawWireCube(b.center, b.size);
-        }
-    }
+    //    if (enemyWanderAreaCollider != null)
+    //    {
+    //        Gizmos.color = Color.green;
+    //        Bounds b = enemyWanderAreaCollider.bounds;
+    //        Gizmos.DrawWireCube(b.center, b.size);
+    //    }
+    //}
 }

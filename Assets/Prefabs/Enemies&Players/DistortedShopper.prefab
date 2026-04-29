@@ -218,10 +218,11 @@ MonoBehaviour:
   bouncePauseDuration: 0.12
   recoilDistance: 1.5
   recoilDuration: 0.12
-  ignoreDuringDashLayers:
-  - Furniture
-  - Loot
-  - Item
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 192
+  wallCheckDistance: 0.25
+  debugDash: 1
 --- !u!114 &8404082261452416212
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -376,6 +377,8 @@ MonoBehaviour:
   bouncePauseDuration: 0.12
   recoilDistance: 1.5
   recoilDuration: 0.12
-  ignoreDuringDashLayers:
-  - Item
-  - Loot
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 0
+  wallCheckDistance: 0.25
+  debugDash: 1
