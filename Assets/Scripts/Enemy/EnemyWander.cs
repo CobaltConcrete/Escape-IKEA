@@ -32,11 +32,19 @@ public class EnemyWander : MonoBehaviour
     private Transform playerTransform;
     private Vector2 lastFacingDirection = Vector2.right;
     private int currentAnimationStateHash;
+    private bool preferCardinalMovement;
 
     private static readonly int WalkLeftHash = Animator.StringToHash("Base Layer.Walk_L");
     private static readonly int WalkRightHash = Animator.StringToHash("Base Layer.Walk_R");
     private static readonly int WalkFrontHash = Animator.StringToHash("Base Layer.Front_WALKING");
     private static readonly int WalkBackHash = Animator.StringToHash("Base Layer.Back_WALKING");
+    private static readonly int EmployeeFrontWalkHash = Animator.StringToHash("Base Layer.Employee_FRONT_Walking");
+    private static readonly int EmployeeBackWalkHash = Animator.StringToHash("Base Layer.Employee_BACK_Walking");
+    private static readonly int EmployeeLeftWalkHash = Animator.StringToHash("Base Layer.Employee_LEFT_Walking");
+    private static readonly int ShooterFrontWalkHash = Animator.StringToHash("Base Layer.CafeteriaEmployee_FRONT_Walking");
+    private static readonly int ShooterBackWalkHash = Animator.StringToHash("Base Layer.CafeteriaEmployee_BACK_Walking");
+    private static readonly int ShooterLeftWalkHash = Animator.StringToHash("Base Layer.CafeteriaEmployee_LEFT_Walking");
+    private static readonly int ShooterRightWalkHash = Animator.StringToHash("Base Layer.CafeteriaEmployee_RIGHT_Walking");
 
     public bool CanMove { get; set; } = true;
 
@@ -47,6 +55,15 @@ public class EnemyWander : MonoBehaviour
             animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
         if (spriteRenderer == null)
             spriteRenderer = GetComponent<SpriteRenderer>() ?? GetComponentInChildren<SpriteRenderer>();
+
+        if (animator != null)
+        {
+            preferCardinalMovement =
+                animator.HasState(0, ShooterFrontWalkHash) ||
+                animator.HasState(0, ShooterBackWalkHash) ||
+                animator.HasState(0, ShooterLeftWalkHash) ||
+                animator.HasState(0, ShooterRightWalkHash);
+        }
     }
 
     private void Start()
@@ -125,7 +142,7 @@ public class EnemyWander : MonoBehaviour
             randomDir = Vector2.right;
         }
 
-        moveDirection = randomDir.normalized;
+        moveDirection = NormalizeMoveDirection(randomDir);
     }
 
     private bool IsTooCloseToPlayer()
@@ -151,7 +168,7 @@ public class EnemyWander : MonoBehaviour
             away = Random.insideUnitCircle;
         }
 
-        moveDirection = away.normalized;
+        moveDirection = NormalizeMoveDirection(away);
         changeDirectionTimer = changeDirectionInterval;
     }
 
@@ -165,7 +182,7 @@ public class EnemyWander : MonoBehaviour
             toCenter = Random.insideUnitCircle;
         }
 
-        moveDirection = toCenter.normalized;
+        moveDirection = NormalizeMoveDirection(toCenter);
         changeDirectionTimer = changeDirectionInterval;
     }
 
@@ -220,7 +237,7 @@ public class EnemyWander : MonoBehaviour
         ContactPoint2D contact = collision.GetContact(0);
         Vector2 wallNormal = contact.normal;
 
-        moveDirection = wallNormal.normalized;
+        moveDirection = NormalizeMoveDirection(wallNormal);
         changeDirectionTimer = changeDirectionInterval;
     }
 
@@ -230,21 +247,32 @@ public class EnemyWander : MonoBehaviour
             return;
 
         bool preferVertical = Mathf.Abs(lastFacingDirection.y) > Mathf.Abs(lastFacingDirection.x);
-        bool hasFrontBack = animator.HasState(0, WalkFrontHash) && animator.HasState(0, WalkBackHash);
         int nextHash;
 
-        if (preferVertical && hasFrontBack)
+        if (preferVertical)
         {
-            nextHash = lastFacingDirection.y > 0f ? WalkBackHash : WalkFrontHash;
+            nextHash = lastFacingDirection.y > 0f
+                ? GetFirstAvailableState(animator, ShooterBackWalkHash, EmployeeBackWalkHash, WalkBackHash, ShooterRightWalkHash, WalkRightHash)
+                : GetFirstAvailableState(animator, ShooterFrontWalkHash, EmployeeFrontWalkHash, WalkFrontHash, ShooterRightWalkHash, WalkRightHash);
+
             if (spriteRenderer != null)
                 spriteRenderer.flipX = false;
         }
         else
         {
             bool faceLeft = lastFacingDirection.x < -0.01f;
-            if (spriteRenderer != null)
-                spriteRenderer.flipX = faceLeft;
-            nextHash = faceLeft ? WalkLeftHash : WalkRightHash;
+            if (faceLeft)
+            {
+                nextHash = GetFirstAvailableState(animator, ShooterLeftWalkHash, EmployeeLeftWalkHash, WalkLeftHash, WalkRightHash);
+                if (spriteRenderer != null)
+                    spriteRenderer.flipX = nextHash == WalkLeftHash;
+            }
+            else
+            {
+                nextHash = GetFirstAvailableState(animator, ShooterRightWalkHash, WalkRightHash, ShooterLeftWalkHash, EmployeeLeftWalkHash, WalkLeftHash);
+                if (spriteRenderer != null)
+                    spriteRenderer.flipX = false;
+            }
         }
 
         if (currentAnimationStateHash == nextHash)
@@ -252,6 +280,17 @@ public class EnemyWander : MonoBehaviour
 
         animator.Play(nextHash, 0, 0f);
         currentAnimationStateHash = nextHash;
+    }
+
+    private static int GetFirstAvailableState(Animator animator, params int[] stateHashes)
+    {
+        foreach (int hash in stateHashes)
+        {
+            if (animator.HasState(0, hash))
+                return hash;
+        }
+
+        return stateHashes.Length > 0 ? stateHashes[0] : 0;
     }
     private bool ShouldAvoidObstacle()
     {
@@ -296,9 +335,30 @@ public class EnemyWander : MonoBehaviour
         }
 
         Vector2 randomSide = Random.insideUnitCircle.normalized * 0.35f;
-        moveDirection = (away.normalized + randomSide).normalized;
+        moveDirection = NormalizeMoveDirection(away.normalized + randomSide);
 
         changeDirectionTimer = changeDirectionInterval;
         obstacleRedirectTimer = obstacleRedirectCooldown;
+    }
+
+    private Vector2 NormalizeMoveDirection(Vector2 direction)
+    {
+        if (direction.sqrMagnitude < 0.0001f)
+            direction = Vector2.right;
+
+        direction = direction.normalized;
+
+        if (!preferCardinalMovement)
+            return direction;
+
+        return SnapToCardinal(direction);
+    }
+
+    private static Vector2 SnapToCardinal(Vector2 direction)
+    {
+        if (Mathf.Abs(direction.x) >= Mathf.Abs(direction.y))
+            return direction.x >= 0f ? Vector2.right : Vector2.left;
+
+        return direction.y >= 0f ? Vector2.up : Vector2.down;
     }
 }

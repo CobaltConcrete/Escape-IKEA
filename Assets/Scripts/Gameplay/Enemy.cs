@@ -72,6 +72,10 @@ public class Enemy : MonoBehaviour
 
     private static readonly int WalkLeftHash = Animator.StringToHash("Base Layer.Walk_L");
     private static readonly int WalkRightHash = Animator.StringToHash("Base Layer.Walk_R");
+    private static readonly int EmployeeFrontWalkHash = Animator.StringToHash("Base Layer.Employee_FRONT_Walking");
+    private static readonly int EmployeeBackWalkHash = Animator.StringToHash("Base Layer.Employee_BACK_Walking");
+    private static readonly int EmployeeLeftWalkHash = Animator.StringToHash("Base Layer.Employee_LEFT_Walking");
+    private static readonly int EmployeeTransformHash = Animator.StringToHash("Base Layer.Employee_TRANSFORM");
 
     private void Awake()
     {
@@ -127,16 +131,8 @@ public class Enemy : MonoBehaviour
             if (transformIntroTimer <= 0f)
             {
                 isPlayingTransformIntro = false;
-
-                if (playTransformIntroOnRoomEntry && spriteRenderer != null && spriteRenderer.sprite != null)
-                {
-                    transformedSprite = transformedIdleSprite != null ? transformedIdleSprite : spriteRenderer.sprite;
-
-                    if (animator != null)
-                        animator.enabled = false;
-
-                    spriteRenderer.sprite = transformedSprite;
-                }
+                if (playTransformIntroOnRoomEntry && transformedIdleSprite != null)
+                    transformedSprite = transformedIdleSprite;
 
                 currentAnimationStateHash = 0;
                 UpdateAnimationState();
@@ -371,7 +367,14 @@ public class Enemy : MonoBehaviour
             rb.linearVelocity = Vector2.zero;
 
         if (animator != null)
-            animator.Play($"Base Layer.{transformAnimationState}", 0, 0f);
+        {
+            int transformHash = Animator.StringToHash($"Base Layer.{transformAnimationState}");
+            if (!animator.HasState(0, transformHash) && animator.HasState(0, EmployeeTransformHash))
+                transformHash = EmployeeTransformHash;
+
+            if (animator.HasState(0, transformHash))
+                animator.Play(transformHash, 0, 0f);
+        }
     }
 
     public void NotifyRoomDeactivated()
@@ -410,19 +413,54 @@ public class Enemy : MonoBehaviour
         if (isPlayingTransformIntro)
             return;
 
-        bool faceLeft = lastMoveDirection.x < -0.01f;
-        if (spriteRenderer != null)
-            spriteRenderer.flipX = faceLeft;
-
         if (animator == null || !animator.enabled)
+        {
+            if (spriteRenderer != null && transformedSprite != null && hasPlayedTransformIntro)
+                spriteRenderer.sprite = transformedSprite;
             return;
+        }
 
-        int nextHash = faceLeft ? WalkLeftHash : WalkRightHash;
+        bool preferVertical = Mathf.Abs(lastMoveDirection.y) > Mathf.Abs(lastMoveDirection.x);
+        int nextHash;
+
+        if (preferVertical)
+        {
+            nextHash = lastMoveDirection.y > 0.01f
+                ? GetFirstAvailableState(animator, EmployeeBackWalkHash, WalkRightHash)
+                : GetFirstAvailableState(animator, EmployeeFrontWalkHash, WalkRightHash);
+
+            if (spriteRenderer != null)
+                spriteRenderer.flipX = false;
+        }
+        else if (lastMoveDirection.x < -0.01f)
+        {
+            nextHash = GetFirstAvailableState(animator, EmployeeLeftWalkHash, WalkLeftHash, WalkRightHash);
+            if (spriteRenderer != null)
+                spriteRenderer.flipX = nextHash == WalkLeftHash;
+        }
+        else
+        {
+            nextHash = GetFirstAvailableState(animator, WalkRightHash, EmployeeLeftWalkHash, WalkLeftHash);
+            if (spriteRenderer != null)
+                spriteRenderer.flipX = false;
+        }
+
         if (currentAnimationStateHash == nextHash)
             return;
 
         animator.Play(nextHash, 0, 0f);
         currentAnimationStateHash = nextHash;
+    }
+
+    private static int GetFirstAvailableState(Animator animator, params int[] stateHashes)
+    {
+        foreach (int hash in stateHashes)
+        {
+            if (animator.HasState(0, hash))
+                return hash;
+        }
+
+        return stateHashes.Length > 0 ? stateHashes[0] : 0;
     }
     private void UpdateStalkerAudioState(bool playerDetected)
     {

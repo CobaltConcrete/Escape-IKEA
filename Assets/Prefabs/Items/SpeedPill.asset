@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: SpeedPill
   m_EditorClassIdentifier: 
   itemName: SpeedPill
-  icon: {fileID: 21300000, guid: 567c1dba48fd591478dcf0bb74786ddf, type: 3}
+  icon: {fileID: -1448858178185668574, guid: 4d9f48ff498e7428ba14350898a7d843, type: 3}
   stackable: 1
   uiScale: 0.75
   glowColor: {r: 0, g: 0, b: 1, a: 1}

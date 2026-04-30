@@ -4,6 +4,9 @@ using UnityEngine.UI;
 
 public class GameRunTimer : MonoBehaviour
 {
+    private const string SelectedRunTimeLimitKey = "SelectedRunTimeLimitSeconds";
+    private const string SelectedMaxBlackoutKey = "SelectedMaxBlackoutLimit";
+
     [SerializeField] private Text timerText;
 
     [Tooltip("Run time in seconds. When greater than zero, the HUD shows time remaining and the player loses if it hits zero before winning. At zero, the clock counts up with no time limit.")]
@@ -17,6 +20,7 @@ public class GameRunTimer : MonoBehaviour
 
     private void Awake()
     {
+        ApplySelectedOverrides();
         RecalculateTotalSeconds();
         RefreshDisplay();
     }
@@ -52,12 +56,17 @@ public class GameRunTimer : MonoBehaviour
     public void SetTimerLimit(float limit)
     {
         runTimeLimitSeconds = limit;
-        runTimeMinutes = (int)(runTimeLimitSeconds/60);
+        runTimeMinutes = Mathf.FloorToInt(runTimeLimitSeconds / 60f);
+        runTimeSeconds = Mathf.RoundToInt(runTimeLimitSeconds % 60f);
+        PlayerPrefs.SetFloat(SelectedRunTimeLimitKey, runTimeLimitSeconds);
+        PlayerPrefs.Save();
     }
 
     public void SetMaxBlackoutLimit(int limit)
     {
         maxNumBlackout = limit;
+        PlayerPrefs.SetInt(SelectedMaxBlackoutKey, maxNumBlackout);
+        PlayerPrefs.Save();
     }
 
     private void TryLoseFromTimeout()
@@ -75,6 +84,22 @@ public class GameRunTimer : MonoBehaviour
         elapsed = 0f;
         loseTriggered = false;
         RefreshDisplay();
+    }
+
+    private void ApplySelectedOverrides()
+    {
+        if (PlayerPrefs.HasKey(SelectedRunTimeLimitKey))
+        {
+            float selectedLimit = PlayerPrefs.GetFloat(SelectedRunTimeLimitKey, runTimeLimitSeconds);
+            runTimeLimitSeconds = Mathf.Max(0f, selectedLimit);
+            runTimeMinutes = Mathf.FloorToInt(runTimeLimitSeconds / 60f);
+            runTimeSeconds = Mathf.RoundToInt(runTimeLimitSeconds % 60f);
+        }
+
+        if (PlayerPrefs.HasKey(SelectedMaxBlackoutKey))
+        {
+            maxNumBlackout = Mathf.Max(0, PlayerPrefs.GetInt(SelectedMaxBlackoutKey, maxNumBlackout));
+        }
     }
 #if UNITY_EDITOR
     private void OnValidate()

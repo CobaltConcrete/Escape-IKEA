@@ -32,6 +32,7 @@ public class RoomPresentation : MonoBehaviour
     [Header("Floor tiles")]
     [Tooltip("Uniform scale per tile. Spacing matches tile.bounds.size * this so tiles stay edge-to-edge with no gaps.")]
     [SerializeField] [Min(0.01f)] private float floorTileScaleFactor = 1.5f;
+    [SerializeField] private Color floorTileTint = new Color(0.77f, 0.77f, 0.77f, 1f);
     [Tooltip("Use the same layer as floor tiles so world-space TMP sorts with the room; Player layer sorts after Floor, so the player draws on top.")]
     [SerializeField] private string labelSortingLayerName = "Item";
     [SerializeField] private int labelSortingOrder = 200;
@@ -228,6 +229,7 @@ public class RoomPresentation : MonoBehaviour
 
                 SpriteRenderer sr = cell.AddComponent<SpriteRenderer>();
                 sr.sprite = tile;
+                sr.color = floorTileTint;
                 sr.drawMode = SpriteDrawMode.Simple;
                 sr.sortingLayerID = floorLayerId;
                 sr.sortingOrder = tileOrder;
