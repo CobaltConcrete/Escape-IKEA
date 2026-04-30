@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 31454892e3c6a4952b2dee3852c1dab8
+guid: a0d32676b77584b338635d5220568da6
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7181550116695620763
-    second: fixedtile_0
+      213: 3439331490108552883
+    second: Stalker_BACK_Walking_4_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: fixedtile_0
+      name: Stalker_BACK_Walking_4_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 64
-        height: 64
+        x: 17
+        y: 14
+        width: 39
+        height: 33
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b9cbe4a18cdf9a360800000000000000
-      internalID: 7181550116695620763
+      spriteID: 3b63cb494c5fabf20800000000000000
+      internalID: 3439331490108552883
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      fixedtile_0: 7181550116695620763
+      Stalker_BACK_Walking_4_0: 3439331490108552883
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

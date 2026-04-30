@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 31454892e3c6a4952b2dee3852c1dab8
+guid: e939da5d61cd84f9cab1ab84fc241716
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 7181550116695620763
-    second: fixedtile_0
+      213: -271250257372857081
+    second: Right_ROLLER_2_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -75,7 +75,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 1
+    textureCompression: 0
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: fixedtile_0
+      name: Right_ROLLER_2_0
       rect:
         serializedVersion: 2
-        x: 0
-        y: 0
-        width: 64
-        height: 64
+        x: 33
+        y: 23
+        width: 54
+        height: 74
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: b9cbe4a18cdf9a360800000000000000
-      internalID: 7181550116695620763
+      spriteID: 70dbe0cf3535c3cf0800000000000000
+      internalID: -271250257372857081
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      fixedtile_0: 7181550116695620763
+      Right_ROLLER_2_0: -271250257372857081
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
