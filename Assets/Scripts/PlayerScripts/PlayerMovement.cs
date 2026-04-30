@@ -8,6 +8,9 @@ public class PlayerMovement : MonoBehaviour
     [SerializeField]
     [Tooltip("How fast the player moves.")]
     public float speed = 5f;
+    [SerializeField]
+    [Tooltip("How much faster the player moves while roller boosting.")]
+    private float rollerBoostMultiplier = 1.5f;
 
     private Rigidbody2D rb;
     private Vector2 move;
@@ -23,6 +26,7 @@ public class PlayerMovement : MonoBehaviour
     private float attackAnimationRemaining;
     private string pendingAttackState;
     private bool pendingAttackFlipX;
+    private bool rollerBoostActive;
 
     //Speed Pill Stuffs
     private float originalSpeed;
@@ -84,17 +88,27 @@ public class PlayerMovement : MonoBehaviour
         }
 
         bool isMoving = move.sqrMagnitude > 0.001f;
+        if (rollerBoostActive)
+        {
+            Vector2 rollerDirection = isMoving ? move : lastMoveDirection;
+            string rollerState = GetRollerAnimationState(rollerDirection);
+            if (animatedSpriteRenderer != null)
+            {
+                animatedSpriteRenderer.flipX =
+                    Mathf.Abs(rollerDirection.x) > Mathf.Abs(rollerDirection.y) &&
+                    rollerDirection.x > 0f;
+            }
+            if (!string.IsNullOrEmpty(rollerState) && PlayStateIfAvailable(rollerState))
+                return;
+        }
+
         string direction = GetAnimationDirection(isMoving ? move : lastMoveDirection);
         string nextState = direction + (isMoving ? "_WALKING" : "_IDLE");
 
         if (animatedSpriteRenderer != null)
             animatedSpriteRenderer.flipX = false;
 
-        if (currentAnimationState == nextState)
-            return;
-
-        animator.Play(nextState);
-        currentAnimationState = nextState;
+        PlayStateIfAvailable(nextState);
     }
 
     private static string GetAnimationDirection(Vector2 direction)
@@ -105,9 +119,40 @@ public class PlayerMovement : MonoBehaviour
         return direction.y > 0f ? "Back" : "Front";
     }
 
+    private static string GetRollerAnimationState(Vector2 direction)
+    {
+        if (Mathf.Abs(direction.x) > Mathf.Abs(direction.y))
+            return "Roller_LEFT";
+
+        return direction.y > 0f ? "Roller_BACK" : "Roller_FRONT";
+    }
+
+    private bool PlayStateIfAvailable(string stateName)
+    {
+        if (animator == null || string.IsNullOrEmpty(stateName))
+            return false;
+
+        int fullPathHash = Animator.StringToHash("Base Layer." + stateName);
+        if (!animator.HasState(0, fullPathHash))
+            return false;
+
+        if (currentAnimationState == stateName)
+            return true;
+
+        animator.Play(stateName);
+        currentAnimationState = stateName;
+        return true;
+    }
+
     public void BoostSpeedFor10Seconds()
     {
-        BoostSpeedForDuration(8f, 10f);
+        BoostSpeedMultiplierForDuration(rollerBoostMultiplier, 10f);
+    }
+
+    public void BoostSpeedMultiplierForDuration(float multiplier, float durationSeconds)
+    {
+        float baseSpeed = speedCoroutine != null ? originalSpeed : speed;
+        BoostSpeedForDuration(baseSpeed * Mathf.Max(0f, multiplier), durationSeconds);
     }
 
     public Vector2 GetFacingDirection()
@@ -159,12 +204,17 @@ public class PlayerMovement : MonoBehaviour
     private IEnumerator SpeedBoostRoutine(float boostedSpeed, float durationSeconds)
     {
         originalSpeed = speed;
-
+        rollerBoostActive = true;
         speed = boostedSpeed;
+        currentAnimationState = null;
+        UpdateAnimation();
 
         yield return new WaitForSeconds(durationSeconds);
 
         speed = originalSpeed;
+        rollerBoostActive = false;
+        currentAnimationState = null;
+        UpdateAnimation();
         speedCoroutine = null;
     }
 

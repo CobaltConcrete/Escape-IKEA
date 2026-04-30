@@ -978,9 +978,8 @@ public class PlayerInventoryInteraction : MonoBehaviour
             case ItemUseEffect.SpeedBoost:
                 if (playerMovement != null)
                 {
-                    float boostedSpeed = def.effectValue > 0f ? def.effectValue : 10f;
                     float duration = def.effectDuration > 0f ? def.effectDuration : 10f;
-                    playerMovement.BoostSpeedForDuration(boostedSpeed, duration);
+                    playerMovement.BoostSpeedMultiplierForDuration(1.5f, duration);
                 }
                 FlashBlue();
                 break;

@@ -4,6 +4,8 @@ using UnityEngine.UI;
 
 public class UI_ObjectivePanel : MonoBehaviour
 {
+    private static readonly Color ShoppingListTextColor = Color.white;
+
     [Header("Loot List")]
     [SerializeField] private Transform lootContainer;
     [SerializeField] private GameObject lootRowTemplate;
@@ -94,6 +96,7 @@ public class UI_ObjectivePanel : MonoBehaviour
                 if (text != null)
                 {
                     text.text = $"{entry.GetDisplayName()} {entry.collectedAmount}/{entry.requiredAmount}";
+                    text.color = ShoppingListTextColor;
 
                     // ⭐ 关键：关闭自动缩放，用我们自己的
                     text.enableAutoSizing = false;
@@ -129,6 +132,8 @@ public class UI_ObjectivePanel : MonoBehaviour
     {
         if (valueText == null) return;
 
+        valueText.color = ShoppingListTextColor;
+
         if (RunObjectiveManager.Instance.RequireGoalValueToUnlockBoss)
         {
             valueText.text =
@@ -144,6 +149,8 @@ public class UI_ObjectivePanel : MonoBehaviour
     private void RefreshBossText()
     {
         if (bossText == null) return;
+
+        bossText.color = ShoppingListTextColor;
 
         if (RunObjectiveManager.Instance.IsObjectiveComplete())
         {
