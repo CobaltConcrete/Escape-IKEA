@@ -718,6 +718,10 @@ PrefabInstance:
       value: 0.6
       objectReference: {fileID: 0}
     - target: {fileID: 666557475202015360, guid: b7909d6493cd9ff4088ecc24e84e33a0, type: 3}
+      propertyPath: blackoutCooldownAfterLightsOn
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 666557475202015360, guid: b7909d6493cd9ff4088ecc24e84e33a0, type: 3}
       propertyPath: fullBlackBeforePlayerLightDuration
       value: 1.5
       objectReference: {fileID: 0}
@@ -1010,23 +1014,48 @@ MonoBehaviour:
     useUISource: 0
     pitchRandomRange: 0
   - key: Countdown1
-    clip: {fileID: 8300000, guid: d50d0fb0d66e18d45a196f4f4e3d0315, type: 3}
-    volume: 1
+    clip: {fileID: 8300000, guid: 2848d9bb99178d543b1d6763376cfb43, type: 3}
+    volume: 1.52
     useUISource: 0
     pitchRandomRange: 0
   - key: Countdown2
-    clip: {fileID: 8300000, guid: daa0fbabac9967242a8bd7367b08a886, type: 3}
-    volume: 1
+    clip: {fileID: 8300000, guid: 6b67b3e18418adf48b3589746279d998, type: 3}
+    volume: 1.39
     useUISource: 0
     pitchRandomRange: 0
   - key: Countdown3
-    clip: {fileID: 8300000, guid: 889b346a736e4e644b255a27c70196c4, type: 3}
-    volume: 1
+    clip: {fileID: 8300000, guid: 1e0fd1b37d198034ab09e89a1caafd55, type: 3}
+    volume: 1.23
     useUISource: 0
     pitchRandomRange: 0
   - key: PlayerWin
     clip: {fileID: 8300000, guid: ef8506b7a858d1b4da4f5e459d465474, type: 3}
     volume: 1
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: WieldBat
+    clip: {fileID: 8300000, guid: ef7fe48fa0b02bf4086f98a63772819c, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: ShoppingCartAim
+    clip: {fileID: 8300000, guid: 70d0493f16a31d04fb52f18ac49807fc, type: 3}
+    volume: 0.941
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: ShoppingCartHit
+    clip: {fileID: 8300000, guid: 524e011bae8169b4d9f3ce30682a1b5b, type: 3}
+    volume: 1.398
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: ShoppingCartCharge
+    clip: {fileID: 8300000, guid: 8d9692b7caa418e40a7f788083f18d05, type: 3}
+    volume: 1.568
+    useUISource: 1
+    pitchRandomRange: 0
+  - key: PlayerDash
+    clip: {fileID: 8300000, guid: 014282c0c9266484196d13e2505540ef, type: 3}
+    volume: 1.754
     useUISource: 0
     pitchRandomRange: 0
   audioMixer: {fileID: 0}
@@ -2744,6 +2773,18 @@ PrefabInstance:
     - target: {fileID: 792196242469595467, guid: 9c39a5698320ab64fb9366beebe3f482, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4437477923299971944, guid: 9c39a5698320ab64fb9366beebe3f482, type: 3}
+      propertyPath: runTimeMinutes
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4437477923299971944, guid: 9c39a5698320ab64fb9366beebe3f482, type: 3}
+      propertyPath: runTimeSeconds
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 4437477923299971944, guid: 9c39a5698320ab64fb9366beebe3f482, type: 3}
+      propertyPath: runTimeLimitSeconds
+      value: 210
       objectReference: {fileID: 0}
     - target: {fileID: 6254217753410137420, guid: 9c39a5698320ab64fb9366beebe3f482, type: 3}
       propertyPath: playerHealth

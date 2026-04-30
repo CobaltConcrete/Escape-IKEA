@@ -31,6 +31,11 @@ public class EnemyDashCharger : MonoBehaviour
     [SerializeField] private float recoilDistance = 1.5f;
     [SerializeField] private float recoilDuration = 0.12f;
 
+    [Header("Line of Sight")]
+    [SerializeField] private LayerMask dashBlockerLayerMask;
+    [SerializeField] private float lineOfSightSkin = 0.15f;
+    [SerializeField] private bool debugLineOfSight = true;
+
     private Collider2D[] ownColliders;
     private readonly System.Collections.Generic.List<Collider2D> ignoredColliders =
         new System.Collections.Generic.List<Collider2D>();
@@ -39,7 +44,6 @@ public class EnemyDashCharger : MonoBehaviour
     private bool isBusy = false;
     private bool isDashing = false;
     private Coroutine activeRoutine;
-    [SerializeField] private bool debugDash = true;
 
     private Vector2 dashDirection = Vector2.right;
     private int currentAnimationStateHash;
@@ -49,11 +53,14 @@ public class EnemyDashCharger : MonoBehaviour
     private static readonly int AttackFrontHash = Animator.StringToHash("Base Layer.Front_ATTACK");
     private static readonly int AttackBackHash = Animator.StringToHash("Base Layer.Back_ATTACK");
 
+    private DistortedShopperAudio shopperAudio;
+
     private void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         wander = GetComponent<EnemyWander>();
         ownColliders = GetComponentsInChildren<Collider2D>();
+        shopperAudio = GetComponent<DistortedShopperAudio>();
         if (animator == null)
             animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
         if (spriteRenderer == null)
@@ -86,17 +93,11 @@ public class EnemyDashCharger : MonoBehaviour
 
     private void Update()
     {
-        if (!gameObject.activeInHierarchy) return;
-
         TryFindPlayer();
-
-        // 玩家不在范围内：继续游荡，不冲刺
-        if (!PlayerInRange())
+        if (!PlayerInRange() || !HasLineOfSightToPlayer())
         {
             if (!isBusy && !isDashing && wander != null)
-            {
                 wander.CanMove = true;
-            }
 
             return;
         }
@@ -142,14 +143,19 @@ public class EnemyDashCharger : MonoBehaviour
 
         TryFindPlayer();
 
-        if (player == null || !PlayerInRange())
+        if (player == null || !PlayerInRange() || !HasLineOfSightToPlayer())
         {
             attackTimer = GetRandomAttackInterval();
             activeRoutine = null;
+
+            if (wander != null)
+                wander.CanMove = true;
+
             yield break;
         }
 
         isBusy = true;
+        shopperAudio?.PlayChargerAim();
         isDashing = false;
 
         if (wander != null)
@@ -185,18 +191,23 @@ public class EnemyDashCharger : MonoBehaviour
         UpdateAttackAnimation(dashDirection);
 
         isDashing = true;
+
+        // 先忽略家具/loot/item，避免刚起步就被卡住
         SetDashIgnoreCollisions(true);
 
+        // 起步前把自己从重叠的家具里推出一点
+        PushOutOfIgnoredObstacles();
 
+        shopperAudio?.PlayChargerCharge();
 
-        rb.linearVelocity = Vector2.zero;
-        rb.AddForce(dashDirection.normalized * dashForce, ForceMode2D.Impulse);
+        rb.linearVelocity = dashDirection.normalized * dashForce;
 
         float dashTimer = 0f;
         while (dashTimer < dashDuration && isDashing)
         {
             dashTimer += Time.deltaTime;
-            yield return null;
+            rb.linearVelocity = dashDirection.normalized * dashForce;
+            yield return new WaitForFixedUpdate();
         }
 
         if (isDashing)
@@ -205,6 +216,39 @@ public class EnemyDashCharger : MonoBehaviour
         }
 
         activeRoutine = null;
+    }
+    private void PushOutOfIgnoredObstacles()
+    {
+        if (ownColliders == null || ownColliders.Length == 0)
+            ownColliders = GetComponentsInChildren<Collider2D>();
+
+        Vector2 totalPush = Vector2.zero;
+
+        Collider2D[] hits = Physics2D.OverlapCircleAll(transform.position, 0.8f);
+
+        foreach (Collider2D other in hits)
+        {
+            if (other == null) continue;
+            if (other.isTrigger) continue;
+            if (IsOwnCollider(other)) continue;
+            if (!ShouldIgnoreColliderDuringDash(other)) continue;
+
+            Vector2 closest = other.ClosestPoint(transform.position);
+            Vector2 away = (Vector2)transform.position - closest;
+
+            if (away.sqrMagnitude < 0.001f)
+                away = (Vector2)transform.position - (Vector2)other.bounds.center;
+
+            if (away.sqrMagnitude < 0.001f)
+                away = -dashDirection;
+
+            totalPush += away.normalized;
+        }
+
+        if (totalPush.sqrMagnitude > 0.001f && rb != null)
+        {
+            rb.position += totalPush.normalized * 0.25f;
+        }
     }
 
     private IEnumerator StunThenRecover()
@@ -227,6 +271,7 @@ public class EnemyDashCharger : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Wall") || collision.gameObject.GetComponentInParent<Door>() != null)
         {
+            shopperAudio?.PlayChargerHit();
             isDashing = false;
 
             Vector2 normal = collision.GetContact(0).normal;
@@ -243,6 +288,7 @@ public class EnemyDashCharger : MonoBehaviour
 
         if (collision.gameObject.CompareTag("Player"))
         {
+            shopperAudio?.PlayChargerHit();
             isDashing = false;
 
             Vector2 away = ((Vector2)transform.position - (Vector2)player.position).normalized;
@@ -425,6 +471,9 @@ public class EnemyDashCharger : MonoBehaviour
         if (other.CompareTag("Player") || other.GetComponentInParent<PlayerHealth>() != null)
             return false;
 
+        if (other.CompareTag("Door") || other.GetComponentInParent<PlayerHealth>() != null)
+            return false;
+
         // 只忽略：家具 / loot
         Transform t = other.transform;
 
@@ -456,5 +505,49 @@ public class EnemyDashCharger : MonoBehaviour
 
         float distance = Vector2.Distance(transform.position, player.position);
         return distance <= detectRange;
+    }
+    private bool HasLineOfSightToPlayer()
+    {
+        if (player == null)
+            return false;
+
+        Vector2 from = rb != null ? rb.position : (Vector2)transform.position;
+        Vector2 to = player.position;
+
+        Vector2 dir = to - from;
+        float distance = dir.magnitude;
+
+        if (distance <= 0.001f)
+            return true;
+
+        dir.Normalize();
+
+        // 从自己身体外一点点开始射，避免打到自己的 collider
+        Vector2 rayStart = from + dir * lineOfSightSkin;
+        float rayDistance = Mathf.Max(0f, distance - lineOfSightSkin);
+
+        RaycastHit2D hit = Physics2D.Raycast(
+            rayStart,
+            dir,
+            rayDistance,
+            dashBlockerLayerMask
+        );
+
+        if (debugLineOfSight)
+        {
+            Debug.DrawLine(
+                rayStart,
+                rayStart + dir * rayDistance,
+                hit.collider == null ? Color.green : Color.red,
+                0.05f
+            );
+
+            if (hit.collider != null)
+            {
+                Debug.Log($"[DashCharger LOS BLOCKED] by {hit.collider.name}, layer={LayerMask.LayerToName(hit.collider.gameObject.layer)}, tag={hit.collider.tag}");
+            }
+        }
+
+        return hit.collider == null;
     }
 }

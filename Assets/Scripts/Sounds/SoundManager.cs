@@ -570,6 +570,10 @@ public class SoundManager : MonoBehaviour
     {
         PlaySound(PLAYER_DEATH);
     }
+    public void PlayPlayerLose()
+    {
+        PlaySound(PLAYER_DEATH);
+    }
 
     public void PlayInventoryOpen()
     {

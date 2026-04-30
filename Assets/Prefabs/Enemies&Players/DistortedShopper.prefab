@@ -212,17 +212,18 @@ MonoBehaviour:
   minAttackInterval: 1.2
   maxAttackInterval: 3.8
   aimDuration: 0.8
+  detectRange: 10
   dashForce: 12
   dashDuration: 1.2
   stunDuration: 1.2
   bouncePauseDuration: 0.12
   recoilDistance: 1.5
   recoilDuration: 0.12
-  wallLayer:
+  dashBlockerLayerMask:
     serializedVersion: 2
     m_Bits: 192
-  wallCheckDistance: 0.25
-  debugDash: 1
+  lineOfSightSkin: 0.15
+  debugLineOfSight: 1
 --- !u!114 &8404082261452416212
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -243,6 +244,12 @@ MonoBehaviour:
   playerBounceDistance: 0.7
   animator: {fileID: 6612345678901234567}
   spriteRenderer: {fileID: 4368097409754222902}
+  obstacleLayerMask:
+    serializedVersion: 2
+    m_Bits: 4288
+  obstacleCheckDistance: 0.55
+  obstacleCheckRadius: 0.28
+  obstacleRedirectCooldown: 0.2
 --- !u!114 &-8047790109118790915
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -343,6 +350,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loopSoundKey: DistortedShopper
   deathSoundKey: DistortedShopperDeath
+  chargerAimSoundKey: ShoppingCartAim
+  chargerChargeSoundKey: ShoppingCartCharge
+  chargerHitSoundKey: ShoppingCartHit
   playOnStart: 0
   minDistance: 1.2
   maxDistance: 15
@@ -371,14 +381,15 @@ MonoBehaviour:
   minAttackInterval: 2.5
   maxAttackInterval: 8
   aimDuration: 0.8
+  detectRange: 6
   dashForce: 12
   dashDuration: 0.5
   stunDuration: 1.2
   bouncePauseDuration: 0.12
   recoilDistance: 1.5
   recoilDuration: 0.12
-  wallLayer:
+  dashBlockerLayerMask:
     serializedVersion: 2
     m_Bits: 0
-  wallCheckDistance: 0.25
-  debugDash: 1
+  lineOfSightSkin: 0.15
+  debugLineOfSight: 1

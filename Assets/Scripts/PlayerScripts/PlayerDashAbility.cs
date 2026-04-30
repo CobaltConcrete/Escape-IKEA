@@ -25,6 +25,7 @@ public class PlayerDashAbility : MonoBehaviour
     [Header("Dash Hit Audio")]
     [SerializeField] private string hitOneEnemySoundKey = "HitOneEnemy";
     [SerializeField] private string hitMultipleEnemiesSoundKey = "Hit2OrMoreEnemies";
+    [SerializeField] private string playerDashSoundKey = "PlayerDash";
     private int dashHitCount;
 
     [Header("Dash Hit Settings")]
@@ -112,6 +113,7 @@ public class PlayerDashAbility : MonoBehaviour
         dashHitCount = 0;
 
         ScreenShake.Instance?.Shake(dashStartShakeDuration, dashStartShakeStrength);
+        SoundManager.Instance?.PlaySound(playerDashSoundKey, 1f);
 
         Vector2 dashDirection = lastNonZeroMoveDirection.normalized;
         float dashSpeed = dashDistance / dashDuration;

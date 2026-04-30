@@ -5,6 +5,9 @@ public class DistortedShopperAudio : MonoBehaviour
     [Header("Loop Sound")]
     [SerializeField] private string loopSoundKey = "DistortedShopper";
     [SerializeField] private string deathSoundKey = "DistortedShopperDeath";
+    [SerializeField] private string chargerAimSoundKey = "ShoppingCartAim";
+    [SerializeField] private string chargerChargeSoundKey = "ShoppingCartCharge";
+    [SerializeField] private string chargerHitSoundKey = "ShoppingCartHit";
     [SerializeField] private bool playOnStart = true;
 
     [Header("3D Audio Settings")]
@@ -86,6 +89,7 @@ public class DistortedShopperAudio : MonoBehaviour
 
     private void HandleDeath()
     {
+        StopAllLocalAudio();
         PlayDeathSound();
     }
 
@@ -137,6 +141,20 @@ public class DistortedShopperAudio : MonoBehaviour
             ownsLoopSlot = false;
         }
     }
+    public void StopAllLocalAudio()
+    {
+        StopLoop();
+
+        AudioSource[] sources = GetComponents<AudioSource>();
+        foreach (AudioSource source in sources)
+        {
+            if (source != null)
+            {
+                source.Stop();
+                Destroy(source);
+            }
+        }
+    }
 
     public void PlayDeathSound()
     {
@@ -159,5 +177,42 @@ public class DistortedShopperAudio : MonoBehaviour
             maxDistance
  );
         }
+    }
+    public void PlayOneShotLocal(string soundKey, float volumeMultiplier = 1f)
+    {
+        if (SoundManager.Instance == null) return;
+
+        AudioClip clip = SoundManager.Instance.GetClip(soundKey);
+        if (clip == null) return;
+
+        AudioSource source = gameObject.AddComponent<AudioSource>();
+        source.clip = clip;
+        source.loop = false;
+        source.playOnAwake = false;
+        source.spatialBlend = spatialBlend;
+        source.rolloffMode = AudioRolloffMode.Linear;
+        source.minDistance = minDistance;
+        source.maxDistance = maxDistance;
+
+        float libraryVolume = SoundManager.Instance.GetSoundVolume(soundKey);
+        source.volume = libraryVolume * volumeMultiplier;
+
+        source.Play();
+        Destroy(source, clip.length + 0.05f);
+    }
+
+    public void PlayChargerAim()
+    {
+        PlayOneShotLocal(chargerAimSoundKey, 1f);
+    }
+
+    public void PlayChargerCharge()
+    {
+        PlayOneShotLocal(chargerChargeSoundKey, 1f);
+    }
+
+    public void PlayChargerHit()
+    {
+        PlayOneShotLocal(chargerHitSoundKey, 1f);
     }
 }

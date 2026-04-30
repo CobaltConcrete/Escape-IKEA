@@ -16,6 +16,7 @@ public class PlayerAttack : MonoBehaviour
     [Header("Hit Audio")]
     [SerializeField] private string hitOneEnemySoundKey = "HitOneEnemy";
     [SerializeField] private string hitMultipleEnemiesSoundKey = "Hit2OrMoreEnemies";
+    [SerializeField] private string batWieldSoundKey = "WieldBat";
 
     [Header("Enemy Knockback")]
     [SerializeField] private float enemyKnockbackDistance = 0.45f;
@@ -117,6 +118,10 @@ public class PlayerAttack : MonoBehaviour
                 SoundManager.Instance?.PlaySound(hitOneEnemySoundKey, 1f);
             else
                 SoundManager.Instance?.PlaySound(hitMultipleEnemiesSoundKey, 1f);
+        }
+        else
+        {
+            SoundManager.Instance?.PlaySound(batWieldSoundKey, 1f);
         }
 
         Collider2D[] bulletHits = Physics2D.OverlapCircleAll(attackCenter, bulletClearRadius);
