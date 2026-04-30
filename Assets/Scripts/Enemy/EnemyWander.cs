@@ -18,6 +18,14 @@ public class EnemyWander : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private SpriteRenderer spriteRenderer;
 
+    [Header("Obstacle Avoidance")]
+    [SerializeField] private LayerMask obstacleLayerMask;
+    [SerializeField] private float obstacleCheckDistance = 0.55f;
+    [SerializeField] private float obstacleCheckRadius = 0.28f;
+    [SerializeField] private float obstacleRedirectCooldown = 0.2f;
+
+    private float obstacleRedirectTimer;
+
     private Rigidbody2D rb;
     private Vector2 moveDirection;
     private float changeDirectionTimer;
@@ -58,6 +66,7 @@ public class EnemyWander : MonoBehaviour
         if (!CanMove) return;
 
         changeDirectionTimer -= Time.deltaTime;
+        obstacleRedirectTimer -= Time.deltaTime;
 
         if (IsTooCloseToPlayer())
         {
@@ -77,6 +86,12 @@ public class EnemyWander : MonoBehaviour
         if (!CanMove) return;
 
         Vector2 pos = rb.position;
+
+        if (ShouldAvoidObstacle())
+        {
+            PickDirectionAwayFromObstacle();
+        }
+
         Vector2 next = pos + moveDirection * (moveSpeed * Time.fixedDeltaTime);
 
         if (WouldLeaveBounds(next))
@@ -198,7 +213,8 @@ public class EnemyWander : MonoBehaviour
     }
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (!collision.gameObject.CompareTag("Wall")) return;
+        if (((1 << collision.gameObject.layer) & obstacleLayerMask) == 0)
+            return;
         if (collision.contactCount == 0) return;
 
         ContactPoint2D contact = collision.GetContact(0);
@@ -236,5 +252,53 @@ public class EnemyWander : MonoBehaviour
 
         animator.Play(nextHash, 0, 0f);
         currentAnimationStateHash = nextHash;
+    }
+    private bool ShouldAvoidObstacle()
+    {
+        if (obstacleRedirectTimer > 0f)
+            return false;
+
+        Vector2 checkCenter = rb.position + moveDirection.normalized * obstacleCheckDistance;
+
+        Collider2D hit = Physics2D.OverlapCircle(
+            checkCenter,
+            obstacleCheckRadius,
+            obstacleLayerMask
+        );
+
+        return hit != null;
+    }
+
+    private void PickDirectionAwayFromObstacle()
+    {
+        Vector2 checkCenter = rb.position + moveDirection.normalized * obstacleCheckDistance;
+
+        Collider2D hit = Physics2D.OverlapCircle(
+            checkCenter,
+            obstacleCheckRadius,
+            obstacleLayerMask
+        );
+
+        if (hit == null)
+            return;
+
+        Vector2 closest = hit.ClosestPoint(rb.position);
+        Vector2 away = rb.position - closest;
+
+        if (away.sqrMagnitude < 0.001f)
+        {
+            away = rb.position - (Vector2)hit.bounds.center;
+        }
+
+        if (away.sqrMagnitude < 0.001f)
+        {
+            away = -moveDirection;
+        }
+
+        Vector2 randomSide = Random.insideUnitCircle.normalized * 0.35f;
+        moveDirection = (away.normalized + randomSide).normalized;
+
+        changeDirectionTimer = changeDirectionInterval;
+        obstacleRedirectTimer = obstacleRedirectCooldown;
     }
 }

@@ -311,6 +311,12 @@ MonoBehaviour:
   playerBounceDistance: 0.7
   animator: {fileID: 0}
   spriteRenderer: {fileID: 0}
+  obstacleLayerMask:
+    serializedVersion: 2
+    m_Bits: 4288
+  obstacleCheckDistance: 0.55
+  obstacleCheckRadius: 0.28
+  obstacleRedirectCooldown: 0.2
 --- !u!114 &1148303909692211348
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -6,7 +6,7 @@ public class PlayerHealth : MonoBehaviour
 {
     [SerializeField] private float maxHealth = 100f;
     [SerializeField] private float startingHealth = 100f;
-    [SerializeField] private float deathSceneDelay = 0.6f;
+    [SerializeField] private float deathSceneDelay = 0f;
 
     public float MaxHealth => maxHealth;
     public float CurrentHealth { get; private set; }
@@ -105,7 +105,7 @@ public class PlayerHealth : MonoBehaviour
                 buzz.StopBuzz();
             }
 
-            SoundManager.Instance.PlayPlayerDeath();
+            //SoundManager.Instance.PlayPlayerDeath();
         }
 
         yield return new WaitForSeconds(deathSceneDelay);

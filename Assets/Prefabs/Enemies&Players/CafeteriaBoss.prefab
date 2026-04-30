@@ -289,6 +289,12 @@ MonoBehaviour:
   playerBounceDistance: 0.7
   animator: {fileID: 0}
   spriteRenderer: {fileID: 0}
+  obstacleLayerMask:
+    serializedVersion: 2
+    m_Bits: 4288
+  obstacleCheckDistance: 0.55
+  obstacleCheckRadius: 0.28
+  obstacleRedirectCooldown: 0.2
 --- !u!114 &1148303909692211348
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -384,6 +390,7 @@ MonoBehaviour:
   fleePushPerSecond: 3.5
   chaseDotThreshold: 0.2
   minPlayerSpeed: 0.35
+  throwSoundInterval: 0.6
 --- !u!114 &2153638254944649856
 MonoBehaviour:
   m_ObjectHideFlags: 0
