@@ -17,7 +17,8 @@ MonoBehaviour:
   stackable: 0
   uiScale: 1
   glowColor: {r: 0.70980394, g: 0.46666667, b: 0.6295599, a: 1}
-  description: Right Click to Dash.
+  description: Right Click to Dash. Charge like a charger and run through everyone
+    like A-Train, but beware, it's highly worn off. In like 10 pushes it would break.
   itemCategory: 0
   equipTag: 2
   useEffect: 0

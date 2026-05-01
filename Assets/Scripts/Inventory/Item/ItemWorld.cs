@@ -419,7 +419,7 @@ public class ItemWorld : MonoBehaviour, IInteractable
             return "";
 
         // 只有 loot 显示 F 提示
-        return "[F] Pick up " + item.definition.itemName;
+        return "Hold [F] Pick up " + item.definition.itemName;
     }
 
     public Vector3 GetInteractionPosition()
