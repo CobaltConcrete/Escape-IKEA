@@ -391,7 +391,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 6656
   interactionPromptUI: {fileID: 0}
-  UtilityKey: 107
+  UtilityKey: 113
   autoEquipWhenSlotEmpty: 1
   autoRefillUtilityWhenConsumed: 1
   autoReplaceWithHigherPriority: 0
