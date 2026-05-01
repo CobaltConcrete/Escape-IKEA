@@ -6,7 +6,7 @@ AnimationClip:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Employee_TRANSFORM
+  m_Name: Employee_Transform
   serializedVersion: 7
   m_Legacy: 0
   m_Compressed: 0
@@ -40,7 +40,7 @@ AnimationClip:
       value: {fileID: 8011326222407775139, guid: c151f9ae7ee6340ab9efbe2e54e38c7b, type: 3}
     - time: 3
       value: {fileID: 276100226568467902, guid: 3db1bfc8cff7c419091889bec8119e36, type: 3}
-    - time: 3.3333333
+    - time: 3.3166666
       value: {fileID: 276100226568467902, guid: 3db1bfc8cff7c419091889bec8119e36, type: 3}
     attribute: m_Sprite
     path: 
@@ -80,7 +80,7 @@ AnimationClip:
     m_AdditiveReferencePoseClip: {fileID: 0}
     m_AdditiveReferencePoseTime: 0
     m_StartTime: 0
-    m_StopTime: 3.35
+    m_StopTime: 3.3333333
     m_OrientationOffsetY: 0
     m_Level: 0
     m_CycleOffset: 0
