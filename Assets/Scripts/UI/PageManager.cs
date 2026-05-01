@@ -571,7 +571,11 @@ public class PageManager : MonoBehaviour
     public void MainMenu()
     {
         Time.timeScale = 1f;
-        SoundManager.Instance?.ResumeAllAudio();
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.StopMusic();
+            SoundManager.Instance.StopAmbient();
+        }
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         SceneManager.LoadScene("MainMenu");
