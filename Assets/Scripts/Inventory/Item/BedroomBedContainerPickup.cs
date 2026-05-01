@@ -89,7 +89,7 @@ public class BedroomBedContainerPickup : MonoBehaviour, IInteractable
             return "";
 
         if (!plushRevealed)
-            return "[F] Take plush from bed";
+            return "Hold [F] Take plush from bed";
 
         if (!CanCollectPlush())
             return "";
@@ -97,7 +97,7 @@ public class BedroomBedContainerPickup : MonoBehaviour, IInteractable
             return "";
 
         string name = plushDefinition != null ? plushDefinition.itemName : "plush";
-        return "[F] Pick up " + name;
+        return "Hold [F] Pick up " + name;
     }
 
     public Vector3 GetInteractionPosition()
