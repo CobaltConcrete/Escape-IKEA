@@ -17,7 +17,6 @@ public class ScreenShake : MonoBehaviour
 
     public void Shake(float duration, float strength)
     {
-        Debug.Log("SCREEN SHAKE CALLED: " + duration + ", " + strength);
 
         if (shakeRoutine != null)
             StopCoroutine(shakeRoutine);
