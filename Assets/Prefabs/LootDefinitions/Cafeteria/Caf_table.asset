@@ -17,20 +17,29 @@ MonoBehaviour:
   stackable: 0
   uiScale: 0.7
   glowColor: {r: 0.33730364, g: 0, b: 1, a: 1}
+  description: 
   itemCategory: 1
   equipTag: 0
   useEffect: 0
   effectValue: 0
   effectDuration: 0
+  armorMaxDurability: 100
+  armorDamageReduction: 0
+  armorSpecialAbility: 0
+  armorDurabilityLossMultiplier: 1
   lootValue: 800
   canAppearInShoppingList: 0
   minRequiredAmount: 1
   maxRequiredAmount: 3
-  shoppingListKey: CafeteriaTable
+  shoppingListKey: Cafeteria Table
   allowedRoomTypes: 03000000
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.8, y: 0.8, z: 0.8}
   spawnFootprint: {x: 1.1, y: 1.1}
+  worldGlowEnabled: 0
+  worldGlowIntensity: 1
+  worldGlowRadius: 2.5
+  worldContrastBackdrop: 0
   worldColliderType: 1
   boxOffset: {x: 0, y: 0}
   boxSize: {x: 1.5, y: 1.5}
