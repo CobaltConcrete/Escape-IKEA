@@ -164,6 +164,8 @@ public class SoundManager : MonoBehaviour
             uiSource.loop = false;
         }
 
+        uiSource.ignoreListenerPause = true;
+
         if (sfxSource == null)
         {
             sfxSource = CreateChildSource("SFXSource");
