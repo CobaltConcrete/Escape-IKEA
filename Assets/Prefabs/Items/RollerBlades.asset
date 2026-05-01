@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a735814c985e7c48bde2bdca9fc5a74, type: 3}
-  m_Name: SpeedPill
+  m_Name: RollerBlades
   m_EditorClassIdentifier: 
-  itemName: SpeedPill
+  itemName: RollerBlades
   icon: {fileID: -1448858178185668574, guid: 4d9f48ff498e7428ba14350898a7d843, type: 3}
   stackable: 1
   uiScale: 0.75
   glowColor: {r: 0, g: 0, b: 1, a: 1}
-  description: 
+  description: Press Q to gain 10 seconds of speed boost!
   itemCategory: 0
   equipTag: 3
   useEffect: 2

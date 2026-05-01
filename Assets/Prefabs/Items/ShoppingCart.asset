@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3a735814c985e7c48bde2bdca9fc5a74, type: 3}
-  m_Name: DashBelt
+  m_Name: ShoppingCart
   m_EditorClassIdentifier: 
-  itemName: DashBelt
+  itemName: ShoppingCart
   icon: {fileID: -1244444127694690324, guid: a96fabba23a564eebb93728f845b1e56, type: 3}
   stackable: 0
   uiScale: 1
   glowColor: {r: 0.70980394, g: 0.46666667, b: 0.6295599, a: 1}
-  description: 
+  description: Right Click to Dash.
   itemCategory: 0
   equipTag: 2
   useEffect: 0
