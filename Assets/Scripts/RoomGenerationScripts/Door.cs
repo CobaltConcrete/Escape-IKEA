@@ -19,6 +19,9 @@ public class Door : MonoBehaviour
     [Header("Rendering")]
     [SerializeField] private SpriteRenderer spriteRenderer;
 
+    [Header("Audio")]
+    [SerializeField] private DoorAudio doorAudio;
+
     private Vector3 closedPosition;
     private Vector3 openPosition;
     private Vector3 interactionPoint; // fixed point for interaction
@@ -50,6 +53,9 @@ public class Door : MonoBehaviour
 
         if (spriteRenderer == null)
             spriteRenderer = GetComponent<SpriteRenderer>();
+
+        if (doorAudio == null)
+            doorAudio = GetComponent<DoorAudio>();
     }
 
     void Update()
@@ -141,6 +147,13 @@ public class Door : MonoBehaviour
 
         isOpen = !isOpen;
         isMoving = true;
+        if (doorAudio != null)
+        {
+            if (isOpen)
+                doorAudio.PlayOpenSound();
+            else
+                doorAudio.PlayCloseSound();
+        }
 
         if (propagate && linkedDoor != null)
         {

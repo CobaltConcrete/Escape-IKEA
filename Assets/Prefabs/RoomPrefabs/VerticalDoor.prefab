@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4813413151079522299}
   - component: {fileID: 8552764670211124563}
   - component: {fileID: 645413060914136864}
+  - component: {fileID: 3837862579553689549}
   m_Layer: 7
   m_Name: VerticalDoor
   m_TagString: Door
@@ -153,4 +154,25 @@ MonoBehaviour:
   interactionRange: 2
   isHorizontal: 1
   linkedDoor: {fileID: 0}
+  isLocked: 0
   spriteRenderer: {fileID: 0}
+  doorAudio: {fileID: 0}
+--- !u!114 &3837862579553689549
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1755126114697834238}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2f518f904c12f9438c9d7abad2bab26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  openSoundKey: SlideDoorOpen
+  closeSoundKey: SlideDoorClose
+  minDistance: 1.2
+  maxDistance: 10
+  openVolumeMultiplier: 1
+  closeVolumeMultiplier: 1
+  soundCooldown: 0.08
