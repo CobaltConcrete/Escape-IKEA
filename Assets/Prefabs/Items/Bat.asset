@@ -15,7 +15,7 @@ MonoBehaviour:
   itemName: Bat
   icon: {fileID: -2320234325026898368, guid: fd25f2ca724fe4d29b3059f01d9f6154, type: 3}
   stackable: 0
-  uiScale: 1
+  uiScale: 0.8
   glowColor: {r: 0.9811321, g: 0.57695496, b: 0.57695496, a: 1}
   description: 
   itemCategory: 0
