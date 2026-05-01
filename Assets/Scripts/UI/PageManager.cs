@@ -7,6 +7,7 @@ using UnityEngine.Rendering.Universal;
 public class PageManager : MonoBehaviour
 {
     public static PageManager Instance = null;
+    private const string SelectedMaxBlackoutKey = "SelectedMaxBlackoutLimit";
 
     private GameObject[] gameUIObjects;
 
@@ -84,6 +85,8 @@ public class PageManager : MonoBehaviour
     private bool flickerLightLow = false;
     private bool lightBuzzingEnabled = true;
     private bool hasPlayedFlashlightSound = false;
+    private int blackoutLimit = 2;
+    private int blackoutCount = 0;
 
     private Coroutine lightsOnRoutine;
 
@@ -122,6 +125,8 @@ public class PageManager : MonoBehaviour
         isBlackout = false;
         flickerLightLow = false;
         hasPlayedFlashlightSound = false;
+        blackoutCount = 0;
+        blackoutLimit = Mathf.Max(0, PlayerPrefs.GetInt(SelectedMaxBlackoutKey, blackoutLimit));
 
         if (blackOutScreen != null)
         {
@@ -157,6 +162,7 @@ public class PageManager : MonoBehaviour
 
         if (!isBlackout &&
     !isRecoveringFromBlackout &&
+    blackoutCount < blackoutLimit &&
     runTimer >= nextAllowedBlackoutTime &&
     runTimer >= nextBlackoutTime)
         {
@@ -202,6 +208,9 @@ public class PageManager : MonoBehaviour
         if (isBlackout)
             return;
 
+        if (blackoutCount >= blackoutLimit)
+            return;
+
         if (lightsOnRoutine != null)
         {
             StopCoroutine(lightsOnRoutine);
@@ -209,6 +218,7 @@ public class PageManager : MonoBehaviour
         }
 
         isBlackout = true;
+        blackoutCount++;
         blackoutState = BlackoutState.WarningFlicker;
         stateTimer = 0f;
         nextFlickerTime = Time.time + GetRandomFlickerInterval();
