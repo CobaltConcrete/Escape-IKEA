@@ -62,7 +62,7 @@ public class LivingRoomContainerPickup : MonoBehaviour, IInteractable
             ? (lootDefinition != null ? lootDefinition.itemName : "")
             : displayNameOverride;
 
-        return string.IsNullOrWhiteSpace(displayName) ? "" : "[F] Pick up " + displayName;
+        return string.IsNullOrWhiteSpace(displayName) ? "" : "Hold [F] Pick up " + displayName;
     }
 
     public Vector3 GetInteractionPosition()

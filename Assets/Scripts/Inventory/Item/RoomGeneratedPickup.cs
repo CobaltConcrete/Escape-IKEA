@@ -64,7 +64,7 @@ public class RoomGeneratedPickup : MonoBehaviour, IInteractable
             ? itemDef.itemName
             : fallbackDisplayName;
 
-        return $"[F] Pick up {displayName}";
+        return $"Hold [F] Pick up {displayName}";
     }
 
     public Vector3 GetInteractionPosition()
