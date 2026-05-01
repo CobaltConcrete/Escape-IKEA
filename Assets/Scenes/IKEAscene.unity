@@ -1078,6 +1078,16 @@ MonoBehaviour:
     volume: 2
     useUISource: 0
     pitchRandomRange: 0
+  - key: ListOpen
+    clip: {fileID: 8300000, guid: 47fc114fe7ffec3418318e104c62ed0b, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
+  - key: ListClose
+    clip: {fileID: 8300000, guid: 6127ab6d3913f084fa24bcb5d438c2ee, type: 3}
+    volume: 2
+    useUISource: 0
+    pitchRandomRange: 0
   audioMixer: {fileID: 0}
   musicSource: {fileID: 0}
   uiSource: {fileID: 0}

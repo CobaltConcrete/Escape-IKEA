@@ -81,6 +81,14 @@ public class PlayerUIScreenController : MonoBehaviour
         }
 
         PlayInventoryTransitionSound(previousState, currentState);
+
+        if (SoundManager.Instance != null)
+        {
+            if (previousState != UIScreenState.Objective && currentState == UIScreenState.Objective)
+                SoundManager.Instance.PlaySound("ListOpen");
+            else if (previousState == UIScreenState.Objective && currentState != UIScreenState.Objective)
+                SoundManager.Instance.PlaySound("ListClose");
+        }
     }
 
     private void PlayInventoryTransitionSound(UIScreenState previousState, UIScreenState newState)
