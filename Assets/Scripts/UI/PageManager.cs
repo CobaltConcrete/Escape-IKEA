@@ -122,6 +122,8 @@ public class PageManager : MonoBehaviour
         isBlackout = false;
         flickerLightLow = false;
         hasPlayedFlashlightSound = false;
+        isRecoveringFromBlackout = false;
+        isLightsOnTransition = false;
 
         if (blackOutScreen != null)
         {
@@ -571,6 +573,7 @@ public class PageManager : MonoBehaviour
     public void MainMenu()
     {
         Time.timeScale = 1f;
+        CancelBlackoutState();
         if (SoundManager.Instance != null)
         {
             SoundManager.Instance.StopMusic();
@@ -579,6 +582,29 @@ public class PageManager : MonoBehaviour
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         SceneManager.LoadScene("MainMenu");
+    }
+    private void CancelBlackoutState()
+    {
+        if (lightsOnRoutine != null)
+        {
+            StopCoroutine(lightsOnRoutine);
+            lightsOnRoutine = null;
+        }
+
+        isBlackout = false;
+        isRecoveringFromBlackout = false;
+        isLightsOnTransition = false;
+        blackoutState = BlackoutState.None;
+        stateTimer = 0f;
+        flickerLightLow = false;
+        hasPlayedFlashlightSound = false;
+
+        SetBlackScreen(false, 0f);
+
+        if (blackOutText != null)
+            blackOutText.SetActive(false);
+
+        RestoreNormalLightingImmediate();
     }
 
     #endregion
