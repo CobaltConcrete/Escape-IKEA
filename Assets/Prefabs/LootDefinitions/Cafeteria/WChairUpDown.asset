@@ -17,20 +17,29 @@ MonoBehaviour:
   stackable: 0
   uiScale: 0.7
   glowColor: {r: 0.83921576, g: 0.8431373, b: 0.7411765, a: 1}
+  description: 
   itemCategory: 1
   equipTag: 0
   useEffect: 0
   effectValue: 0
   effectDuration: 0
+  armorMaxDurability: 100
+  armorDamageReduction: 0
+  armorSpecialAbility: 0
+  armorDurabilityLossMultiplier: 1
   lootValue: 300
   canAppearInShoppingList: 0
   minRequiredAmount: 1
   maxRequiredAmount: 3
-  shoppingListKey: WhiteChair
+  shoppingListKey: White Chair
   allowedRoomTypes: 03000000
   bonusSpawnWeight: 1
   worldDropScale: {x: 0.7, y: 0.7, z: 0.7}
   spawnFootprint: {x: 1, y: 1}
+  worldGlowEnabled: 0
+  worldGlowIntensity: 1
+  worldGlowRadius: 2.5
+  worldContrastBackdrop: 0
   worldColliderType: 1
   boxOffset: {x: 0, y: 0}
   boxSize: {x: 2, y: 2}
