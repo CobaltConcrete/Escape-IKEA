@@ -1962,6 +1962,14 @@ PrefabInstance:
       propertyPath: lootInventoryFullText
       value: 
       objectReference: {fileID: 1647155053}
+    - target: {fileID: 1822560432590618026, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: maxHealth
+      value: 250
+      objectReference: {fileID: 0}
+    - target: {fileID: 1822560432590618026, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
+      propertyPath: startingHealth
+      value: 250
+      objectReference: {fileID: 0}
     - target: {fileID: 2186692304189018441, guid: f7c1b01aa23d7244b97a9f61e14a0c06, type: 3}
       propertyPath: m_Name
       value: Player
@@ -2353,6 +2361,22 @@ PrefabInstance:
     - target: {fileID: 3178300615298924659, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3298129238203669014, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_fontColor.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3298129238203669014, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_fontColor.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3298129238203669014, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_fontColor.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3298129238203669014, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
+      propertyPath: m_fontColor32.rgba
+      value: 4294967295
       objectReference: {fileID: 0}
     - target: {fileID: 3694953047713900371, guid: c2477741217fcb7408f9d6b22ba48a6f, type: 3}
       propertyPath: m_AnchorMax.y
