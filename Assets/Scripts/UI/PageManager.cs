@@ -116,6 +116,9 @@ public class PageManager : MonoBehaviour
         if (scene.name != "IKEAscene")
             return;
 
+        globalLight = GameObject.Find("Global Light 2D")?.GetComponent<Light2D>();
+        playerLight = GameObject.Find("Player")?.GetComponentInChildren<Light2D>();
+
         runTimer = 0f;
         stateTimer = 0f;
         blackoutState = BlackoutState.None;
@@ -643,5 +646,39 @@ public class PageManager : MonoBehaviour
                blackoutState == BlackoutState.FullDark &&
                stateTimer >= fullBlackBeforePlayerLightDuration &&
                !isLightsOnTransition;
+    }
+
+    private void ForceResetBlackoutState()
+    {
+        if (lightsOnRoutine != null)
+        {
+            StopCoroutine(lightsOnRoutine);
+            lightsOnRoutine = null;
+        }
+
+        isBlackout = false;
+        isRecoveringFromBlackout = false;
+        isLightsOnTransition = false;
+        blackoutState = BlackoutState.None;
+
+        stateTimer = 0f;
+        flickerLightLow = false;
+        hasPlayedFlashlightSound = false;
+
+        SetBlackScreen(false, 0f);
+
+        if (blackOutText != null)
+            blackOutText.SetActive(false);
+
+        if (globalLight != null)
+            globalLight.intensity = normalGlobalLightIntensity;
+
+        if (playerLight != null)
+        {
+            playerLight.intensity = 0f;
+            playerLight.enabled = false;
+        }
+
+        SetLightBuzzing(true);
     }
 }
