@@ -30,6 +30,7 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private AudioSource uiSource;
     [SerializeField] private AudioSource sfxSource;
     [SerializeField] private AudioSource ambientSource;
+    private Dictionary<string, AudioSource> loopSources = new Dictionary<string, AudioSource>();
 
     [Header("Default Volumes")]
     [Range(0f, 1f)][SerializeField] private float masterVolume = 1f;
@@ -162,6 +163,8 @@ public class SoundManager : MonoBehaviour
             uiSource = CreateChildSource("UISource");
             uiSource.loop = false;
         }
+
+        uiSource.ignoreListenerPause = true;
 
         if (sfxSource == null)
         {
@@ -619,6 +622,12 @@ public class SoundManager : MonoBehaviour
 
         if (uiSource != null)
             uiSource.Stop();
+        foreach (var kv in loopSources)
+        {
+            if (kv.Value != null)
+                Destroy(kv.Value.gameObject);
+        }
+        loopSources.Clear();
     }
     public void PauseAllAudio()
     {
@@ -628,5 +637,39 @@ public class SoundManager : MonoBehaviour
     public void ResumeAllAudio()
     {
         AudioListener.pause = false;
+    }
+
+    public void PlayLoop(string key)
+    {
+        if (loopSources.ContainsKey(key))
+            return;
+
+        NamedSound sound = GetNamedSound(key);
+        if (sound == null || sound.clip == null)
+            return;
+
+        GameObject obj = new GameObject("Loop_" + key);
+        obj.transform.SetParent(transform);
+
+        AudioSource source = obj.AddComponent<AudioSource>();
+        source.clip = sound.clip;
+        source.loop = true;
+        source.volume = masterVolume * sfxVolume * sound.volume;
+        source.spatialBlend = 0f;
+        source.playOnAwake = false;
+
+        source.Play();
+
+        loopSources[key] = source;
+    }
+    public void StopLoop(string key)
+    {
+        if (!loopSources.TryGetValue(key, out AudioSource source))
+            return;
+
+        if (source != null)
+            Destroy(source.gameObject);
+
+        loopSources.Remove(key);
     }
 }

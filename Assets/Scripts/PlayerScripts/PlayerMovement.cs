@@ -12,6 +12,8 @@ public class PlayerMovement : MonoBehaviour
     [Tooltip("How much faster the player moves while roller boosting.")]
     private float rollerBoostMultiplier = 1.5f;
 
+    public bool IsMoving => move.sqrMagnitude > 0.001f;
+
     private Rigidbody2D rb;
     private Vector2 move;
     private Vector2 lastMoveDirection = Vector2.down;
