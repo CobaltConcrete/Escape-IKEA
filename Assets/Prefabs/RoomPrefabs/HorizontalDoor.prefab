@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4177731085417568137}
   - component: {fileID: 5082145070216620650}
   - component: {fileID: 4327968913149675359}
+  - component: {fileID: -7830357955773077626}
   m_Layer: 7
   m_Name: HorizontalDoor
   m_TagString: Door
@@ -153,4 +154,25 @@ MonoBehaviour:
   interactionRange: 2
   isHorizontal: 1
   linkedDoor: {fileID: 0}
+  isLocked: 0
   spriteRenderer: {fileID: 0}
+  doorAudio: {fileID: 0}
+--- !u!114 &-7830357955773077626
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1156195886993432942}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f2f518f904c12f9438c9d7abad2bab26, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  openSoundKey: SlideDoorOpen
+  closeSoundKey: SlideDoorClose
+  minDistance: 1.2
+  maxDistance: 10
+  openVolumeMultiplier: 1
+  closeVolumeMultiplier: 1
+  soundCooldown: 0.08

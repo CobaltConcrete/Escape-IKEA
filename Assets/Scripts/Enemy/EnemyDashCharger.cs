@@ -541,11 +541,6 @@ public class EnemyDashCharger : MonoBehaviour
                 hit.collider == null ? Color.green : Color.red,
                 0.05f
             );
-
-            if (hit.collider != null)
-            {
-                Debug.Log($"[DashCharger LOS BLOCKED] by {hit.collider.name}, layer={LayerMask.LayerToName(hit.collider.gameObject.layer)}, tag={hit.collider.tag}");
-            }
         }
 
         return hit.collider == null;

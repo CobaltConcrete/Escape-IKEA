@@ -119,6 +119,9 @@ public class PageManager : MonoBehaviour
         if (scene.name != "IKEAscene")
             return;
 
+        globalLight = GameObject.Find("Global Light 2D")?.GetComponent<Light2D>();
+        playerLight = GameObject.Find("Player")?.GetComponentInChildren<Light2D>();
+
         runTimer = 0f;
         stateTimer = 0f;
         blackoutState = BlackoutState.None;
@@ -127,6 +130,8 @@ public class PageManager : MonoBehaviour
         hasPlayedFlashlightSound = false;
         blackoutCount = 0;
         blackoutLimit = Mathf.Max(0, PlayerPrefs.GetInt(SelectedMaxBlackoutKey, blackoutLimit));
+        isRecoveringFromBlackout = false;
+        isLightsOnTransition = false;
 
         if (blackOutScreen != null)
         {
@@ -396,6 +401,7 @@ public class PageManager : MonoBehaviour
 
         isLightsOnTransition = false;
         lightsOnRoutine = null;
+        isRecoveringFromBlackout = false;
     }
 
     private void EnterDarkNoPlayerLight()
@@ -581,10 +587,38 @@ public class PageManager : MonoBehaviour
     public void MainMenu()
     {
         Time.timeScale = 1f;
-        SoundManager.Instance?.ResumeAllAudio();
+        CancelBlackoutState();
+        if (SoundManager.Instance != null)
+        {
+            SoundManager.Instance.StopMusic();
+            SoundManager.Instance.StopAmbient();
+        }
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
         SceneManager.LoadScene("MainMenu");
+    }
+    private void CancelBlackoutState()
+    {
+        if (lightsOnRoutine != null)
+        {
+            StopCoroutine(lightsOnRoutine);
+            lightsOnRoutine = null;
+        }
+
+        isBlackout = false;
+        isRecoveringFromBlackout = false;
+        isLightsOnTransition = false;
+        blackoutState = BlackoutState.None;
+        stateTimer = 0f;
+        flickerLightLow = false;
+        hasPlayedFlashlightSound = false;
+
+        SetBlackScreen(false, 0f);
+
+        if (blackOutText != null)
+            blackOutText.SetActive(false);
+
+        RestoreNormalLightingImmediate();
     }
 
     #endregion
@@ -623,5 +657,39 @@ public class PageManager : MonoBehaviour
                blackoutState == BlackoutState.FullDark &&
                stateTimer >= fullBlackBeforePlayerLightDuration &&
                !isLightsOnTransition;
+    }
+
+    private void ForceResetBlackoutState()
+    {
+        if (lightsOnRoutine != null)
+        {
+            StopCoroutine(lightsOnRoutine);
+            lightsOnRoutine = null;
+        }
+
+        isBlackout = false;
+        isRecoveringFromBlackout = false;
+        isLightsOnTransition = false;
+        blackoutState = BlackoutState.None;
+
+        stateTimer = 0f;
+        flickerLightLow = false;
+        hasPlayedFlashlightSound = false;
+
+        SetBlackScreen(false, 0f);
+
+        if (blackOutText != null)
+            blackOutText.SetActive(false);
+
+        if (globalLight != null)
+            globalLight.intensity = normalGlobalLightIntensity;
+
+        if (playerLight != null)
+        {
+            playerLight.intensity = 0f;
+            playerLight.enabled = false;
+        }
+
+        SetLightBuzzing(true);
     }
 }

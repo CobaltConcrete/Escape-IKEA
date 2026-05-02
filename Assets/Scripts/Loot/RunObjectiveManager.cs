@@ -532,7 +532,6 @@ public class RunObjectiveManager : MonoBehaviour
 
         if (firstTime)
         {
-            Debug.Log($"Loot capacity set to {capacity} = required {requiredLootTotal} + extra {generatedLootExtraSlots}");
         }
     }
 
