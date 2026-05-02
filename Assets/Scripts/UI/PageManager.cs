@@ -391,6 +391,7 @@ public class PageManager : MonoBehaviour
 
         isLightsOnTransition = false;
         lightsOnRoutine = null;
+        isRecoveringFromBlackout = false;
     }
 
     private void EnterDarkNoPlayerLight()
